@@ -10,6 +10,12 @@ import { useState } from "react";
 import { WishlistDrawer } from "../common/wishlist-drawer";
 import { CartDrawer } from "../common/cart-drawer";
 import { CatalogModal } from "./catalog-modal";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 
 export default function DesktopHeader() {
   const [cartItems, setCartItems] = useState([
@@ -98,13 +104,25 @@ export default function DesktopHeader() {
 
           {/* Actions */}
           <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="relative hidden sm:flex"
-            >
-              <User className="h-5 w-5" />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="relative hidden sm:flex"
+                >
+                  <User className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link href="/settings">Hisobim</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/orders">Buyurtmalarim</Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <WishlistDrawer
               onRemoveItem={() => {}}
               items={wishlistItems}

@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Header } from "@/components/layout/header";
 import { NextIntlClientProvider } from "next-intl";
 
+import { Toaster } from "react-hot-toast";
+
 import "./globals.css";
 import { Footer } from "@/components/layout/footer";
 
@@ -35,6 +37,7 @@ export default function RootLayout({
           <main>
             <Header />
             <div className="container px-4 mx-auto">{children}</div>
+            <Toaster position="top-center" reverseOrder={false} />
             <Footer />
           </main>
         </NextIntlClientProvider>
