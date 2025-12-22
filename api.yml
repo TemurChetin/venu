@@ -1,0 +1,3930 @@
+openapi: 3.0.3
+info:
+  title: Antic Mobile API
+  description: |
+    To'liq API hujjatlari - Antic Mobile ilovasi uchun barcha API endpoint'lari.
+    Bu hujjat mobile ilovada ishlatiladigan barcha API'larni o'z ichiga oladi.
+  version: 1.0.0
+  contact:
+    name: API Support
+    url: https://theantique.uz
+
+servers:
+  - url: https://theantique.uz
+    description: Production server
+
+tags:
+  - name: Authentication
+    description: Foydalanuvchi autentifikatsiyasi va ro'yxatdan o'tish
+  - name: Products
+    description: Mahsulotlar bilan ishlash
+  - name: Categories
+    description: Kategoriyalar
+  - name: Brands
+    description: Brendlar
+  - name: Cart
+    description: Savat operatsiyalari
+  - name: Orders
+    description: Buyurtmalar
+  - name: Customer
+    description: Mijoz ma'lumotlari
+  - name: Address
+    description: Manzillar
+  - name: Wishlist
+    description: Sevimlilar ro'yxati
+  - name: Reviews
+    description: Sharhlar va reytinglar
+  - name: Shipping
+    description: Yetkazib berish
+  - name: Coupons
+    description: Kuponlar
+  - name: Chat
+    description: Chat va xabarlar
+  - name: Notifications
+    description: Bildirishnomalar
+  - name: Support
+    description: Qo'llab-quvvatlash
+  - name: Wallet
+    description: Hamyon
+  - name: Loyalty
+    description: Sadoqat ballari
+  - name: Deals
+    description: Aksiyalar va takliflar
+  - name: Sellers
+    description: Sotuvchilar
+  - name: Banners
+    description: Bannerlar
+  - name: Compare
+    description: Taqqoslash
+  - name: Search
+    description: Qidiruv
+  - name: Location
+    description: Joylashuv va xarita
+  - name: Refund
+    description: Qaytarishlar
+  - name: Restock
+    description: Qayta tayyorlash so'rovlari
+  - name: Digital Products
+    description: Raqamli mahsulotlar
+  - name: Regions
+    description: Viloyatlar va tumanlar
+  - name: Config
+    description: Konfiguratsiya
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Bearer token authentication
+
+  parameters:
+    guestId:
+      name: guest_id
+      in: query
+      description: Mehmon foydalanuvchi ID
+      required: false
+      schema:
+        type: integer
+        default: 1
+    limit:
+      name: limit
+      in: query
+      description: Natijalar soni
+      required: false
+      schema:
+        type: integer
+        default: 10
+    offset:
+      name: offset
+      in: query
+      description: Pagination offset
+      required: false
+      schema:
+        type: integer
+        default: 0
+    lang:
+      name: lang
+      in: header
+      description: Til kodi (uz, en, ru, Cyrl)
+      required: false
+      schema:
+        type: string
+        default: uz
+
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/Error"
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+
+    SuccessResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+
+    LoginRequest:
+      type: object
+      required:
+        - email_or_phone
+        - password
+        - type
+      properties:
+        email_or_phone:
+          type: string
+          description: Email yoki telefon raqami
+        password:
+          type: string
+        type:
+          type: string
+          enum: [email, phone]
+
+    RegisterRequest:
+      type: object
+      properties:
+        f_name:
+          type: string
+        l_name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        password:
+          type: string
+        confirm_password:
+          type: string
+        guest_id:
+          type: integer
+
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        product_type:
+          type: string
+        unit_price:
+          type: number
+        discount:
+          type: number
+        discount_type:
+          type: string
+        current_stock:
+          type: integer
+        thumbnail:
+          type: string
+        rating:
+          type: array
+          items:
+            type: number
+        review_count:
+          type: integer
+        wish_list:
+          type: integer
+
+    ProductListResponse:
+      type: object
+      properties:
+        total_size:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+        products:
+          type: array
+          items:
+            $ref: "#/components/schemas/Product"
+        min_price:
+          type: number
+        max_price:
+          type: number
+
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        icon:
+          type: string
+        parent_id:
+          type: integer
+
+    Brand:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        image:
+          type: string
+
+    CartItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        product_id:
+          type: integer
+        quantity:
+          type: integer
+        price:
+          type: number
+        discount:
+          type: number
+        tax:
+          type: number
+
+    Order:
+      type: object
+      properties:
+        id:
+          type: integer
+        order_amount:
+          type: number
+        order_status:
+          type: string
+        payment_status:
+          type: string
+        created_at:
+          type: string
+
+    Customer:
+      type: object
+      properties:
+        id:
+          type: integer
+        f_name:
+          type: string
+        l_name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+
+    Address:
+      type: object
+      properties:
+        id:
+          type: integer
+        address_type:
+          type: string
+        address:
+          type: string
+        city:
+          type: string
+        country:
+          type: string
+        zip:
+          type: string
+        phone:
+          type: string
+
+security:
+  - bearerAuth: []
+
+paths:
+  # ==================== Authentication ====================
+  /api/v1/auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Ro'yxatdan o'tish
+      description: Yangi foydalanuvchi ro'yxatdan o'tadi
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "200":
+          description: Muvaffaqiyatli ro'yxatdan o'tish
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          description: Xato so'rov
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Kirish
+      description: Foydalanuvchi tizimga kiradi
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Muvaffaqiyatli kirish
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          description: Noto'g'ri ma'lumotlar
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/auth/logout:
+    get:
+      tags:
+        - Authentication
+      summary: Chiqish
+      description: Foydalanuvchi tizimdan chiqadi
+      responses:
+        "200":
+          description: Muvaffaqiyatli chiqish
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/auth/forgot-password:
+    post:
+      tags:
+        - Authentication
+      summary: Parolni unutish
+      description: Parolni tiklash uchun so'rov yuboradi
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - identity
+                - type
+              properties:
+                identity:
+                  type: string
+                  description: Email yoki telefon
+                type:
+                  type: string
+                  enum: [email, phone]
+      responses:
+        "200":
+          description: So'rov yuborildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/auth/reset-password:
+    post:
+      tags:
+        - Authentication
+      summary: Parolni tiklash
+      description: OTP va yangi parol bilan parolni tiklaydi
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - otp
+                - identity
+                - password
+                - confirm_password
+              properties:
+                otp:
+                  type: string
+                identity:
+                  type: string
+                password:
+                  type: string
+                confirm_password:
+                  type: string
+      responses:
+        "200":
+          description: Parol muvaffaqiyatli yangilandi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/auth/check-phone:
+    post:
+      tags:
+        - Authentication
+      summary: Telefon raqamini tekshirish
+      description: Telefon raqamiga OTP yuboradi
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - phone
+                - temporary_token
+              properties:
+                phone:
+                  type: string
+                temporary_token:
+                  type: string
+      responses:
+        "200":
+          description: OTP yuborildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/auth/verify-phone:
+    post:
+      tags:
+        - Authentication
+      summary: Telefon raqamini tasdiqlash
+      description: OTP kod bilan telefon raqamini tasdiqlaydi
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - phone
+                - otp
+                - token
+              properties:
+                phone:
+                  type: string
+                otp:
+                  type: string
+                token:
+                  type: string
+      responses:
+        "200":
+          description: Telefon raqami tasdiqlandi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/auth/resend-otp-check-phone:
+    post:
+      tags:
+        - Authentication
+      summary: Telefon OTP ni qayta yuborish
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - phone
+                - temporary_token
+              properties:
+                phone:
+                  type: string
+                temporary_token:
+                  type: string
+      responses:
+        "200":
+          description: OTP qayta yuborildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/auth/check-email:
+    post:
+      tags:
+        - Authentication
+      summary: Email ni tekshirish
+      description: Email ga OTP yuboradi
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - temporary_token
+              properties:
+                email:
+                  type: string
+                temporary_token:
+                  type: string
+      responses:
+        "200":
+          description: OTP yuborildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/auth/verify-email:
+    post:
+      tags:
+        - Authentication
+      summary: Email ni tasdiqlash
+      description: OTP kod bilan email ni tasdiqlaydi
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - code
+                - token
+              properties:
+                email:
+                  type: string
+                code:
+                  type: string
+                token:
+                  type: string
+      responses:
+        "200":
+          description: Email tasdiqlandi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/auth/resend-otp-check-email:
+    post:
+      tags:
+        - Authentication
+      summary: Email OTP ni qayta yuborish
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - temporary_token
+              properties:
+                email:
+                  type: string
+                temporary_token:
+                  type: string
+      responses:
+        "200":
+          description: OTP qayta yuborildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/auth/verify-otp:
+    post:
+      tags:
+        - Authentication
+      summary: OTP ni tasdiqlash
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - otp
+                - identity
+              properties:
+                otp:
+                  type: string
+                identity:
+                  type: string
+      responses:
+        "200":
+          description: OTP tasdiqlandi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/auth/social-customer-login:
+    post:
+      tags:
+        - Authentication
+      summary: Ijtimoiy tarmoq orqali kirish
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                token:
+                  type: string
+                unique_id:
+                  type: string
+                medium:
+                  type: string
+                  enum: [google, facebook, apple]
+      responses:
+        "200":
+          description: Muvaffaqiyatli kirish
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/auth/registration-with-otp:
+    post:
+      tags:
+        - Authentication
+      summary: OTP bilan ro'yxatdan o'tish
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - phone
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                phone:
+                  type: string
+      responses:
+        "200":
+          description: Ro'yxatdan o'tish muvaffaqiyatli
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/auth/registration-with-social-media:
+    post:
+      tags:
+        - Authentication
+      summary: Ijtimoiy tarmoq orqali ro'yxatdan o'tish
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                phone:
+                  type: string
+      responses:
+        "200":
+          description: Ro'yxatdan o'tish muvaffaqiyatli
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/auth/verify-profile-info:
+    post:
+      tags:
+        - Authentication
+      summary: Profil ma'lumotlarini tasdiqlash
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email_or_phone
+                - token
+                - type
+              properties:
+                email_or_phone:
+                  type: string
+                token:
+                  type: string
+                type:
+                  type: string
+                  enum: [email, phone]
+      responses:
+        "200":
+          description: Profil ma'lumotlari tasdiqlandi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/auth/firebase-auth-token-store:
+    post:
+      tags:
+        - Authentication
+      summary: Firebase auth token ni saqlash
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - identity
+                - token
+              properties:
+                identity:
+                  type: string
+                token:
+                  type: string
+      responses:
+        "200":
+          description: Token saqlandi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/auth/firebase-auth-verify:
+    post:
+      tags:
+        - Authentication
+      summary: Firebase auth ni tasdiqlash
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - phone_number
+                - session
+                - otp
+                - is_forget_password
+              properties:
+                phone_number:
+                  type: string
+                session:
+                  type: string
+                otp:
+                  type: string
+                is_forget_password:
+                  type: boolean
+      responses:
+        "200":
+          description: Firebase auth tasdiqlandi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/auth/verify-token:
+    post:
+      tags:
+        - Authentication
+      summary: Token ni tasdiqlash
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - token
+              properties:
+                email:
+                  type: string
+                token:
+                  type: string
+      responses:
+        "200":
+          description: Token tasdiqlandi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/auth/existing-account-check:
+    post:
+      tags:
+        - Authentication
+      summary: Mavjud hisobni tekshirish
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - user_response
+                - medium
+              properties:
+                email:
+                  type: string
+                user_response:
+                  type: integer
+                medium:
+                  type: string
+      responses:
+        "200":
+          description: Hisob tekshirildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/get-guest-id:
+    get:
+      tags:
+        - Authentication
+      summary: Mehmon ID olish
+      description: Yangi mehmon ID yaratadi yoki mavjudini qaytaradi
+      security: []
+      responses:
+        "200":
+          description: Mehmon ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  guest_id:
+                    type: integer
+
+  # ==================== Products ====================
+  /api/v1/products/latest:
+    get:
+      tags:
+        - Products
+      summary: Eng so'nggi mahsulotlar
+      description: Eng so'nggi qo'shilgan mahsulotlar ro'yxati
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/guestId"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+      responses:
+        "200":
+          description: Mahsulotlar ro'yxati
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductListResponse"
+
+  /api/v1/products/new-arrival:
+    get:
+      tags:
+        - Products
+      summary: Yangi kelgan mahsulotlar
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/guestId"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+      responses:
+        "200":
+          description: Yangi mahsulotlar ro'yxati
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductListResponse"
+
+  /api/v1/products/top-rated:
+    get:
+      tags:
+        - Products
+      summary: Eng yuqori reytingli mahsulotlar
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/guestId"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+      responses:
+        "200":
+          description: Top reytingli mahsulotlar
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductListResponse"
+
+  /api/v1/products/best-sellings:
+    get:
+      tags:
+        - Products
+      summary: Eng ko'p sotilgan mahsulotlar
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/guestId"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+      responses:
+        "200":
+          description: Eng ko'p sotilgan mahsulotlar
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductListResponse"
+
+  /api/v1/products/discounted-product:
+    get:
+      tags:
+        - Products
+      summary: Chegirmali mahsulotlar
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/guestId"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+      responses:
+        "200":
+          description: Chegirmali mahsulotlar ro'yxati
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductListResponse"
+
+  /api/v1/products/featured:
+    get:
+      tags:
+        - Products
+      summary: Taniqli mahsulotlar
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/guestId"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+      responses:
+        "200":
+          description: Taniqli mahsulotlar ro'yxati
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductListResponse"
+
+  /api/v1/products/home-categories:
+    get:
+      tags:
+        - Products
+      summary: Uy sahifasi kategoriyalari
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/guestId"
+      responses:
+        "200":
+          description: Kategoriyalar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  categories:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Category"
+
+  /api/v1/products/details/{productId}:
+    get:
+      tags:
+        - Products
+      summary: Mahsulot tafsilotlari
+      description: Bitta mahsulotning to'liq ma'lumotlari
+      security: []
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - $ref: "#/components/parameters/guestId"
+      responses:
+        "200":
+          description: Mahsulot tafsilotlari
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  product:
+                    type: object
+
+  /api/v1/products/reviews/{productId}:
+    get:
+      tags:
+        - Products
+      summary: Mahsulot sharhlari
+      security: []
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Sharhlar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reviews:
+                    type: array
+
+  /api/v1/products/reviews/submit:
+    post:
+      tags:
+        - Reviews
+      summary: Sharh yuborish
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - product_id
+                - rating
+                - comment
+              properties:
+                product_id:
+                  type: integer
+                rating:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                comment:
+                  type: string
+                images:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "200":
+          description: Sharh muvaffaqiyatli yuborildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/products/review/{orderId}:
+    get:
+      tags:
+        - Reviews
+      summary: Buyurtma bo'yicha sharh olish
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Sharh ma'lumotlari
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/v1/products/review/update:
+    put:
+      tags:
+        - Reviews
+      summary: Sharhni yangilash
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                review_id:
+                  type: integer
+                rating:
+                  type: integer
+                comment:
+                  type: string
+      responses:
+        "200":
+          description: Sharh yangilandi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/products/review/delete-image:
+    post:
+      tags:
+        - Reviews
+      summary: Sharh rasmini o'chirish
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                review_id:
+                  type: integer
+                image:
+                  type: string
+      responses:
+        "200":
+          description: Rasm o'chirildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/products/related-products/{productId}:
+    get:
+      tags:
+        - Products
+      summary: O'xshash mahsulotlar
+      security: []
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - $ref: "#/components/parameters/guestId"
+      responses:
+        "200":
+          description: O'xshash mahsulotlar ro'yxati
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductListResponse"
+
+  /api/v1/products/filter:
+    post:
+      tags:
+        - Products
+      summary: Mahsulotlarni filtrlash
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                category_ids:
+                  type: array
+                  items:
+                    type: integer
+                brand_ids:
+                  type: array
+                  items:
+                    type: integer
+                min_price:
+                  type: number
+                max_price:
+                  type: number
+                sort_by:
+                  type: string
+                limit:
+                  type: integer
+                offset:
+                  type: integer
+      responses:
+        "200":
+          description: Filtrlangan mahsulotlar
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductListResponse"
+
+  /api/v1/products/suggestion-product:
+    get:
+      tags:
+        - Search
+      summary: Mahsulot nomi taklifi
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/guestId"
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+      responses:
+        "200":
+          description: Taklif qilingan mahsulotlar
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  products:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+
+  /api/v1/products/counter/{productId}:
+    get:
+      tags:
+        - Products
+      summary: Mahsulot hisoblagichi
+      security: []
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Hisoblagich ma'lumotlari
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/v1/products/social-share-link/{productId}:
+    get:
+      tags:
+        - Products
+      summary: Ijtimoiy tarmoq ulashish havolasi
+      security: []
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Ulashish havolasi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  link:
+                    type: string
+
+  /api/v1/products/shipping-methods:
+    get:
+      tags:
+        - Shipping
+      summary: Yetkazib berish usullari
+      security: []
+      responses:
+        "200":
+          description: Yetkazib berish usullari ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  shipping_methods:
+                    type: array
+
+  /api/v1/products/most-demanded-product:
+    get:
+      tags:
+        - Products
+      summary: Eng talab qilinadigan mahsulotlar
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/guestId"
+      responses:
+        "200":
+          description: Eng talab qilinadigan mahsulotlar
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductListResponse"
+
+  /api/v1/products/shop-again-product:
+    get:
+      tags:
+        - Products
+      summary: Yana xarid qilish mahsulotlari
+      responses:
+        "200":
+          description: Mahsulotlar ro'yxati
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductListResponse"
+
+  /api/v1/products/just-for-you:
+    get:
+      tags:
+        - Products
+      summary: Siz uchun mahsulotlar
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/guestId"
+      responses:
+        "200":
+          description: Siz uchun tavsiya qilingan mahsulotlar
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductListResponse"
+
+  /api/v1/products/most-searching:
+    get:
+      tags:
+        - Products
+      summary: Eng ko'p qidirilgan mahsulotlar
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/guestId"
+      responses:
+        "200":
+          description: Eng ko'p qidirilgan mahsulotlar
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductListResponse"
+
+  /api/v1/products/clearance-sale:
+    get:
+      tags:
+        - Products
+      summary: Tozalash aksiyasi mahsulotlari
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/guestId"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+      responses:
+        "200":
+          description: Tozalash aksiyasi mahsulotlari
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductListResponse"
+
+  /api/v1/products/digital-author-list:
+    get:
+      tags:
+        - Digital Products
+      summary: Raqamli mualliflar ro'yxati
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/guestId"
+        - name: seller_id
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Mualliflar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  authors:
+                    type: array
+
+  /api/v1/products/digital-publishing-house-list:
+    get:
+      tags:
+        - Digital Products
+      summary: Raqamli nashriyotlar ro'yxati
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/guestId"
+        - name: seller_id
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Nashriyotlar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  publishing_houses:
+                    type: array
+
+  # ==================== Categories ====================
+  /api/v1/categories:
+    get:
+      tags:
+        - Categories
+      summary: Kategoriyalar ro'yxati
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/guestId"
+        - name: seller_id
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Kategoriyalar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  categories:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Category"
+
+  /api/v1/categories/products/{categoryId}:
+    get:
+      tags:
+        - Categories
+      summary: Kategoriya mahsulotlari
+      security: []
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - $ref: "#/components/parameters/guestId"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+      responses:
+        "200":
+          description: Kategoriya mahsulotlari
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductListResponse"
+
+  /api/v1/categories/find-what-you-need:
+    get:
+      tags:
+        - Categories
+      summary: Nima kerak topish
+      security: []
+      responses:
+        "200":
+          description: Kategoriyalar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+
+  # ==================== Brands ====================
+  /api/v1/brands:
+    get:
+      tags:
+        - Brands
+      summary: Brendlar ro'yxati
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/guestId"
+        - name: seller_id
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Brendlar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  brands:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Brand"
+
+  /api/v1/brands/products/{brandId}:
+    get:
+      tags:
+        - Brands
+      summary: Brend mahsulotlari
+      security: []
+      parameters:
+        - name: brandId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - $ref: "#/components/parameters/guestId"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+      responses:
+        "200":
+          description: Brend mahsulotlari
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductListResponse"
+
+  # ==================== Cart ====================
+  /api/v1/cart:
+    get:
+      tags:
+        - Cart
+      summary: Savat ma'lumotlari
+      description: Foydalanuvchi savatidagi barcha mahsulotlar
+      responses:
+        "200":
+          description: Savat ma'lumotlari
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cart:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/CartItem"
+
+  /api/v1/cart/add:
+    post:
+      tags:
+        - Cart
+      summary: Savatga qo'shish
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+                - quantity
+              properties:
+                id:
+                  type: integer
+                  description: Mahsulot ID
+                quantity:
+                  type: integer
+                variant:
+                  type: string
+                color:
+                  type: string
+      responses:
+        "200":
+          description: Mahsulot savatga qo'shildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/cart/update:
+    put:
+      tags:
+        - Cart
+      summary: Savat miqdorini yangilash
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - key
+                - quantity
+              properties:
+                key:
+                  type: integer
+                  description: Savat element ID
+                quantity:
+                  type: integer
+      responses:
+        "200":
+          description: Savat yangilandi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/cart/remove:
+    delete:
+      tags:
+        - Cart
+      summary: Savatdan olib tashlash
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - key
+              properties:
+                key:
+                  type: integer
+      responses:
+        "200":
+          description: Mahsulot savatdan olib tashlandi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/cart/select-cart-items:
+    post:
+      tags:
+        - Cart
+      summary: Savat elementlarini tanlash
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                key:
+                  type: integer
+                is_selected:
+                  type: integer
+      responses:
+        "200":
+          description: Tanlov yangilandi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/cart/product-restock-request:
+    post:
+      tags:
+        - Restock
+      summary: Qayta tayyorlash so'rovi
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - product_id
+              properties:
+                product_id:
+                  type: integer
+                variant:
+                  type: string
+      responses:
+        "200":
+          description: So'rov yuborildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  # ==================== Orders ====================
+  /api/v1/customer/order/list:
+    get:
+      tags:
+        - Orders
+      summary: Buyurtmalar ro'yxati
+      parameters:
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum:
+              [
+                pending,
+                confirmed,
+                processing,
+                processed,
+                delivered,
+                failed,
+                returned,
+                canceled,
+                out_for_delivery,
+              ]
+      responses:
+        "200":
+          description: Buyurtmalar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orders:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Order"
+
+  /api/v1/customer/order/details:
+    get:
+      tags:
+        - Orders
+      summary: Buyurtma tafsilotlari
+      parameters:
+        - name: order_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Buyurtma tafsilotlari
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order:
+                    type: object
+
+  /api/v1/customer/order/get-order-by-id:
+    get:
+      tags:
+        - Orders
+      summary: ID bo'yicha buyurtma olish
+      parameters:
+        - name: order_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Buyurtma ma'lumotlari
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order:
+                    type: object
+
+  /api/v1/customer/order/place:
+    post:
+      tags:
+        - Orders
+      summary: Buyurtma berish
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - cart
+                - customer_id
+                - payment_method
+              properties:
+                cart:
+                  type: array
+                customer_id:
+                  type: integer
+                payment_method:
+                  type: string
+                coupon_code:
+                  type: string
+                coupon_discount_bearer:
+                  type: string
+                discount_amount:
+                  type: number
+                discount_type:
+                  type: string
+                shipping_address:
+                  type: object
+                billing_address:
+                  type: object
+                shipping_method_id:
+                  type: integer
+      responses:
+        "200":
+          description: Buyurtma muvaffaqiyatli berildi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order_id:
+                    type: integer
+
+  /api/v1/customer/order/place-by-offline-payment:
+    post:
+      tags:
+        - Orders
+      summary: Ofllayn to'lov bilan buyurtma berish
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - cart
+                - customer_id
+                - payment_method
+                - offline_payment_id
+              properties:
+                cart:
+                  type: array
+                customer_id:
+                  type: integer
+                payment_method:
+                  type: string
+                offline_payment_id:
+                  type: integer
+                coupon_code:
+                  type: string
+                shipping_address:
+                  type: object
+                billing_address:
+                  type: object
+      responses:
+        "200":
+          description: Buyurtma muvaffaqiyatli berildi
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/v1/customer/order/place-by-wallet:
+    post:
+      tags:
+        - Orders
+      summary: Hamyon orqali buyurtma berish
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - cart
+                - customer_id
+              properties:
+                cart:
+                  type: array
+                customer_id:
+                  type: integer
+                coupon_code:
+                  type: string
+                shipping_address:
+                  type: object
+                billing_address:
+                  type: object
+      responses:
+        "200":
+          description: Buyurtma muvaffaqiyatli berildi
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/v1/customer/order/again:
+    post:
+      tags:
+        - Orders
+      summary: Qayta buyurtma berish
+      description: Oldingi buyurtmani qayta yaratadi
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - order_id
+              properties:
+                order_id:
+                  type: integer
+      responses:
+        "200":
+          description: Buyurtma qayta yaratildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/order/track:
+    get:
+      tags:
+        - Orders
+      summary: Buyurtma kuzatish
+      security: []
+      parameters:
+        - name: order_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Buyurtma holati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tracking:
+                    type: object
+
+  /api/v1/order/track-order:
+    get:
+      tags:
+        - Orders
+      summary: Buyurtma kuzatish (yangi)
+      parameters:
+        - name: order_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Buyurtma kuzatish ma'lumotlari
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/v1/order/cancel-order:
+    post:
+      tags:
+        - Orders
+      summary: Buyurtmani bekor qilish
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - order_id
+                - reason
+              properties:
+                order_id:
+                  type: integer
+                reason:
+                  type: string
+      responses:
+        "200":
+          description: Buyurtma bekor qilindi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/customer/order/generate-invoice:
+    get:
+      tags:
+        - Orders
+      summary: Invoice yaratish
+      parameters:
+        - name: order_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Invoice fayli
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+
+  /api/v1/customer/order/digital-product-download/{orderId}:
+    get:
+      tags:
+        - Digital Products
+      summary: Raqamli mahsulotni yuklab olish
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Yuklab olish havolasi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  download_link:
+                    type: string
+
+  /api/v1/customer/order/digital-product-download-otp-resend:
+    post:
+      tags:
+        - Digital Products
+      summary: Raqamli mahsulot uchun OTP ni qayta yuborish
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - order_id
+              properties:
+                order_id:
+                  type: integer
+      responses:
+        "200":
+          description: OTP qayta yuborildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/customer/order/digital-product-download-otp-verify:
+    post:
+      tags:
+        - Digital Products
+      summary: Raqamli mahsulot uchun OTP ni tasdiqlash
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - order_id
+                - otp
+              properties:
+                order_id:
+                  type: integer
+                otp:
+                  type: string
+      responses:
+        "200":
+          description: OTP tasdiqlandi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  download_link:
+                    type: string
+
+  # ==================== Customer ====================
+  /api/v1/customer/info:
+    get:
+      tags:
+        - Customer
+      summary: Mijoz ma'lumotlari
+      responses:
+        "200":
+          description: Mijoz ma'lumotlari
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  customer:
+                    $ref: "#/components/schemas/Customer"
+
+  /api/v1/customer/update-profile:
+    put:
+      tags:
+        - Customer
+      summary: Profilni yangilash
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                f_name:
+                  type: string
+                l_name:
+                  type: string
+                email:
+                  type: string
+                phone:
+                  type: string
+                image:
+                  type: string
+      responses:
+        "200":
+          description: Profil yangilandi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/customer/account-delete:
+    post:
+      tags:
+        - Customer
+      summary: Hisobni o'chirish
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - password
+              properties:
+                password:
+                  type: string
+      responses:
+        "200":
+          description: Hisob o'chirildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/customer/language-change:
+    post:
+      tags:
+        - Customer
+      summary: Tilni o'zgartirish
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - current_language
+              properties:
+                current_language:
+                  type: string
+                  enum: [uz, en, ru, Cyrl]
+                _method:
+                  type: string
+                  default: put
+      responses:
+        "200":
+          description: Til o'zgardi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/customer/cm-firebase-token:
+    post:
+      tags:
+        - Customer
+      summary: Firebase token ni yangilash
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - _method
+                - guest_id
+                - cm_firebase_token
+              properties:
+                _method:
+                  type: string
+                  default: put
+                guest_id:
+                  type: string
+                cm_firebase_token:
+                  type: string
+      responses:
+        "200":
+          description: Token yangilandi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/customer/get-restricted-country-list:
+    get:
+      tags:
+        - Customer
+      summary: Cheklangan mamlakatlar ro'yxati
+      responses:
+        "200":
+          description: Mamlakatlar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  countries:
+                    type: array
+                    items:
+                      type: string
+
+  /api/v1/customer/get-restricted-zip-list:
+    get:
+      tags:
+        - Customer
+      summary: Cheklangan ZIP kodlar ro'yxati
+      responses:
+        "200":
+          description: ZIP kodlar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  zip_codes:
+                    type: array
+                    items:
+                      type: string
+
+  # ==================== Address ====================
+  /api/v1/customer/address/list:
+    get:
+      tags:
+        - Address
+      summary: Manzillar ro'yxati
+      responses:
+        "200":
+          description: Manzillar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  addresses:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Address"
+
+  /api/v1/customer/address/add:
+    post:
+      tags:
+        - Address
+      summary: Yangi manzil qo'shish
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - address_type
+                - address
+                - contact_person_name
+                - contact_person_number
+              properties:
+                address_type:
+                  type: string
+                  enum: [home, office, other]
+                address:
+                  type: string
+                city:
+                  type: string
+                country:
+                  type: string
+                zip:
+                  type: string
+                contact_person_name:
+                  type: string
+                contact_person_number:
+                  type: string
+                latitude:
+                  type: number
+                longitude:
+                  type: number
+      responses:
+        "200":
+          description: Manzil qo'shildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/customer/address/update:
+    put:
+      tags:
+        - Address
+      summary: Manzilni yangilash
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+              properties:
+                id:
+                  type: integer
+                address_type:
+                  type: string
+                address:
+                  type: string
+                city:
+                  type: string
+                country:
+                  type: string
+                zip:
+                  type: string
+                contact_person_name:
+                  type: string
+                contact_person_number:
+                  type: string
+      responses:
+        "200":
+          description: Manzil yangilandi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/customer/address:
+    delete:
+      tags:
+        - Address
+      summary: Manzilni o'chirish
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+              properties:
+                id:
+                  type: integer
+      responses:
+        "200":
+          description: Manzil o'chirildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  # ==================== Wishlist ====================
+  /api/v1/customer/wish-list:
+    get:
+      tags:
+        - Wishlist
+      summary: Sevimlilar ro'yxati
+      responses:
+        "200":
+          description: Sevimlilar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  wishlist:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Product"
+
+  /api/v1/customer/wish-list/add:
+    post:
+      tags:
+        - Wishlist
+      summary: Sevimlilar ro'yxatiga qo'shish
+      parameters:
+        - name: product_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Mahsulot sevimlilar ro'yxatiga qo'shildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/customer/wish-list/remove:
+    delete:
+      tags:
+        - Wishlist
+      summary: Sevimlilar ro'yxatidan olib tashlash
+      parameters:
+        - name: product_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Mahsulot sevimlilar ro'yxatidan olib tashlandi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  # ==================== Shipping ====================
+  /api/v1/shipping-method/by-seller/{sellerId}/{type}:
+    get:
+      tags:
+        - Shipping
+      summary: Sotuvchi bo'yicha yetkazib berish usullari
+      parameters:
+        - name: sellerId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: type
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [order_wise, product_wise]
+      responses:
+        "200":
+          description: Yetkazib berish usullari
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  shipping_methods:
+                    type: array
+
+  /api/v1/shipping-method/choose-for-order:
+    post:
+      tags:
+        - Shipping
+      summary: Buyurtma uchun yetkazib berish usulini tanlash
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - cart_group_id
+                - shipping_method_id
+              properties:
+                cart_group_id:
+                  type: string
+                shipping_method_id:
+                  type: integer
+      responses:
+        "200":
+          description: Yetkazib berish usuli tanlandi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/shipping-method/chosen:
+    get:
+      tags:
+        - Shipping
+      summary: Tanlangan yetkazib berish usullari
+      responses:
+        "200":
+          description: Tanlangan usullar
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  shipping_methods:
+                    type: array
+
+  /api/v1/shipping-method/check-shipping-type:
+    get:
+      tags:
+        - Shipping
+      summary: Yetkazib berish turini tekshirish
+      responses:
+        "200":
+          description: Yetkazib berish turi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  shipping_type:
+                    type: string
+
+  /api/v1/delivery-methods:
+    get:
+      tags:
+        - Shipping
+      summary: Yetkazib berish usullari (viloyat bo'yicha)
+      security: []
+      parameters:
+        - name: region_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Yetkazib berish usullari
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  delivery_methods:
+                    type: array
+
+  /api/v1/calculate:
+    post:
+      tags:
+        - Shipping
+      summary: Yetkazib berish narxini hisoblash
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - region_id
+                - delivery_method_id
+              properties:
+                region_id:
+                  type: integer
+                delivery_method_id:
+                  type: integer
+                weight:
+                  type: number
+      responses:
+        "200":
+          description: Yetkazib berish narxi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  shipping_fee:
+                    type: number
+
+  # ==================== Coupons ====================
+  /api/v1/coupon/apply:
+    get:
+      tags:
+        - Coupons
+      summary: Kuponni qo'llash
+      parameters:
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Kupon qo'llandi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  discount:
+                    type: number
+                  discount_type:
+                    type: string
+
+  /api/v1/coupon/list:
+    get:
+      tags:
+        - Coupons
+      summary: Kuponlar ro'yxati
+      parameters:
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+      responses:
+        "200":
+          description: Kuponlar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  coupons:
+                    type: array
+
+  /api/v1/coupons/{sellerId}:
+    get:
+      tags:
+        - Coupons
+      summary: Sotuvchi kuponlari
+      parameters:
+        - name: sellerId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Sotuvchi kuponlari
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  coupons:
+                    type: array
+
+  /api/v1/coupon/applicable-list:
+    get:
+      tags:
+        - Coupons
+      summary: Qo'llash mumkin bo'lgan kuponlar
+      responses:
+        "200":
+          description: Kuponlar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  coupons:
+                    type: array
+
+  # ==================== Chat ====================
+  /api/v1/customer/chat/list/:
+    get:
+      tags:
+        - Chat
+      summary: Chat ro'yxati
+      responses:
+        "200":
+          description: Chat ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  chats:
+                    type: array
+
+  /api/v1/customer/chat/get-messages/{chatId}:
+    get:
+      tags:
+        - Chat
+      summary: Xabarlarni olish
+      parameters:
+        - name: chatId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Xabarlar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  messages:
+                    type: array
+
+  /api/v1/customer/chat/send-message/:
+    post:
+      tags:
+        - Chat
+      summary: Xabar yuborish
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+                - message
+              properties:
+                id:
+                  type: integer
+                  description: Chat ID
+                message:
+                  type: string
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Xabar yuborildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/customer/chat/seen-message/:
+    post:
+      tags:
+        - Chat
+      summary: Xabarni ko'rilgan deb belgilash
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+              properties:
+                id:
+                  type: integer
+      responses:
+        "200":
+          description: Xabar ko'rilgan deb belgilandi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/customer/chat/search/:
+    get:
+      tags:
+        - Chat
+      summary: Chat qidiruv
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Qidiruv natijalari
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  chats:
+                    type: array
+
+  # ==================== Notifications ====================
+  /api/v1/notifications:
+    get:
+      tags:
+        - Notifications
+      summary: Bildirishnomalar ro'yxati
+      responses:
+        "200":
+          description: Bildirishnomalar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  notifications:
+                    type: array
+
+  /api/v1/notifications/seen:
+    post:
+      tags:
+        - Notifications
+      summary: Bildirishnomani ko'rilgan deb belgilash
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                notification_id:
+                  type: integer
+      responses:
+        "200":
+          description: Bildirishnoma ko'rilgan deb belgilandi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  # ==================== Support ====================
+  /api/v1/customer/support-ticket/create:
+    post:
+      tags:
+        - Support
+      summary: Qo'llab-quvvatlash chiptasi yaratish
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - subject
+                - type
+                - description
+              properties:
+                subject:
+                  type: string
+                type:
+                  type: string
+                description:
+                  type: string
+      responses:
+        "200":
+          description: Chipta yaratildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/customer/support-ticket/get:
+    get:
+      tags:
+        - Support
+      summary: Qo'llab-quvvatlash chiptalari
+      responses:
+        "200":
+          description: Chiptalar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tickets:
+                    type: array
+
+  /api/v1/customer/support-ticket/conv/{ticketId}:
+    get:
+      tags:
+        - Support
+      summary: Chipta suhbati
+      parameters:
+        - name: ticketId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Suhbat xabarlari
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  conversation:
+                    type: array
+
+  /api/v1/customer/support-ticket/reply/{ticketId}:
+    post:
+      tags:
+        - Support
+      summary: Chiptaga javob berish
+      parameters:
+        - name: ticketId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - reply
+              properties:
+                reply:
+                  type: string
+                attachment:
+                  type: string
+      responses:
+        "200":
+          description: Javob yuborildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/customer/support-ticket/close/{ticketId}:
+    get:
+      tags:
+        - Support
+      summary: Chiptani yopish
+      parameters:
+        - name: ticketId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Chipta yopildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  # ==================== Wallet ====================
+  /api/v1/customer/wallet/list:
+    get:
+      tags:
+        - Wallet
+      summary: Hamyon tranzaksiyalari
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          schema:
+            type: integer
+        - name: transaction_type
+          in: query
+          schema:
+            type: string
+            enum: [all, debit, credit]
+      responses:
+        "200":
+          description: Tranzaksiyalar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transactions:
+                    type: array
+
+  /api/v1/add-to-fund:
+    post:
+      tags:
+        - Wallet
+      summary: Hamyonga pul qo'shish
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - amount
+              properties:
+                amount:
+                  type: number
+                payment_method:
+                  type: string
+      responses:
+        "200":
+          description: Pul qo'shildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/customer/wallet/bonus-list:
+    get:
+      tags:
+        - Wallet
+      summary: Hamyon bonus ro'yxati
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Bonus ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  bonus_list:
+                    type: array
+                    items:
+                      type: object
+
+  # ==================== Loyalty Points ====================
+  /api/v1/customer/loyalty/list:
+    get:
+      tags:
+        - Loyalty
+      summary: Sadoqat ballari ro'yxati
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          schema:
+            type: integer
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [order_place, point_to_wallet, refund_order]
+      responses:
+        "200":
+          description: Sadoqat ballari ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  loyalty_points:
+                    type: array
+
+  /api/v1/customer/loyalty/loyalty-exchange-currency:
+    post:
+      tags:
+        - Loyalty
+      summary: Sadoqat ballarini pulga aylantirish
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - point
+              properties:
+                point:
+                  type: number
+      responses:
+        "200":
+          description: Ballar pulga aylantirildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  # ==================== Refund ====================
+  /api/v1/customer/order/refund:
+    get:
+      tags:
+        - Refund
+      summary: Qaytarish so'rovi ma'lumotlari
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: order_details_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Qaytarish ma'lumotlari
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  refund_info:
+                    type: object
+
+  /api/v1/customer/order/refund-store:
+    post:
+      tags:
+        - Refund
+      summary: Qaytarish so'rovi yuborish
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - order_details_id
+                - amount
+                - refund_reason
+              properties:
+                order_details_id:
+                  type: integer
+                amount:
+                  type: number
+                refund_reason:
+                  type: string
+                images[]:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        "200":
+          description: Qaytarish so'rovi yuborildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/customer/order/refund-details:
+    get:
+      tags:
+        - Refund
+      summary: Qaytarish natijasi
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Qaytarish natijasi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  refund_details:
+                    type: object
+
+  # ==================== Restock Requests ====================
+  /api/v1/customer/restock-requests/list:
+    get:
+      tags:
+        - Restock
+      summary: Qayta tayyorlash so'rovlari ro'yxati
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: So'rovlar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  restock_requests:
+                    type: array
+
+  /api/v1/customer/restock-requests/delete:
+    post:
+      tags:
+        - Restock
+      summary: Qayta tayyorlash so'rovini o'chirish
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - type
+                - id
+              properties:
+                type:
+                  type: string
+                id:
+                  type: string
+      responses:
+        "200":
+          description: So'rov o'chirildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  # ==================== Config ====================
+  /api/v1/config:
+    get:
+      tags:
+        - Config
+      summary: Ilova konfiguratsiyasi
+      responses:
+        "200":
+          description: Konfiguratsiya ma'lumotlari
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  config:
+                    type: object
+
+  # ==================== Banners ====================
+  /api/v1/banners:
+    get:
+      tags:
+        - Banners
+      summary: Bannerlar ro'yxati
+      parameters:
+        - $ref: "#/components/parameters/guestId"
+      responses:
+        "200":
+          description: Bannerlar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  banners:
+                    type: array
+
+  # ==================== Deals ====================
+  /api/v1/flash-deals:
+    get:
+      tags:
+        - Deals
+      summary: Flash deal ma'lumotlari
+      parameters:
+        - $ref: "#/components/parameters/guestId"
+      responses:
+        "200":
+          description: Flash deal ma'lumotlari
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  flash_deal:
+                    type: object
+
+  /api/v1/flash-deals/products/{dealId}:
+    get:
+      tags:
+        - Deals
+      summary: Flash deal mahsulotlari
+      parameters:
+        - name: dealId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - $ref: "#/components/parameters/guestId"
+      responses:
+        "200":
+          description: Flash deal mahsulotlari
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+
+  /api/v1/deals/featured:
+    get:
+      tags:
+        - Deals
+      summary: Targ'ib qilingan takliflar
+      parameters:
+        - $ref: "#/components/parameters/guestId"
+      responses:
+        "200":
+          description: Targ'ib qilingan takliflar
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+
+  /api/v1/dealsoftheday/deal-of-the-day:
+    get:
+      tags:
+        - Deals
+      summary: Kun taklifi
+      parameters:
+        - $ref: "#/components/parameters/guestId"
+      responses:
+        "200":
+          description: Kun taklifi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deal:
+                    type: object
+
+  # ==================== Sellers ====================
+  /api/v1/seller:
+    get:
+      tags:
+        - Sellers
+      summary: Sotuvchi ma'lumotlari
+      parameters:
+        - name: seller_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Sotuvchi ma'lumotlari
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  seller:
+                    type: object
+
+  /api/v1/seller/{sellerId}/products:
+    get:
+      tags:
+        - Sellers
+      summary: Sotuvchi mahsulotlari
+      parameters:
+        - name: sellerId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - $ref: "#/components/parameters/guestId"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: brand_ids
+          in: query
+          schema:
+            type: string
+        - name: product_id
+          in: query
+          schema:
+            type: string
+        - name: product_authors
+          in: query
+          schema:
+            type: string
+        - name: publishing_houses
+          in: query
+          schema:
+            type: string
+        - name: product_type
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Sotuvchi mahsulotlari
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductList"
+
+  /api/v1/seller/{sellerId}/seller-best-selling-products:
+    get:
+      tags:
+        - Sellers
+      summary: Sotuvchining eng ko'p sotilgan mahsulotlari
+      parameters:
+        - name: sellerId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - $ref: "#/components/parameters/guestId"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+      responses:
+        "200":
+          description: Eng ko'p sotilgan mahsulotlar
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductList"
+
+  /api/v1/seller/list/{type}:
+    get:
+      tags:
+        - Sellers
+      summary: Sotuvchilar ro'yxati
+      parameters:
+        - name: type
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+      responses:
+        "200":
+          description: Sotuvchilar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sellers:
+                    type: array
+
+  /api/v1/seller/more:
+    get:
+      tags:
+        - Sellers
+      summary: Qo'shimcha do'konlar
+      responses:
+        "200":
+          description: Qo'shimcha do'konlar
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stores:
+                    type: array
+
+  /api/v1/seller/{sellerId}/products:
+    get:
+      tags:
+        - Sellers
+      summary: Sotuvchi clearance mahsulotlari
+      parameters:
+        - name: sellerId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - $ref: "#/components/parameters/guestId"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+        - name: offer_type
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Clearance mahsulotlari
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductList"
+
+  /api/v1/categories:
+    get:
+      tags:
+        - Categories
+      summary: Sotuvchi bo'yicha kategoriyalar
+      parameters:
+        - name: seller_id
+          in: query
+          schema:
+            type: integer
+        - $ref: "#/components/parameters/guestId"
+      responses:
+        "200":
+          description: Kategoriyalar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  categories:
+                    type: array
+
+  /api/v1/brands:
+    get:
+      tags:
+        - Brands
+      summary: Sotuvchi bo'yicha brendlar
+      parameters:
+        - name: seller_id
+          in: query
+          schema:
+            type: integer
+        - $ref: "#/components/parameters/guestId"
+      responses:
+        "200":
+          description: Brendlar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  brands:
+                    type: array
+
+  /api/v1/coupons/{sellerId}:
+    get:
+      tags:
+        - Coupons
+      summary: Sotuvchi kuponlari
+      parameters:
+        - name: sellerId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Sotuvchi kuponlari
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  coupons:
+                    type: array
+
+  # ==================== Digital Payment ====================
+  /api/v1/digital-payment:
+    post:
+      tags:
+        - Orders
+      summary: Raqamli to'lov
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - payment_method
+              properties:
+                payment_method:
+                  type: string
+                order_id:
+                  type: integer
+      responses:
+        "200":
+          description: To'lov amalga oshirildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/customer/order/offline-payment-method-list:
+    get:
+      tags:
+        - Orders
+      summary: Offline to'lov usullari ro'yxati
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: To'lov usullari ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  payment_methods:
+                    type: array
+
+  # ==================== Map API ====================
+  /api/v1/mapapi/geocode-api:
+    post:
+      tags:
+        - Location
+      summary: Geokodlash (koordinatalardan manzil)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - lat
+                - lng
+              properties:
+                lat:
+                  type: number
+                lng:
+                  type: number
+      responses:
+        "200":
+          description: Manzil ma'lumotlari
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/v1/mapapi/place-api-autocomplete:
+    post:
+      tags:
+        - Location
+      summary: Joylashuv avtomatik to'ldirish
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - input
+              properties:
+                input:
+                  type: string
+      responses:
+        "200":
+          description: Takliflar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  predictions:
+                    type: array
+
+  /api/v1/mapapi/place-api-details:
+    post:
+      tags:
+        - Location
+      summary: Joylashuv tafsilotlari
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - place_id
+              properties:
+                place_id:
+                  type: string
+      responses:
+        "200":
+          description: Joylashuv tafsilotlari
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/v1/mapapi/distance-api:
+    post:
+      tags:
+        - Location
+      summary: Masofa hisoblash
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - origins
+                - destinations
+              properties:
+                origins:
+                  type: string
+                destinations:
+                  type: string
+      responses:
+        "200":
+          description: Masofa ma'lumotlari
+          content:
+            application/json:
+              schema:
+                type: object
+
+  # ==================== Contact Us ====================
+  /api/v1/contact-us:
+    post:
+      tags:
+        - Config
+      summary: Aloqa qilish
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - message
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                message:
+                  type: string
+                subject:
+                  type: string
+      responses:
+        "200":
+          description: Xabar yuborildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  # ==================== Attributes ====================
+  /api/v1/attributes:
+    get:
+      tags:
+        - Products
+      summary: Atributlar ro'yxati
+      responses:
+        "200":
+          description: Atributlar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  attributes:
+                    type: array
+
+  # ==================== Regions & Districts ====================
+  /api/v1/regions:
+    get:
+      tags:
+        - Regions
+      summary: Viloyatlar ro'yxati
+      responses:
+        "200":
+          description: Viloyatlar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  regions:
+                    type: array
+
+  /api/v1/districts:
+    get:
+      tags:
+        - Regions
+      summary: Tumanlar ro'yxati
+      parameters:
+        - name: region_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Tumanlar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  districts:
+                    type: array
+
+  # ==================== Compare ====================
+  /api/v1/customer/compare/list:
+    get:
+      tags:
+        - Compare
+      summary: Taqqoslash ro'yxati
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Taqqoslash ro'yxati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  compare_lists:
+                    type: array
+
+  /api/v1/customer/compare/product-store:
+    post:
+      tags:
+        - Compare
+      summary: Mahsulotni taqqoslash ro'yxatiga qo'shish
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - product_id
+              properties:
+                product_id:
+                  type: integer
+      responses:
+        "200":
+          description: Mahsulot qo'shildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/customer/compare/clear-all:
+    post:
+      tags:
+        - Compare
+      summary: Barcha taqqoslash ro'yxatini tozalash
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                _method:
+                  type: string
+                  default: delete
+      responses:
+        "200":
+          description: Ro'yxat tozalandi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /api/v1/customer/compare/product-replace:
+    get:
+      tags:
+        - Compare
+      summary: Taqqoslash ro'yxatidagi mahsulotni almashtirish
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: compare_id
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: product_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Mahsulot almashtirildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"

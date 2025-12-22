@@ -36,7 +36,7 @@ export default function RootLayout({
         <NextIntlClientProvider>
           <main>
             <Header />
-            <div className="container px-4 mx-auto">{children}</div>
+            <div className="container pb-20 md:pb-0">{children}</div>
             <Toaster position="top-center" reverseOrder={false} />
             <Footer />
           </main>
