@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Smartphone,
   Refrigerator,
@@ -13,9 +13,13 @@ import {
   Heart,
   Home,
   ChevronRight,
+  Package,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link, useRouter } from "@/i18n/routing";
+import { useCategories } from "@/services/queries/products";
+import type { Category as ApiCategory } from "@/types/api";
+import Image from "next/image";
 
 interface SubCategory {
   name: string;
@@ -30,336 +34,26 @@ interface Category {
   featured?: string[];
 }
 
-const categories: Category[] = [
-  {
-    id: "electronics",
-    name: "Elektronika",
-    icon: <Smartphone className="h-5 w-5" />,
-    subCategories: [
-      {
-        name: "Smartfonlar va telefonlar",
-        items: [
-          "iPhone",
-          "Samsung",
-          "Xiaomi",
-          "Realme",
-          "Vivo",
-          "OPPO",
-          "Huawei",
-          "Honor",
-        ],
-      },
-      {
-        name: "Noutbuklar, planshetlar va kompyuterlar",
-        items: [
-          "Noutbuklar",
-          "Planshetlar",
-          "Monobloklar",
-          "Stol kompyuterlari",
-          "Gaming noutbuklar",
-        ],
-      },
-      {
-        name: "Audio texnika",
-        items: [
-          "Quloqchinlar",
-          "Kalonkalar",
-          "Naushniklar",
-          "Mikrafonlar",
-          "Audio aksessuarlar",
-        ],
-      },
-      {
-        name: "TV, video va foto",
-        items: [
-          "Televizorlar",
-          "Proektorlar",
-          "Fotoapparatlar",
-          "Video kameralar",
-          "Dronlar",
-        ],
-      },
-      {
-        name: "Aqlli soatlar va fitnes bilaguzuklar",
-        items: [
-          "Apple Watch",
-          "Samsung Galaxy Watch",
-          "Xiaomi Mi Band",
-          "Fitnes bilaguzuklar",
-        ],
-      },
-    ],
-    featured: [
-      "iPhone 15 Pro",
-      "MacBook Air M2",
-      "Samsung Galaxy S24",
-      "AirPods Pro",
-    ],
-  },
-  {
-    id: "appliances",
-    name: "Maishiy texnika",
-    icon: <Refrigerator className="h-5 w-5" />,
-    subCategories: [
-      {
-        name: "Katta maishiy texnika",
-        items: [
-          "Muzlatgichlar",
-          "Kir yuvish mashinalari",
-          "Gaz plitalari",
-          "Dishwasherlar",
-          "Konditsionerlar",
-        ],
-      },
-      {
-        name: "Oshxona texnikasi",
-        items: [
-          "Mikroto'lqinli pechlar",
-          "Blenderlar",
-          "Multicookerlar",
-          "Elektr choynak",
-          "Kofemashina",
-        ],
-      },
-      {
-        name: "Uy uchun texnika",
-        items: [
-          "Changyutgichlar",
-          "Dazmollar",
-          "Ventilyatorlar",
-          "Isitgichlar",
-          "Namlagichlar",
-        ],
-      },
-      {
-        name: "Go'zallik texnikasi",
-        items: [
-          "Fen",
-          "Soch to'g'rilagich",
-          "Elektr ustaralar",
-          "Epilyatorlar",
-          "Manikur to'plamlari",
-        ],
-      },
-    ],
-    featured: [
-      "Samsung Muzlatgich",
-      "LG Kir yuvish",
-      "Bosch Gaz plita",
-      "Dyson Changyutgich",
-    ],
-  },
-  {
-    id: "clothing",
-    name: "Kiyim",
-    icon: <Shirt className="h-5 w-5" />,
-    subCategories: [
-      {
-        name: "Erkaklar kiyimi",
-        items: [
-          "Ko'ylaklar",
-          "Futbolkalar",
-          "Shimlar",
-          "Shortilar",
-          "Kostyumlar",
-          "Kurtka va paltolar",
-        ],
-      },
-      {
-        name: "Ayollar kiyimi",
-        items: [
-          "Ko'ylaklar",
-          "Bluzalar",
-          "Yubkalar",
-          "Shimlar",
-          "Kostyumlar",
-          "Paltolar",
-        ],
-      },
-      {
-        name: "Bolalar kiyimi",
-        items: [
-          "O'g'il bolalar",
-          "Qiz bolalar",
-          "Chaqaloqlar",
-          "Sport kiyimlari",
-        ],
-      },
-      {
-        name: "Sport kiyimlari",
-        items: [
-          "Futbolkalar",
-          "Sportivka",
-          "Shortilar",
-          "Trikolar",
-          "Suzish kiyimlari",
-        ],
-      },
-    ],
-    featured: ["Erkaklar ko'ylagi", "Ayollar ko'ylagi", "Bolalar futbolkasi"],
-  },
-  {
-    id: "shoes",
-    name: "Poyabzal",
-    icon: <Footprints className="h-5 w-5" />,
-    subCategories: [
-      {
-        name: "Erkaklar poyabzali",
-        items: [
-          "Krossovkalar",
-          "Tufllar",
-          "Botinkalar",
-          "Sandallalar",
-          "Sport poyabzal",
-        ],
-      },
-      {
-        name: "Ayollar poyabzali",
-        items: [
-          "Krossovkalar",
-          "Tufllar",
-          "Botinkalar",
-          "Sandallalar",
-          "Sport poyabzal",
-        ],
-      },
-      {
-        name: "Bolalar poyabzali",
-        items: ["Krossovkalar", "Tufllar", "Botinkalar", "Sandallalar"],
-      },
-    ],
-    featured: ["Nike Air Max", "Adidas Ultraboost", "Puma RS-X"],
-  },
-  {
-    id: "accessories",
-    name: "Aksessuarlar",
-    icon: <Glasses className="h-5 w-5" />,
-    subCategories: [
-      {
-        name: "Sumkalar va ryukzaklar",
-        items: [
-          "Erkaklar sumkalari",
-          "Ayollar sumkalari",
-          "Ryukzaklar",
-          "Baul va chemodanlar",
-        ],
-      },
-      {
-        name: "Bosh kiyimlar",
-        items: ["Kepkalar", "Shapkalar", "Shapka va sharf to'plamlari"],
-      },
-      {
-        name: "Kamarlar va hamyonlar",
-        items: [
-          "Erkaklar hamyonlari",
-          "Ayollar hamyonlari",
-          "Kamarlar",
-          "Kartochka ushlagichlar",
-        ],
-      },
-      {
-        name: "Zargarlik buyumlari",
-        items: ["Soatlar", "Bilaguzuklar", "Sirg'alar", "Zanjirlar", "Uzuklar"],
-      },
-    ],
-    featured: ["Designer sumka", "Premium hamyon", "Gold soat"],
-  },
-  {
-    id: "beauty",
-    name: "Go'zallik va parfyumeriya",
-    icon: <Sparkles className="h-5 w-5" />,
-    subCategories: [
-      {
-        name: "Parfyumeriya",
-        items: [
-          "Erkaklar parfyumi",
-          "Ayollar parfyumi",
-          "Deodorantlar",
-          "Atirlar",
-        ],
-      },
-      {
-        name: "Parvarishlash",
-        items: [
-          "Yuz uchun",
-          "Tana uchun",
-          "Soch uchun",
-          "Qo'l uchun",
-          "Oyoq uchun",
-        ],
-      },
-      {
-        name: "Dekorativ kosmetika",
-        items: [
-          "Makiyaj asoslari",
-          "Ko'z makiyaji",
-          "Lab makiyaji",
-          "Nail art",
-        ],
-      },
-      {
-        name: "Soch parvarishi",
-        items: ["Shampunlar", "Konditsionerlar", "Maskalar", "Soch moylari"],
-      },
-    ],
-    featured: ["Dior Sauvage", "Chanel No.5", "La Mer kremi"],
-  },
-  {
-    id: "health",
-    name: "Salomatlik",
-    icon: <Heart className="h-5 w-5" />,
-    subCategories: [
-      {
-        name: "Tibbiy asboblar",
-        items: [
-          "Tonometrlar",
-          "Termometrlar",
-          "Glyukometrlar",
-          "Puls o'lchagichlar",
-        ],
-      },
-      {
-        name: "Vitaminlar va qo'shimchalar",
-        items: [
-          "Multivitaminlar",
-          "Omega-3",
-          "Kaltsiy",
-          "Vitamin D",
-          "Protein",
-        ],
-      },
-      {
-        name: "Ortopedik mahsulotlar",
-        items: ["Yostiqlar", "Matraslar", "Kamarlar", "To'piqlar"],
-      },
-    ],
-    featured: ["Omron tonometr", "Vitamin kompleksi", "Ortopedik yostiq"],
-  },
-  {
-    id: "home",
-    name: "Uy va bog'",
-    icon: <Home className="h-5 w-5" />,
-    subCategories: [
-      {
-        name: "Mebel",
-        items: ["Yotoq xonasi", "Mehmonxona", "Oshxona", "Ofis mebellari"],
-      },
-      {
-        name: "Uyni bezash",
-        items: ["Pardalari", "Gilamlar", "Yostiqlar", "Dekoratsiyalar"],
-      },
-      {
-        name: "Oshxona buyumlari",
-        items: ["Idish-tovoqlar", "Kostryulkalar", "Pichoqlar", "Aksessuarlar"],
-      },
-      {
-        name: "Bog' asboblari",
-        items: ["O'roq", "Qurzoq", "Suv purkagichlar", "Bog' mebellar"],
-      },
-    ],
-    featured: ["Divan", "Stol va stul to'plami", "Pardalar"],
-  },
-];
+// Icon mapping function
+const getIconFromString = (iconName?: string): React.ReactNode => {
+  const iconMap: Record<string, React.ReactNode> = {
+    smartphone: <Smartphone className="h-5 w-5" />,
+    refrigerator: <Refrigerator className="h-5 w-5" />,
+    shirt: <Shirt className="h-5 w-5" />,
+    footprints: <Footprints className="h-5 w-5" />,
+    glasses: <Glasses className="h-5 w-5" />,
+    sparkles: <Sparkles className="h-5 w-5" />,
+    heart: <Heart className="h-5 w-5" />,
+    home: <Home className="h-5 w-5" />,
+  };
+
+  if (iconName) {
+    const normalized = iconName.toLowerCase().replace(/[^a-z0-9]/g, "");
+    return iconMap[normalized] || <Package className="h-5 w-5" />;
+  }
+
+  return <Package className="h-5 w-5" />;
+};
 
 export function CatalogModal({
   isOpen,
@@ -369,12 +63,69 @@ export function CatalogModal({
   onClose: () => void;
 }) {
   const router = useRouter();
+  const { data: categoriesData, isLoading, error } = useCategories();
+  const [hoveredCategory, setHoveredCategory] = useState<number | null>(null);
 
-  const [hoveredCategory, setHoveredCategory] = useState<string | null>(
-    categories[0].id
-  );
+  const categories = categoriesData ?? [];
+
+  // Set initial hovered category when categories are loaded
+  useEffect(() => {
+    if (categories.length > 0 && !hoveredCategory) {
+      setHoveredCategory(categories[0]?.id);
+    }
+  }, [categories, hoveredCategory]);
 
   if (!isOpen) return null;
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <>
+        <div className="fixed inset-0" onClick={onClose} />
+        <div
+          className={cn(
+            "fixed left-0 right-0 top-[168px] z-50 mx-auto max-w-[1200px] transition-all duration-700 ease-out transform",
+            {
+              "opacity-100 translate-y-0": isOpen,
+              "opacity-0 -translate-y-5 pointer-events-none": !isOpen,
+            }
+          )}
+        >
+          <div className="overflow-hidden rounded-2xl bg-background shadow-2xl ring-1 ring-border">
+            <div className="flex items-center justify-center p-8">
+              <p className="text-muted-foreground">Yuklanmoqda...</p>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  // Show error state
+  if (error || categories.length === 0) {
+    return (
+      <>
+        <div className="fixed inset-0" onClick={onClose} />
+        <div
+          className={cn(
+            "fixed left-0 right-0 top-[168px] z-50 mx-auto max-w-[1200px] transition-all duration-700 ease-out transform",
+            {
+              "opacity-100 translate-y-0": isOpen,
+              "opacity-0 -translate-y-5 pointer-events-none": !isOpen,
+            }
+          )}
+        >
+          <div className="overflow-hidden rounded-2xl bg-background shadow-2xl ring-1 ring-border">
+            <div className="flex items-center justify-center p-8">
+              <p className="text-muted-foreground">
+                Kategoriyalar yuklanmadi. Iltimos, qayta urinib ko'ring.
+              </p>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   const activeCategory =
     categories.find((cat) => cat.id === hoveredCategory) || categories[0];
@@ -398,12 +149,12 @@ export function CatalogModal({
           <div className="flex">
             {/* Left Sidebar - Categories */}
             <div className="w-[280px] border-r bg-muted/30">
-              <div className="py-4">
+              <div className="">
                 {categories.map((category) => (
                   <button
                     key={category.id}
                     onClick={() => {
-                      router.push("/search");
+                      router.push(`/search?category=${category.id}`);
                       onClose();
                     }}
                     onMouseEnter={() => setHoveredCategory(category.id)}
@@ -413,15 +164,14 @@ export function CatalogModal({
                         : "text-foreground hover:bg-muted"
                     }`}
                   >
-                    <span
-                      className={`${
-                        hoveredCategory === category.id
-                          ? "text-primary"
-                          : "text-muted-foreground"
-                      }`}
-                    >
-                      {category.icon}
-                    </span>
+                    {category.icon && (
+                      <Image
+                        src={category.icon}
+                        alt={category.name}
+                        width={20}
+                        height={20}
+                      />
+                    )}
                     <span className="flex-1 font-medium">{category.name}</span>
                     <ChevronRight
                       className={`h-4 w-4 ${
@@ -436,50 +186,43 @@ export function CatalogModal({
             </div>
 
             {/* Right Content - Subcategories */}
-            <div className="flex-1 p-8">
+            {/* <div className="flex-1 p-8">
               <div className="grid grid-cols-3 gap-8">
-                {activeCategory.subCategories.map((subCategory, index) => (
+                {activeCategory.subcategories?.map((subCategory, index) => (
                   <div key={index}>
                     <h3 className="mb-3 font-semibold text-foreground">
                       {subCategory.name}
                     </h3>
                     <ul className="space-y-2">
-                      {subCategory.items.map((item, itemIndex) => (
-                        <li key={itemIndex}>
+                      {subCategory.subcategories &&
+                      subCategory.subcategories?.length > 0 ? (
+                        subCategory.subcategories?.map((item, itemIndex) => (
+                          <li key={itemIndex}>
+                            <Link
+                              onClick={onClose}
+                              href="/search"
+                              className="text-sm text-muted-foreground transition-colors hover:text-primary"
+                            >
+                              {item.name}
+                            </Link>
+                          </li>
+                        ))
+                      ) : (
+                        <li>
                           <Link
                             onClick={onClose}
-                            href="/search"
+                            href={`/search?category=${activeCategory.id}`}
                             className="text-sm text-muted-foreground transition-colors hover:text-primary"
                           >
-                            {item}
+                            {subCategory.name}
                           </Link>
                         </li>
-                      ))}
+                      )}
                     </ul>
                   </div>
                 ))}
               </div>
-
-              {/* Featured Products */}
-              {activeCategory.featured && (
-                <div className="mt-8 border-t pt-6">
-                  <h3 className="mb-4 font-semibold text-foreground">
-                    Ommabop mahsulotlar
-                  </h3>
-                  <div className="flex gap-3">
-                    {activeCategory.featured.map((product, index) => (
-                      <a
-                        key={index}
-                        href="#"
-                        className="rounded-lg border bg-muted/30 px-4 py-2 text-sm transition-colors hover:border-primary hover:bg-primary/5 hover:text-primary"
-                      >
-                        {product}
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

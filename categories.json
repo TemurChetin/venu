@@ -1,0 +1,20 @@
+{
+  "id": 423,
+  "name": "Noutbuklar va kompyuterlar",
+  "slug": "noutbuklar-va-kompyuterlar",
+  "icon": "2025-08-19-68a42694a3ec6.webp",
+  "icon_storage_type": "public",
+  "parent_id": 0,
+  "position": 0,
+  "created_at": "2025-08-08T12:31:29.000000Z",
+  "updated_at": "2025-09-12T05:41:26.000000Z",
+  "home_status": 1,
+  "priority": 0,
+  "products": [],
+  "icon_full_url": {
+    "key": "2025-08-19-68a42694a3ec6.webp",
+    "path": "https://venu.uz/storage/category/2025-08-19-68a42694a3ec6.webp",
+    "status": 200
+  },
+  "translations": []
+}

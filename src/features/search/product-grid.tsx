@@ -1,25 +1,80 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Pagination } from "@/components/ui/pagination";
 import { SlidersHorizontal } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { CatalogFilters } from "./catalog-filter";
 import { ProductCard } from "@/components/common/product-card";
-import { mockDataGenerator } from "@/lib/mock-data";
+import {
+  useProductFilter,
+  type ProductFilterParams,
+} from "@/services/queries/products";
+import React, { useEffect, useState, useMemo } from "react";
 
-// Mock product data
-const products = mockDataGenerator(30);
-export function ProductGrid() {
+interface ProductGridProps {
+  searchQuery?: string;
+  filters: ProductFilterParams;
+}
+
+export function ProductGrid({ searchQuery, filters }: ProductGridProps) {
+  const [currentFilters, setCurrentFilters] =
+    useState<ProductFilterParams>(filters);
+  const { data, isLoading, error } = useProductFilter(currentFilters);
+
+  // Update filters when props change
+  React.useEffect(() => {
+    setCurrentFilters(filters);
+  }, [filters]);
+
+  const products = data?.products || [];
+  const totalSize = data?.total_size || 0;
+  const limit = parseInt(currentFilters.limit || "20", 10);
+
+  // Calculate pagination values
+  const currentPage = useMemo(() => {
+    const offset = currentFilters.offset || 0;
+    return Math.floor(offset / limit) + 1;
+  }, [currentFilters.offset, limit]);
+
+  const totalPages = useMemo(() => {
+    return Math.ceil(totalSize / limit);
+  }, [totalSize, limit]);
+
+  const handlePageChange = (page: number) => {
+    const newOffset = (page - 1) * limit;
+    setCurrentFilters((prev) => ({
+      ...prev,
+      offset: newOffset,
+    }));
+    // Scroll to top of product grid when page changes
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleFiltersChange = (newFilters: ProductFilterParams) => {
+    setCurrentFilters((prev) => ({
+      ...prev,
+      ...newFilters,
+      offset: 0,
+    }));
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground text-balance">
-            Barcha mahsulotlar
+            {searchQuery ? `"${searchQuery}" qidiruvi` : "Barcha mahsulotlar"}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Jami {products.length} ta mahsulot topildi
+            {isLoading ? (
+              "Yuklanmoqda..."
+            ) : error ? (
+              "Xatolik yuz berdi"
+            ) : (
+              <>Jami {totalSize} ta mahsulot topildi</>
+            )}
           </p>
         </div>
 
@@ -37,25 +92,61 @@ export function ProductGrid() {
           </SheetTrigger>
           <SheetContent side="left" className="w-80 p-0">
             <div className="py-6">
-              <CatalogFilters />
+              <CatalogFilters
+                searchQuery={searchQuery}
+                filters={currentFilters}
+                onFiltersChange={handleFiltersChange}
+              />
             </div>
           </SheetContent>
         </Sheet>
       </div>
 
       {/* Product Grid */}
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
-        {products.map((product) => (
-          <ProductCard key={product.id} {...product} />
-        ))}
-      </div>
+      {isLoading && products.length === 0 ? (
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div
+              key={i}
+              className="aspect-square bg-muted animate-pulse rounded-lg"
+            />
+          ))}
+        </div>
+      ) : error ? (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Mahsulotlar yuklanmadi</p>
+          <Button
+            variant="outline"
+            onClick={() => setCurrentFilters((prev) => ({ ...prev }))}
+            className="mt-4"
+          >
+            Qayta urinish
+          </Button>
+        </div>
+      ) : products.length > 0 ? (
+        <>
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
 
-      {/* Load More */}
-      <div className="flex justify-center pt-6">
-        <Button variant="outline" size="lg" className="min-w-48 bg-transparent">
-          Ko'proq yuklash
-        </Button>
-      </div>
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex justify-center pt-6">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
+        </>
+      ) : (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Mahsulotlar topilmadi</p>
+        </div>
+      )}
     </div>
   );
 }

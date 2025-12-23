@@ -1,0 +1,211 @@
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import { usePublicQuery } from "./use-public-query";
+import { instance } from "../api";
+import { useGuestId } from "../guest-id";
+import type {
+  ProductListResponse,
+  BannersResponse,
+  ProductDetailResponse,
+  ProductReviewsResponse,
+  CategoriesResponse,
+  Category,
+} from "@/types/api";
+
+/**
+ * Product Query Hooks
+ * All hooks use the public query system with guest ID management
+ */
+
+// Banners
+export const useBanners = () => {
+  return usePublicQuery<BannersResponse[]>({
+    url: "/v1/banners",
+    enabled: true,
+    requiresGuestId: false,
+  });
+};
+
+// Latest Products
+export const useLatestProducts = (limit = 10, offset = 0) => {
+  return usePublicQuery<ProductListResponse>({
+    url: "/v1/products/latest",
+    query: { limit, offset },
+    enabled: true,
+  });
+};
+
+// New Arrival Products
+export const useNewArrivalProducts = (limit = 10, offset = 0) => {
+  return usePublicQuery<ProductListResponse>({
+    url: "/v1/products/new-arrival",
+    query: { limit, offset },
+    enabled: true,
+  });
+};
+
+// Top Rated Products
+export const useTopRatedProducts = (limit = 10, offset = 0) => {
+  return usePublicQuery<ProductListResponse>({
+    url: "/v1/products/top-rated",
+    query: { limit, offset },
+    enabled: true,
+  });
+};
+
+// Best Selling Products
+export const useBestSellingProducts = (limit = 10, offset = 0) => {
+  return usePublicQuery<ProductListResponse>({
+    url: "/v1/products/best-sellings",
+    query: { limit, offset },
+    enabled: true,
+  });
+};
+
+// Featured Products
+export const useFeaturedProducts = (limit = 10, offset = 0) => {
+  return usePublicQuery<ProductListResponse>({
+    url: "/v1/products/featured",
+    query: { limit, offset },
+    enabled: true,
+  });
+};
+
+// Discounted Products
+export const useDiscountedProducts = (limit = 10, offset = 0) => {
+  return usePublicQuery<ProductListResponse>({
+    url: "/v1/products/discounted-product",
+    query: { limit, offset },
+    enabled: true,
+  });
+};
+
+// Product Detail
+export const useProductDetail = (productSlug: string) => {
+  return usePublicQuery<ProductDetailResponse>({
+    url: `/v1/products/details/${productSlug}`,
+    enabled: !!productSlug,
+  });
+};
+
+// Product Reviews
+export const useProductReviews = (productSlug: string) => {
+  return usePublicQuery<ProductReviewsResponse>({
+    url: `/v1/products/reviews/${productSlug}`,
+    enabled: !!productSlug,
+    requiresGuestId: false, // Reviews don't need guestId
+  });
+};
+
+// Related Products
+export const useRelatedProducts = (
+  productSlug: string,
+  limit = 10,
+  offset = 0
+) => {
+  return usePublicQuery<ProductListResponse>({
+    url: `/v1/products/related-products/${productSlug}`,
+    query: { limit, offset },
+    enabled: !!productSlug,
+  });
+};
+
+// Categories
+export const useCategories = () => {
+  return usePublicQuery<CategoriesResponse>({
+    url: "/v1/products/home-categories",
+    query: {
+      limit: 1,
+      offset: 0,
+    },
+    enabled: true,
+  });
+};
+
+export const useAllCategories = () => {
+  // TODO: add useCategories query
+  return useCategories();
+};
+
+// Brands (for filter)
+export interface Brand {
+  id: number;
+  name: string;
+  image?: string;
+}
+
+export interface BrandsResponse {
+  brands: Brand[];
+}
+
+export const useBrands = () => {
+  return usePublicQuery<BrandsResponse>({
+    url: "/v1/brands",
+    enabled: true,
+  });
+};
+
+// Product Filter
+export interface ProductFilterParams {
+  search: string;
+  category: string;
+  brand: string;
+  product_authors: string;
+  publishing_houses: string;
+  sort_by: string | null;
+  price_min: number | null;
+  price_max: number | null;
+  limit: string;
+  offset: number;
+  product_type: string;
+}
+
+export const useProductFilter = (params: ProductFilterParams) => {
+  const { isLoading: isLoadingGuestId } = useGuestId();
+
+  // Build filter payload according to ProductFilterParams interface
+  const filterPayload: ProductFilterParams = {
+    search: params.search || "",
+    category: params.category || "[]",
+    brand: params.brand || "[]",
+    product_authors: params.product_authors || "[]",
+    publishing_houses: params.publishing_houses || "[]",
+    sort_by: params.sort_by,
+    price_min: params.price_min,
+    price_max: params.price_max,
+    limit: params.limit || "20",
+    offset: params.offset || 0,
+    product_type: params.product_type || "all",
+  };
+
+  return usePublicQuery<ProductListResponse>({
+    url: "/v1/products/filter",
+    enabled: !isLoadingGuestId,
+    method: "POST",
+    data: filterPayload,
+  });
+};
+
+// Product Suggestion (for search autocomplete)
+export interface ProductSuggestion {
+  name: string;
+  id?: number;
+}
+
+export interface ProductSuggestionResponse {
+  products: ProductSuggestion[];
+}
+
+export const useProductSuggestion = (name: string, enabled = true) => {
+  return usePublicQuery<ProductSuggestionResponse>({
+    url: "/v1/products/suggestion-product",
+    query: {
+      name,
+      limit: 10,
+      offset: 0,
+    },
+    enabled: enabled && name.length > 0,
+    debounceTime: 300,
+  });
+};

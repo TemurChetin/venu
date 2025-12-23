@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useParams } from "next/navigation";
 import { Star, Heart, ShoppingCart, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,212 +11,330 @@ import { ProductGallery } from "@/features/detail/product-gallery";
 import { SellerInfo } from "@/features/detail/seller-info";
 import { ProductReviews } from "@/features/detail/product-reviews";
 import { RelatedProducts } from "@/features/detail/related-products";
+import {
+  useProductDetail,
+  useProductReviews,
+  useRelatedProducts,
+} from "@/services/queries/products";
+import { formatCurrency } from "@/lib/format-currency";
 
 export default function DetailPage() {
-  const [selectedSize, setSelectedSize] = useState("16GB");
-  const [selectedColor, setSelectedColor] = useState("white");
+  const params = useParams();
+  const productSlug = params?.id as string;
 
-  return (
-    <main className="container mx-auto px-4 py-6 md:py-8">
-      {/* Breadcrumb */}
-      <nav className="mb-6 text-sm text-muted-foreground">
-        <ol className="flex items-center gap-2 flex-wrap">
-          <li>Главная</li>
-          <li>/</li>
-          <li>Категории</li>
-          <li>/</li>
-          <li className="text-foreground">Paxta yostiqchalari</li>
-        </ol>
-      </nav>
+  const { data: productData, isLoading: isLoadingProduct } =
+    useProductDetail(productSlug);
+  const { data: reviewsData } = useProductReviews(productSlug);
+  const { data: relatedProductsData } = useRelatedProducts(productSlug, 4);
 
-      {/* Product Section */}
-      <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 mb-12">
-        {/* Gallery */}
-        <ProductGallery />
+  const product = productData;
+  const reviews = reviewsData?.reviews || [];
+  const relatedProducts = relatedProductsData?.products || [];
 
-        {/* Product Info */}
-        <div className="space-y-6">
-          {/* Title & Rating */}
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold mb-3 text-balance leading-tight">
-              Paxta yostiqchalari Soft Cotton Lure!, 120 dona
-            </h1>
-            <div className="flex items-center gap-4 flex-wrap">
-              <div className="flex items-center gap-2">
-                <div className="flex items-center">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className="h-4 w-4 fill-primary text-primary"
-                    />
-                  ))}
-                </div>
-                <span className="text-sm font-medium">4.9</span>
-                <span className="text-sm text-muted-foreground">
-                  (755 sharhlar)
-                </span>
-              </div>
-              <Badge variant="secondary">Original</Badge>
-            </div>
-          </div>
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [selectedColor, setSelectedColor] = useState<number | null>(null);
 
-          {/* Timer */}
-          {/* <Card className="border-primary/20 bg-primary/5"> */}
-          {/*   <CardContent className="p-4"> */}
-          {/*     <div className="flex items-center justify-between gap-4 flex-wrap"> */}
-          {/*       <span className="text-sm font-medium">Ulgurib qoling</span> */}
-          {/*       <CountdownTimer hours={136} minutes={56} seconds={4} /> */}
-          {/*     </div> */}
-          {/*   </CardContent> */}
-          {/* </Card> */}
-          {/**/}
-          {/* Price */}
+  // Calculate price with discount
+  const priceInfo = useMemo(() => {
+    if (!product) return null;
 
-          <div className="space-y-2">
-            <div className="flex items-baseline gap-3 flex-wrap">
-              <span className="text-4xl font-bold text-primary">
-                23,455 so'm
-              </span>
-              <span className="text-xl text-muted-foreground line-through">
-                25,990
-              </span>
-              <Badge variant="destructive" className="bg-primary">
-                -12%
-              </Badge>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              2699 dona xarid qilish mumkin
-            </p>
-            <p className="text-sm font-medium">
-              Bu haftada 435 kishi sotib oldi
-            </p>
-          </div>
+    const originalPrice = product.unit_price;
+    let discountedPrice = originalPrice;
 
-          <Separator />
+    if (product.discount > 0) {
+      if (product.discount_type === "percentage") {
+        discountedPrice = originalPrice * (1 - product.discount / 100);
+      } else {
+        discountedPrice = originalPrice - product.discount;
+      }
+    }
 
-          {/* Color Selection */}
-          <div className="space-y-3">
-            <label className="text-sm font-medium">Rangi:</label>
-            <div className="flex items-center gap-3 flex-wrap">
-              {["white", "pink", "blue"].map((color) => (
-                <button
-                  key={color}
-                  onClick={() => setSelectedColor(color)}
-                  className={`h-10 w-10 rounded-full border-2 transition-all ${
-                    selectedColor === color
-                      ? "border-primary scale-110"
-                      : "border-border"
-                  }`}
-                  style={{
-                    backgroundColor:
-                      color === "white"
-                        ? "#fff"
-                        : color === "pink"
-                        ? "#ffc0cb"
-                        : "#add8e6",
-                  }}
-                />
-              ))}
-            </div>
-          </div>
+    const discountPercent =
+      product.discount > 0
+        ? product.discount_type === "percentage"
+          ? product.discount
+          : Math.round((product.discount / originalPrice) * 100)
+        : 0;
 
-          {/* Size Selection */}
-          <div className="space-y-3">
-            <label className="text-sm font-medium">Hajmi:</label>
-            <div className="flex items-center gap-3 flex-wrap">
-              {["8 GB", "16 GB", "32 GB"].map((size) => (
-                <Button
-                  key={size}
-                  variant={selectedSize === size ? "default" : "outline"}
-                  onClick={() => setSelectedSize(size)}
-                  className="min-w-[80px]"
-                >
-                  {size}
-                </Button>
-              ))}
-            </div>
-          </div>
+    return {
+      originalPrice,
+      discountedPrice,
+      discountPercent,
+    };
+  }, [product]);
 
-          <Separator />
+  // Calculate average rating
+  const averageRating = useMemo(() => {
+    if (!product?.rating || product.rating.length === 0) return 0;
+    const sum = product.rating.reduce((a: number, b: number) => a + b, 0);
+    return sum / product.rating.length;
+  }, [product]);
 
-          {/* Delivery Info */}
-          <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
-            <Truck className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+  // Initialize selected color and size when product loads
+  useEffect(() => {
+    if (
+      product?.colors &&
+      product.colors.length > 0 &&
+      selectedColor === null
+    ) {
+      setSelectedColor(product.colors[0].id);
+    }
+    if (product?.sizes && product.sizes.length > 0 && selectedSize === null) {
+      setSelectedSize(product.sizes[0].value);
+    }
+  }, [product, selectedColor, selectedSize]);
+
+  useEffect(() => {
+    console.log(product);
+  }, [product]);
+
+  if (isLoadingProduct) {
+    return (
+      <main className="container mx-auto px-4 py-6 md:py-8">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <p className="text-muted-foreground">Yuklanmoqda...</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (!product) {
+    return (
+      <main className="container mx-auto px-4 py-6 md:py-8">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <p className="text-muted-foreground">Mahsulot topilmadi</p>
+        </div>
+      </main>
+    );
+  } else
+    return (
+      <main className="container mx-auto px-4 py-6 md:py-8">
+        {/* Breadcrumb */}
+        <nav className="mb-6 text-sm text-muted-foreground">
+          <ol className="flex items-center gap-2 flex-wrap">
+            <li>Главная</li>
+            <li>/</li>
+            {product.category && (
+              <>
+                <li>{product.category.name}</li>
+                <li>/</li>
+              </>
+            )}
+            <li className="text-foreground">{product.name}</li>
+          </ol>
+        </nav>
+
+        {/* Product Section */}
+        <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 mb-12">
+          {/* Gallery */}
+          <ProductGallery
+            images={
+              product.images_full_url?.map(
+                (img: { path: string }) => img.path
+              ) || [product.thumbnail_full_url?.path || product.thumbnail || ""]
+            }
+          />
+
+          {/* Product Info */}
+          <div className="space-y-6">
+            {/* Title & Rating */}
             <div>
-              <p className="font-medium text-sm">Ertaga yetkazib beramiz</p>
-              <p className="text-sm text-muted-foreground">
-                В пункт выдачи или курьером
-              </p>
+              <h1 className="text-2xl md:text-3xl font-bold mb-3 text-balance leading-tight">
+                {product.name}
+              </h1>
+              <div className="flex items-center gap-4 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`h-4 w-4 ${
+                          i < Math.round(averageRating)
+                            ? "fill-primary text-primary"
+                            : "fill-muted text-muted"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-sm font-medium">
+                    {averageRating.toFixed(1)}
+                  </span>
+                  <span className="text-sm text-muted-foreground">
+                    ({product.review_count || product.reviews_count || 0}{" "}
+                    sharhlar)
+                  </span>
+                </div>
+                {product.product_type && (
+                  <Badge variant="secondary">{product.product_type}</Badge>
+                )}
+              </div>
             </div>
-          </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-3 flex-col sm:flex-row">
-            <Button size="lg" className="flex-1 h-12 text-base font-medium">
-              <ShoppingCart className="mr-2 h-5 w-5" />
-              Savatga qo'shish
-            </Button>
+            {/* Price */}
+            {priceInfo && (
+              <div className="space-y-2">
+                <div className="flex items-baseline gap-3 flex-wrap">
+                  <span className="text-4xl font-bold text-primary">
+                    {formatCurrency(Math.round(priceInfo.discountedPrice))}
+                  </span>
+                  {priceInfo.discountPercent > 0 && (
+                    <>
+                      <span className="text-xl text-muted-foreground line-through">
+                        {formatCurrency(Math.round(priceInfo.originalPrice))}
+                      </span>
+                      <Badge variant="destructive" className="bg-primary">
+                        -{priceInfo.discountPercent}%
+                      </Badge>
+                    </>
+                  )}
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {product.current_stock} dona xarid qilish mumkin
+                </p>
+              </div>
+            )}
+
+            <Separator />
+
+            {/* Color Selection */}
+            {product.colors && product.colors.length > 0 && (
+              <div className="space-y-3">
+                <label className="text-sm font-medium">Rangi:</label>
+                <div className="flex items-center gap-3 flex-wrap">
+                  {product.colors.map(
+                    (color: { id: number; name: string; code: string }) => (
+                      <button
+                        key={color.id}
+                        onClick={() => setSelectedColor(color.id)}
+                        className={`h-10 w-10 rounded-full border-2 transition-all ${
+                          selectedColor === color.id
+                            ? "border-primary scale-110"
+                            : "border-border"
+                        }`}
+                        style={{
+                          backgroundColor: color.code || "#fff",
+                        }}
+                        title={color.name}
+                      />
+                    )
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Size Selection */}
+            {product.sizes && product.sizes.length > 0 && (
+              <div className="space-y-3">
+                <label className="text-sm font-medium">Hajmi:</label>
+                <div className="flex items-center gap-3 flex-wrap">
+                  {product.sizes.map(
+                    (size: { id: number; name: string; value: string }) => (
+                      <Button
+                        key={size.id}
+                        variant={
+                          selectedSize === size.value ? "default" : "outline"
+                        }
+                        onClick={() => setSelectedSize(size.value)}
+                        className="min-w-[80px]"
+                      >
+                        {size.value}
+                      </Button>
+                    )
+                  )}
+                </div>
+              </div>
+            )}
+
+            <Separator />
+
+            {/* Delivery Info */}
+            {product.shipping_methods &&
+              product.shipping_methods.length > 0 && (
+                <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
+                  <Truck className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                  <div>
+                    <p className="font-medium text-sm">
+                      {product.shipping_methods[0].name}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {product.shipping_methods[0].estimated_days} kun ichida
+                      yetkazib beramiz
+                    </p>
+                  </div>
+                </div>
+              )}
+
+            {/* Action Buttons */}
+            <div className="flex gap-3 flex-col sm:flex-row">
+              <Button size="lg" className="flex-1 h-12 text-base font-medium">
+                <ShoppingCart className="mr-2 h-5 w-5" />
+                Savatga qo'shish
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="sm:w-auto h-12 bg-transparent"
+              >
+                <Heart className="h-5 w-5" />
+              </Button>
+            </div>
+
             <Button
               size="lg"
-              variant="outline"
-              className="sm:w-auto h-12 bg-transparent"
+              variant="secondary"
+              className="w-full h-12 text-base font-medium"
             >
-              <Heart className="h-5 w-5" />
+              1 bosishda xarid qiling
             </Button>
-          </div>
 
-          <Button
-            size="lg"
-            variant="secondary"
-            className="w-full h-12 text-base font-medium"
-          >
-            1 bosishda xarid qiling
-          </Button>
-
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 pt-4">
-            <div className="text-center">
-              <p className="text-2xl font-bold text-primary">0</p>
-              <p className="text-xs text-muted-foreground">Заказы</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold text-primary">0</p>
-              <p className="text-xs text-muted-foreground">Отзывы</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold text-primary">0</p>
-              <p className="text-xs text-muted-foreground">В избранном</p>
+            {/* Stats */}
+            <div className="grid grid-cols-3 gap-4 pt-4">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-primary">0</p>
+                <p className="text-xs text-muted-foreground">Заказы</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-primary">
+                  {product.review_count || product.reviews_count || 0}
+                </p>
+                <p className="text-xs text-muted-foreground">Отзывы</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-primary">
+                  {product.wish_list || product.wish_list_count || 0}
+                </p>
+                <p className="text-xs text-muted-foreground">В избранном</p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Product Description */}
-      <Card className="mb-12">
-        <CardContent className="p-6 md:p-8">
-          <h2 className="text-xl font-bold mb-4">Mahsulot haqida</h2>
-          <div className="space-y-4 text-muted-foreground leading-relaxed">
-            <p>
-              LURE paxta yostiqchalari maxsus texnologiya - "suv bilan
-              silliqlash" yordamida ishlab chiqariladi, shu bilan mukammal
-              silliq sirt hosil qiladi.
-            </p>
-            <p>
-              Silliq sirt tufayli disklar kosmetik mahsulotlarni o'zlashtiradi
-              va surmaydi. Disklar delaminatsiyalanmaydi va villi qoldirmaydi.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+        {/* Product Description */}
+        {product.description && (
+          <Card className="mb-12">
+            <CardContent className="p-6 md:p-8">
+              <h2 className="text-xl font-bold mb-4">Mahsulot haqida</h2>
+              <div
+                className="space-y-4 text-muted-foreground leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: product.description }}
+              />
+            </CardContent>
+          </Card>
+        )}
 
-      {/* Seller Info */}
-      <SellerInfo />
+        {/* Seller Info */}
+        {product.seller && <SellerInfo seller={product.seller} />}
 
-      {/* Reviews */}
-      <ProductReviews />
+        {/* Reviews */}
+        <ProductReviews
+          reviews={reviews}
+          totalCount={reviewsData?.total_count}
+        />
 
-      {/* Related Products */}
-      <RelatedProducts />
-    </main>
-  );
+        {/* Related Products */}
+        {relatedProducts.length > 0 && (
+          <RelatedProducts products={relatedProducts} />
+        )}
+      </main>
+    );
 }

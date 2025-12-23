@@ -54,7 +54,11 @@ export function ProductReviews() {
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`h-4 w-4 ${i < review.rating ? "fill-primary text-primary" : "fill-muted text-muted"}`}
+                      className={`h-4 w-4 ${
+                        i < review.rating
+                          ? "fill-primary text-primary"
+                          : "fill-muted text-muted"
+                      }`}
                     />
                   ))}
                 </div>

@@ -5,56 +5,30 @@ import { Navigation, Pagination } from "swiper/modules";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRef } from "react";
 import type { Swiper as SwiperType } from "swiper";
+import { useBanners } from "@/services/queries/products";
 
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 
-const slides = [
-  {
-    id: 1,
-    image: "https://images.uzum.uz/d50ls03s2tab83s6hi10/main_page_banner.jpg",
-    alt: "Avtomobil sotib oling - kuniga 161 000 so'mdan",
-  },
-  {
-    id: 2,
-    image: "https://images.uzum.uz/d506qp8jsv1neacpatgg/main_page_banner.jpg",
-    alt: "Nasiya 2 karra foydali - Xiaomi Redmi 15C smartfoni",
-  },
-  {
-    id: 3,
-    image: "https://images.uzum.uz/d50ls03s2tab83s6hi10/main_page_banner.jpg",
-    alt: "Avtomobil sotib oling - kuniga 161 000 so'mdan",
-  },
-  {
-    id: 4,
-    image: "https://images.uzum.uz/d506qp8jsv1neacpatgg/main_page_banner.jpg",
-    alt: "Nasiya 2 karra foydali - Xiaomi Redmi 15C smartfoni",
-  },
-  {
-    id: 5,
-    image: "https://images.uzum.uz/d50ls03s2tab83s6hi10/main_page_banner.jpg",
-    alt: "Avtomobil sotib oling - kuniga 161 000 so'mdan",
-  },
-  {
-    id: 6,
-    image: "https://images.uzum.uz/d506qp8jsv1neacpatgg/main_page_banner.jpg",
-    alt: "Nasiya 2 karra foydali - Xiaomi Redmi 15C smartfoni",
-  },
-  {
-    id: 7,
-    image: "https://images.uzum.uz/d50ls03s2tab83s6hi10/main_page_banner.jpg",
-    alt: "Avtomobil sotib oling - kuniga 161 000 so'mdan",
-  },
-  {
-    id: 8,
-    image: "https://images.uzum.uz/d506qp8jsv1neacpatgg/main_page_banner.jpg",
-    alt: "Nasiya 2 karra foydali - Xiaomi Redmi 15C smartfoni",
-  },
-];
-
 export function Carousel() {
   const swiperRef = useRef<SwiperType | null>(null);
+  const { data: bannersData, isLoading } = useBanners();
+
+  const slides =
+    bannersData?.filter((banner) => banner.banner_type === "Main Banner") || [];
+
+  if (isLoading) {
+    return (
+      <div className="relative w-full px-4 py-8">
+        <div className="w-full h-[200px] md:h-[300px] bg-gray-200 animate-pulse rounded-2xl" />
+      </div>
+    );
+  }
+
+  if (slides.length === 0) {
+    return null;
+  }
 
   return (
     <div className="relative w-full px-4 py-8">
@@ -93,8 +67,8 @@ export function Carousel() {
           <SwiperSlide key={slide.id}>
             <div className="overflow-hidden rounded-2xl">
               <img
-                src={slide.image || "/placeholder.svg"}
-                alt={slide.alt}
+                src={slide.photo_full_url?.path || "/placeholder.svg"}
+                alt={slide.title || ""}
                 className="w-full h-auto object-cover aspect-[16/7]"
               />
             </div>

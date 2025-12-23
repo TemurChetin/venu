@@ -1,16 +1,51 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import {
+  useAllCategories,
+  useBrands,
+  type ProductFilterParams,
+} from "@/services/queries/products";
+import type { Category } from "@/types/api";
 
-export function CatalogFilters() {
-  const [priceRange, setPriceRange] = useState([0, 150000]);
+interface CatalogFiltersProps {
+  searchQuery?: string;
+  filters: ProductFilterParams;
+  onFiltersChange: (filters: ProductFilterParams) => void;
+}
+
+export function CatalogFilters({
+  searchQuery,
+  filters,
+  onFiltersChange,
+}: CatalogFiltersProps) {
+  const { data: categoriesData, isLoading: categoriesLoading } =
+    useAllCategories();
+  const { data: brandsData, isLoading: brandsLoading } = useBrands();
+
+  const categories = categoriesData || [];
+  const brands = brandsData?.brands || [];
+
+  const [priceRange, setPriceRange] = useState<[number, number]>([
+    filters.price_min || 0,
+    filters.price_max || 150000,
+  ]);
+
+  const [selectedCategories, setSelectedCategories] = useState<number[]>(
+    filters.category ? JSON.parse(filters.category) : []
+  );
+  const [selectedBrands, setSelectedBrands] = useState<number[]>(
+    filters.brand ? JSON.parse(filters.brand) : []
+  );
+
   const [expandedSections, setExpandedSections] = useState({
     categories: true,
+    brands: true,
     price: true,
     stock: true,
     color: true,
@@ -18,8 +53,58 @@ export function CatalogFilters() {
     country: true,
   });
 
+  // Update price range when filters change externally
+  useEffect(() => {
+    if (filters.price_min !== undefined || filters.price_max !== undefined) {
+      setPriceRange([filters.price_min || 0, filters.price_max || 150000]);
+    }
+  }, [filters.price_min, filters.price_max]);
+
+  // Update selected categories/brands when filters change externally
+  useEffect(() => {
+    if (filters.category) {
+      setSelectedCategories(
+        filters.category ? JSON.parse(filters.category) : []
+      );
+    }
+    if (filters.brand) {
+      setSelectedBrands(filters.brand ? JSON.parse(filters.brand) : []);
+    }
+  }, [filters.category, filters.brand]);
+
   const toggleSection = (section: keyof typeof expandedSections) => {
     setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }));
+  };
+
+  const handleCategoryToggle = (categoryId: number) => {
+    const newSelected = selectedCategories.includes(categoryId)
+      ? selectedCategories.filter((id) => id !== categoryId)
+      : [...selectedCategories, categoryId];
+    setSelectedCategories(newSelected);
+    onFiltersChange({
+      ...filters,
+      category: newSelected.length > 0 ? JSON.stringify(newSelected) : "[]",
+    });
+  };
+
+  const handleBrandToggle = (brandId: number) => {
+    const newSelected = selectedBrands.includes(brandId)
+      ? selectedBrands.filter((id) => id !== brandId)
+      : [...selectedBrands, brandId];
+    setSelectedBrands(newSelected);
+    onFiltersChange({
+      ...filters,
+      brand: newSelected.length > 0 ? JSON.stringify(newSelected) : "[]",
+    });
+  };
+
+  const handlePriceChange = (newRange: number[]) => {
+    setPriceRange([newRange[0], newRange[1]]);
+    onFiltersChange({
+      ...filters,
+      price_min: newRange[0] > 0 ? newRange[0] : null,
+      price_max: newRange[1] < 150000 ? newRange[1] : null,
+    });
   };
 
   return (
@@ -39,42 +124,77 @@ export function CatalogFilters() {
         </button>
         {expandedSections.categories && (
           <div className="space-y-2.5">
-            <div className="flex items-center space-x-2">
-              <Checkbox id="cat1" />
-              <Label
-                htmlFor="cat1"
-                className="text-sm font-normal cursor-pointer"
-              >
-                Kitoblar
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox id="cat2" />
-              <Label
-                htmlFor="cat2"
-                className="text-sm font-normal cursor-pointer"
-              >
-                O'quv adabiyotlari
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox id="cat3" />
-              <Label
-                htmlFor="cat3"
-                className="text-sm font-normal cursor-pointer"
-              >
-                Badiiy adabiyot
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox id="cat4" />
-              <Label
-                htmlFor="cat4"
-                className="text-sm font-normal cursor-pointer"
-              >
-                Bolalar uchun
-              </Label>
-            </div>
+            {categoriesLoading ? (
+              <div className="text-sm text-muted-foreground">
+                Yuklanmoqda...
+              </div>
+            ) : categories.length > 0 ? (
+              categories.slice(0, 10).map((category: Category) => (
+                <div key={category.id} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`cat-${category.id}`}
+                    checked={selectedCategories.includes(category.id)}
+                    onCheckedChange={() => handleCategoryToggle(category.id)}
+                  />
+                  <Label
+                    htmlFor={`cat-${category.id}`}
+                    className="text-sm font-normal cursor-pointer"
+                  >
+                    {category.name}
+                  </Label>
+                </div>
+              ))
+            ) : (
+              <div className="text-sm text-muted-foreground">
+                Kategoriyalar topilmadi
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      <div className="h-px bg-border" />
+
+      {/* Brands */}
+      <div className="space-y-3">
+        <button
+          onClick={() => toggleSection("brands")}
+          className="flex w-full items-center justify-between text-base font-semibold text-foreground"
+        >
+          Brendlar
+          {expandedSections.brands ? (
+            <ChevronUp className="h-4 w-4" />
+          ) : (
+            <ChevronDown className="h-4 w-4" />
+          )}
+        </button>
+        {expandedSections.brands && (
+          <div className="space-y-2.5">
+            {brandsLoading ? (
+              <div className="text-sm text-muted-foreground">
+                Yuklanmoqda...
+              </div>
+            ) : brands.length > 0 ? (
+              brands.slice(0, 10).map((brand) => (
+                <div key={brand.id} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`brand-${brand.id}`}
+                    checked={selectedBrands.includes(brand.id)}
+                    onCheckedChange={() => handleBrandToggle(brand.id)}
+                  />
+                  <Label
+                    htmlFor={`brand-${brand.id}`}
+                    className="text-sm font-normal cursor-pointer"
+                  >
+                    {brand.name}
+                  </Label>
+                </div>
+              ))
+            ) : (
+              <div className="text-sm text-muted-foreground">
+                Brendlar topilmadi
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -102,7 +222,10 @@ export function CatalogFilters() {
                 placeholder="0"
                 value={priceRange[0]}
                 onChange={(e) =>
-                  setPriceRange([Number(e.target.value), priceRange[1]])
+                  handlePriceChange([
+                    Number(e.target.value) || 0,
+                    priceRange[1],
+                  ])
                 }
                 className="h-10"
               />
@@ -112,14 +235,17 @@ export function CatalogFilters() {
                 placeholder="150000"
                 value={priceRange[1]}
                 onChange={(e) =>
-                  setPriceRange([priceRange[0], Number(e.target.value)])
+                  handlePriceChange([
+                    priceRange[0],
+                    Number(e.target.value) || 150000,
+                  ])
                 }
                 className="h-10"
               />
             </div>
             <Slider
               value={priceRange}
-              onValueChange={setPriceRange}
+              onValueChange={handlePriceChange}
               max={150000}
               step={1000}
               className="w-full"

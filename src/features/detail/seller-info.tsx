@@ -4,7 +4,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MessageCircle, Store } from "lucide-react";
 
-export function SellerInfo() {
+interface SellerInfoProps {
+  seller: {
+    id: number;
+    name: string;
+    logo?: string;
+    rating?: number;
+    review_count?: number;
+    product_count?: number;
+  };
+}
+
+export function SellerInfo({ seller }: SellerInfoProps) {
   return (
     <Card className="mb-12">
       <CardHeader>
@@ -15,12 +26,27 @@ export function SellerInfo() {
       </CardHeader>
       <CardContent>
         <div className="flex items-center justify-between flex-wrap gap-4">
-          <div className="space-y-1">
-            <p className="font-medium">AGE Compyuters</p>
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <span>0 Отзывы</span>
-              <span>•</span>
-              <span>475 Товары</span>
+          <div className="flex items-center gap-4">
+            {seller.logo && (
+              <img
+                src={seller.logo}
+                alt={seller.name}
+                className="h-12 w-12 rounded-full object-cover"
+              />
+            )}
+            <div className="space-y-1">
+              <p className="font-medium">{seller.name}</p>
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                {seller.review_count !== undefined && (
+                  <>
+                    <span>{seller.review_count} Отзывы</span>
+                    <span>•</span>
+                  </>
+                )}
+                {seller.product_count !== undefined && (
+                  <span>{seller.product_count} Товары</span>
+                )}
+              </div>
             </div>
           </div>
           <Button variant="outline" className="gap-2 bg-transparent">
