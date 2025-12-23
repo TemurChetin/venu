@@ -12,34 +12,6 @@ export interface ThumbnailUrl {
   status: number;
 }
 
-export interface Product {
-  id: number;
-  name: string;
-  slug: string;
-  product_type: string;
-  unit_price: number;
-  discount: number;
-  discount_type: string;
-  current_stock: number;
-  thumbnail?: string;
-  thumbnail_full_url?: ThumbnailUrl;
-  rating?: number[];
-  review_count?: number;
-  reviews_count?: number;
-  wish_list?: number;
-  wish_list_count?: number;
-  images_full_url?: ImageUrl[];
-}
-
-export interface ProductListResponse {
-  total_size: number;
-  limit: number;
-  offset: number;
-  products: Product[];
-  min_price: number;
-  max_price: number;
-}
-
 export interface BannerPhotoUrl {
   key: string;
   path: string;
@@ -67,18 +39,117 @@ export interface GuestIdResponse {
   guest_id: number;
 }
 
+export interface SellerImageFullUrl {
+  key: string;
+  path: string;
+  status: number;
+}
+
+export interface ShopImageFullUrl {
+  key: string | null;
+  path: string | null;
+  status: number;
+}
+
+export interface Shop {
+  id: number;
+  seller_id: number;
+  name: string;
+  slug: string;
+  address: string;
+  contact: string;
+  image: string;
+  image_storage_type: string;
+  bottom_banner: string;
+  bottom_banner_storage_type: string;
+  offer_banner: string | null;
+  offer_banner_storage_type: string;
+  vacation_start_date: string | null;
+  vacation_end_date: string | null;
+  vacation_note: string | null;
+  vacation_status: boolean;
+  temporary_close: boolean;
+  created_at: string;
+  updated_at: string;
+  banner: string;
+  banner_storage_type: string;
+  long: string;
+  lat: string;
+  region_id: number;
+  district_id: number;
+  image_full_url: ShopImageFullUrl;
+  bottom_banner_full_url: ShopImageFullUrl;
+  offer_banner_full_url: ShopImageFullUrl;
+  banner_full_url: ShopImageFullUrl;
+}
+
+export interface SellerStorage {
+  id: number;
+  data_type: string;
+  data_id: string;
+  key: string;
+  value: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Seller {
+  id: number;
+  f_name: string;
+  l_name: string;
+  phone: string;
+  image: string;
+  email: string;
+  password: string;
+  status: string;
+  remember_token: string;
+  created_at: string;
+  updated_at: string;
+  bank_name: string;
+  branch: string;
+  account_no: string;
+  holder_name: string;
+  auth_token: string | null;
+  sales_commission_percentage: number | null;
+  gst: number | null;
+  cm_firebase_token: string | null;
+  pos_status: number;
+  minimum_order_amount: number;
+  free_delivery_status: number;
+  free_delivery_over_amount: number;
+  app_language: string;
+  vat_percent: number;
+  inn: number;
+  image_full_url: SellerImageFullUrl;
+  shop: Shop;
+  storage: SellerStorage[];
+}
+
+export interface Product {
+  id: number;
+  name: string;
+  slug: string;
+  product_type: string;
+  unit_price: number;
+  discount: number;
+  discount_type: string;
+  current_stock: number;
+  thumbnail?: string;
+  thumbnail_full_url?: ThumbnailUrl;
+  rating?: number[];
+  review_count?: number;
+  reviews_count?: number;
+  wish_list?: number;
+  wish_list_count?: number;
+  images_full_url?: ImageUrl[];
+}
+
 // Product Detail Types
 export type ProductDetailResponse = Product & {
-  description?: string;
+  details?: string;
   short_description?: string;
-  seller?: {
-    id: number;
-    name: string;
-    logo?: string;
-    rating?: number;
-    review_count?: number;
-    product_count?: number;
-  };
+  seller?: Seller;
+
   category?: {
     id: number;
     name: string;

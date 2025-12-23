@@ -1,16 +1,13 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
 import { usePublicQuery } from "./use-public-query";
-import { instance } from "../api";
 import { useGuestId } from "../guest-id";
 import type {
-  ProductListResponse,
   BannersResponse,
   ProductDetailResponse,
   ProductReviewsResponse,
   CategoriesResponse,
-  Category,
+  Product,
 } from "@/types/api";
 
 /**
@@ -29,7 +26,7 @@ export const useBanners = () => {
 
 // Latest Products
 export const useLatestProducts = (limit = 10, offset = 0) => {
-  return usePublicQuery<ProductListResponse>({
+  return usePublicQuery<Product[]>({
     url: "/v1/products/latest",
     query: { limit, offset },
     enabled: true,
@@ -38,7 +35,7 @@ export const useLatestProducts = (limit = 10, offset = 0) => {
 
 // New Arrival Products
 export const useNewArrivalProducts = (limit = 10, offset = 0) => {
-  return usePublicQuery<ProductListResponse>({
+  return usePublicQuery<Product[]>({
     url: "/v1/products/new-arrival",
     query: { limit, offset },
     enabled: true,
@@ -47,7 +44,7 @@ export const useNewArrivalProducts = (limit = 10, offset = 0) => {
 
 // Top Rated Products
 export const useTopRatedProducts = (limit = 10, offset = 0) => {
-  return usePublicQuery<ProductListResponse>({
+  return usePublicQuery<Product[]>({
     url: "/v1/products/top-rated",
     query: { limit, offset },
     enabled: true,
@@ -56,7 +53,7 @@ export const useTopRatedProducts = (limit = 10, offset = 0) => {
 
 // Best Selling Products
 export const useBestSellingProducts = (limit = 10, offset = 0) => {
-  return usePublicQuery<ProductListResponse>({
+  return usePublicQuery<Product[]>({
     url: "/v1/products/best-sellings",
     query: { limit, offset },
     enabled: true,
@@ -65,7 +62,7 @@ export const useBestSellingProducts = (limit = 10, offset = 0) => {
 
 // Featured Products
 export const useFeaturedProducts = (limit = 10, offset = 0) => {
-  return usePublicQuery<ProductListResponse>({
+  return usePublicQuery<Product[]>({
     url: "/v1/products/featured",
     query: { limit, offset },
     enabled: true,
@@ -74,7 +71,7 @@ export const useFeaturedProducts = (limit = 10, offset = 0) => {
 
 // Discounted Products
 export const useDiscountedProducts = (limit = 10, offset = 0) => {
-  return usePublicQuery<ProductListResponse>({
+  return usePublicQuery<Product[]>({
     url: "/v1/products/discounted-product",
     query: { limit, offset },
     enabled: true,
@@ -100,14 +97,14 @@ export const useProductReviews = (productSlug: string) => {
 
 // Related Products
 export const useRelatedProducts = (
-  productSlug: string,
+  productId?: number,
   limit = 10,
   offset = 0
 ) => {
-  return usePublicQuery<ProductListResponse>({
-    url: `/v1/products/related-products/${productSlug}`,
+  return usePublicQuery<Product[]>({
+    url: `/v1/products/related-products/${productId}`,
     query: { limit, offset },
-    enabled: !!productSlug,
+    enabled: !!productId,
   });
 };
 
@@ -179,7 +176,7 @@ export const useProductFilter = (params: ProductFilterParams) => {
     product_type: params.product_type || "all",
   };
 
-  return usePublicQuery<ProductListResponse>({
+  return usePublicQuery<Product[]>({
     url: "/v1/products/filter",
     enabled: !isLoadingGuestId,
     method: "POST",

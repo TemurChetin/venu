@@ -25,11 +25,11 @@ export default function DetailPage() {
   const { data: productData, isLoading: isLoadingProduct } =
     useProductDetail(productSlug);
   const { data: reviewsData } = useProductReviews(productSlug);
-  const { data: relatedProductsData } = useRelatedProducts(productSlug, 4);
+  const { data: relatedProductsData } = useRelatedProducts(productData?.id, 4);
 
   const product = productData;
   const reviews = reviewsData?.reviews || [];
-  const relatedProducts = relatedProductsData?.products || [];
+  const relatedProducts = relatedProductsData || [];
 
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<number | null>(null);
@@ -310,14 +310,18 @@ export default function DetailPage() {
         </div>
 
         {/* Product Description */}
-        {product.description && (
+        {product.details && (
           <Card className="mb-12">
-            <CardContent className="p-6 md:p-8">
+            <CardContent>
               <h2 className="text-xl font-bold mb-4">Mahsulot haqida</h2>
               <div
                 className="space-y-4 text-muted-foreground leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: product.description }}
+                dangerouslySetInnerHTML={{ __html: product.details }}
               />
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Eaque
+              molestiae delectus amet neque dolorum, cum beatae consectetur ipsa
+              earum laboriosam natus repellat veniam corrupti eligendi impedit
+              aspernatur quam, nemo sapiente.
             </CardContent>
           </Card>
         )}
