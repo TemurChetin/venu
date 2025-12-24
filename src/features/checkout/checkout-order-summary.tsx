@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ShoppingBag, Truck, Minus, Plus, Trash2 } from "lucide-react";
+import { formatCurrency } from "@/lib/format-currency";
 
 interface OrderItem {
   id: string;
@@ -110,7 +111,7 @@ export function CheckoutOrderSummary({
                   </button>
                 </div>
                 <p className="mt-1 text-sm font-semibold">
-                  {item.price.toLocaleString("uz-UZ")} so'm
+                  {formatCurrency(item.price)}
                 </p>
               </div>
             </div>
@@ -124,9 +125,7 @@ export function CheckoutOrderSummary({
             <span className="text-muted-foreground">
               Mahsulotlar ({items.length})
             </span>
-            <span className="font-medium">
-              {subtotal.toLocaleString("uz-UZ")} so'm
-            </span>
+            <span className="font-medium">{formatCurrency(subtotal)}</span>
           </div>
 
           <div className="flex justify-between">
@@ -138,7 +137,7 @@ export function CheckoutOrderSummary({
               {isFreeDelivery ? (
                 <span className="text-green-600">Bepul</span>
               ) : (
-                `${deliveryPrice.toLocaleString("uz-UZ")} so'm`
+                formatCurrency(deliveryPrice)
               )}
             </span>
           </div>
@@ -148,14 +147,14 @@ export function CheckoutOrderSummary({
           <div className="flex justify-between text-base">
             <span className="font-semibold">Jami:</span>
             <span className="text-xl font-bold text-primary">
-              {total.toLocaleString("uz-UZ")} so'm
+              {formatCurrency(total)}
             </span>
           </div>
 
           {subtotal < 1000000 && (
             <p className="rounded-lg bg-primary/10 p-3 text-xs text-primary">
-              Yana {(1000000 - subtotal).toLocaleString("uz-UZ")} so'm qo'shing
-              va bepul yetkazishdan foydalaning!
+              Yana {formatCurrency(1000000 - subtotal)} qo'shing va bepul
+              yetkazishdan foydalaning!
             </p>
           )}
         </div>

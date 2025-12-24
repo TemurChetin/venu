@@ -1,6 +1,14 @@
 "use client";
 
-import { ShoppingCart, Heart, User, Search, Menu, X } from "lucide-react";
+import {
+  ShoppingCart,
+  Heart,
+  User,
+  Search,
+  Menu,
+  X,
+  LogOut,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
@@ -16,34 +24,85 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
+import { useSession, signOut } from "next-auth/react";
+import { PhoneAuthModal } from "@/components/auth";
+import { toast } from "react-hot-toast";
+import {
+  useWishlist,
+  useRemoveFromWishlist,
+  useCart,
+  useUpdateCart,
+  useRemoveFromCart,
+  useAddToCart,
+} from "@/services/queries";
 
 export default function DesktopHeader() {
-  const [cartItems, setCartItems] = useState([
-    {
-      id: "1",
-      name: "Paxta yostiqchalari Soft Cotton Lure!, 120 dona",
-      price: 23455,
-      quantity: 2,
-      image:
-        "https://media.moddb.com/images/downloads/1/297/296999/no-photo-or-blank-image-icon-loa.jpg",
-      size: "16 GB",
-      color: "white",
-    },
-  ]);
-  const [wishlistItems, setWishlistItems] = useState([
-    {
-      id: "2",
-      name: "Paxta yostiqchalari Soft Cotton Lure!, 120 dona",
-      price: 23455,
-      originalPrice: 25990,
-      discount: 12,
-      image:
-        "https://media.moddb.com/images/downloads/1/297/296999/no-photo-or-blank-image-icon-loa.jpg",
-      inStock: true,
-    },
-  ]);
-
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const { data: session } = useSession();
+
+  // Wishlist API hooks
+  const { data: wishlistData, isLoading: isWishlistLoading } = useWishlist(
+    !!session
+  );
+  const removeFromWishlist = useRemoveFromWishlist();
+
+  // Cart API hooks - only fetch when user is authenticated
+  const { data: cartData, isLoading: isCartLoading } = useCart(!!session);
+  const updateCart = useUpdateCart();
+  const removeFromCart = useRemoveFromCart();
+  const addToCart = useAddToCart();
+
+  // Handle remove from wishlist
+  const handleRemoveFromWishlist = (productId: number) => {
+    removeFromWishlist.mutate(productId);
+  };
+
+  // Handle add to cart from wishlist
+  const handleAddToCart = (productId: number) => {
+    if (!session) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+    addToCart.mutate({
+      id: productId,
+      quantity: 1,
+    });
+  };
+
+  // Handle update cart quantity
+  const handleUpdateCartQuantity = (key: number, quantity: number) => {
+    if (!session) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+    updateCart.mutate({ key, quantity });
+  };
+
+  // Handle remove from cart
+  const handleRemoveFromCart = (key: number) => {
+    if (!session) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+    removeFromCart.mutate({ key });
+  };
+
+  // Get cart items and count
+  const cartItems = cartData || [];
+  const cartItemsCount = cartItems.reduce(
+    (sum, item) => sum + item.quantity,
+    0
+  );
+
+  const handleLogout = async () => {
+    try {
+      await signOut({ redirect: false });
+      toast.success("Muvaffaqiyatli chiqildi");
+    } catch (error) {
+      toast.error("Chiqishda xatolik yuz berdi");
+    }
+  };
 
   return (
     <header className="z-50 relative w-full border-b border-border bg-background/95 backdrop-blur">
@@ -104,47 +163,68 @@ export default function DesktopHeader() {
 
           {/* Actions */}
           <div className="flex items-center gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="relative hidden sm:flex"
-                >
-                  <User className="h-5 w-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem asChild>
-                  <Link href="/settings">Hisobim</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/orders">Buyurtmalarim</Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {session ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="relative hidden sm:flex"
+                  >
+                    <User className="h-5 w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <Link href="/settings">Hisobim</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/orders">Buyurtmalarim</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Chiqish
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative hidden sm:flex"
+                onClick={() => setIsAuthModalOpen(true)}
+              >
+                <User className="h-5 w-5" />
+              </Button>
+            )}
             <WishlistDrawer
-              onRemoveItem={() => {}}
-              items={wishlistItems}
-              onAddToCart={() => {}}
+              onRemoveItem={handleRemoveFromWishlist}
+              items={wishlistData || []}
+              onAddToCart={handleAddToCart}
+              isLoading={isWishlistLoading}
             >
               <Button variant="ghost" size="icon" className="relative">
                 <Heart className="h-5 w-5" />
-                <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs bg-primary">
-                  {wishlistItems.length}
-                </Badge>
+                {wishlistData && wishlistData.length > 0 && (
+                  <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs bg-primary">
+                    {wishlistData.length}
+                  </Badge>
+                )}
               </Button>
             </WishlistDrawer>
             <CartDrawer
-              onUpdateQuantity={() => {}}
-              onRemoveItem={() => {}}
+              onUpdateQuantity={handleUpdateCartQuantity}
+              onRemoveItem={handleRemoveFromCart}
               items={cartItems}
+              isLoading={isCartLoading}
             >
               <Button variant="ghost" size="icon" className="relative">
                 <ShoppingCart className="h-5 w-5" />
-                <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs bg-primary">
-                  {cartItems.reduce((sum, item) => sum + item.quantity, 0)}
-                </Badge>
+                {cartItemsCount > 0 && (
+                  <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs bg-primary">
+                    {cartItemsCount}
+                  </Badge>
+                )}
               </Button>
             </CartDrawer>
           </div>
@@ -186,6 +266,10 @@ export default function DesktopHeader() {
       <CatalogModal
         isOpen={isCatalogOpen}
         onClose={() => setIsCatalogOpen(false)}
+      />
+      <PhoneAuthModal
+        open={isAuthModalOpen}
+        onOpenChange={setIsAuthModalOpen}
       />
     </header>
   );

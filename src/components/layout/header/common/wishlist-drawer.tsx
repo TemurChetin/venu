@@ -13,22 +13,15 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
-
-interface WishlistItem {
-  id: string;
-  name: string;
-  price: number;
-  originalPrice?: number;
-  discount?: number;
-  image: string;
-  inStock: boolean;
-}
+import { WishlistProduct } from "@/types/api";
+import { formatCurrency } from "@/lib/format-currency";
 
 interface WishlistDrawerProps {
-  items: WishlistItem[];
-  onRemoveItem: (id: string) => void;
-  onAddToCart: (id: string) => void;
+  items: WishlistProduct[];
+  onRemoveItem: (productId: number) => void;
+  onAddToCart: (productId: number) => void;
   children: React.ReactNode;
+  isLoading?: boolean;
 }
 
 export function WishlistDrawer({
@@ -36,7 +29,56 @@ export function WishlistDrawer({
   onRemoveItem,
   onAddToCart,
   children,
+  isLoading = false,
 }: WishlistDrawerProps) {
+  // Transform API data to display format
+  const transformItem = (item: WishlistProduct) => {
+    const product = item.product_full_info || item.productFullInfo;
+    if (!product) return null;
+
+    const originalPrice = product.unit_price;
+    const discountAmount =
+      product.discount_type === "percentage" ||
+      product.discount_type === "percent"
+        ? (originalPrice * product.discount) / 100
+        : product.discount || 0;
+    const discountedPrice = originalPrice - discountAmount;
+    const discountPercent =
+      product.discount_type === "percentage" ||
+      product.discount_type === "percent"
+        ? product.discount
+        : product.discount > 0
+        ? Math.round((discountAmount / originalPrice) * 100)
+        : 0;
+
+    // Get product image
+    const imageUrl =
+      product.thumbnail_full_url?.path ||
+      (product.thumbnail
+        ? `${process.env.NEXT_PUBLIC_API || ""}/storage/product/thumbnail/${
+            product.thumbnail
+          }`
+        : null) ||
+      product.images_full_url?.[0]?.path ||
+      "/placeholder.svg";
+
+    return {
+      id: item.id,
+      productId: product.id,
+      name: product.name,
+      price: discountedPrice,
+      originalPrice: discountPercent > 0 ? originalPrice : undefined,
+      discount: discountPercent > 0 ? discountPercent : undefined,
+      image: imageUrl,
+      inStock: product.current_stock > 0,
+      slug: product.slug,
+    };
+  };
+
+  const displayItems = items
+    .map(transformItem)
+    .filter((item): item is NonNullable<typeof item> => item !== null);
+
   return (
     <Sheet>
       <SheetTrigger asChild>{children}</SheetTrigger>
@@ -47,7 +89,7 @@ export function WishlistDrawer({
         <SheetHeader className="p-6 pb-4">
           <SheetTitle className="flex items-center gap-2 text-xl">
             <Heart className="h-5 w-5 fill-primary text-primary" />
-            Sevimlilar ({items.length})
+            Sevimlilar ({displayItems.length})
           </SheetTitle>
           <SheetDescription>Sizning sevimli mahsulotlaringiz</SheetDescription>
         </SheetHeader>
@@ -55,7 +97,11 @@ export function WishlistDrawer({
         <Separator />
 
         <div className="flex-1 overflow-y-auto p-6">
-          {items.length === 0 ? (
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center h-full text-center">
+              <p className="text-sm text-muted-foreground">Yuklanmoqda...</p>
+            </div>
+          ) : displayItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
               <Heart className="h-16 w-16 text-muted-foreground mb-4" />
               <p className="text-lg font-medium mb-2">Sevimlilar bo'sh</p>
@@ -65,7 +111,7 @@ export function WishlistDrawer({
             </div>
           ) : (
             <div className="space-y-4">
-              {items.map((item) => (
+              {displayItems.map((item) => (
                 <div
                   key={item.id}
                   className="group relative p-4 rounded-lg border bg-card hover:shadow-md transition-shadow"
@@ -74,15 +120,15 @@ export function WishlistDrawer({
                     size="icon"
                     variant="ghost"
                     className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                    onClick={() => onRemoveItem(item.id)}
+                    onClick={() => onRemoveItem(item.productId)}
                   >
                     <X className="h-4 w-4" />
                   </Button>
 
                   <div className="flex gap-4">
-                    <div className="relative h-24 w-24 flex-shrink-0 rounded-md overflow-hidden bg-muted">
+                    <div className="relative h-24 w-24 shrink-0 rounded-md overflow-hidden bg-muted">
                       <Image
-                        src={item.image || "/placeholder.svg"}
+                        src={item.image}
                         alt={item.name}
                         fill
                         className="object-cover"
@@ -96,12 +142,12 @@ export function WishlistDrawer({
 
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-bold text-primary">
-                          {item.price.toLocaleString()} so'm
+                          {formatCurrency(item.price)}
                         </span>
                         {item.originalPrice && (
                           <>
                             <span className="text-sm text-muted-foreground line-through">
-                              {item.originalPrice.toLocaleString()}
+                              {formatCurrency(item.originalPrice)}
                             </span>
                             {item.discount && (
                               <Badge
@@ -119,7 +165,7 @@ export function WishlistDrawer({
                         <Button
                           size="sm"
                           className="w-full h-9"
-                          onClick={() => onAddToCart(item.id)}
+                          onClick={() => onAddToCart(item.productId)}
                         >
                           <ShoppingCart className="h-4 w-4 mr-2" />
                           Savatga qo'shish

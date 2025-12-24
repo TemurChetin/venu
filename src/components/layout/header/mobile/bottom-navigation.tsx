@@ -5,6 +5,14 @@ import { Home, Search, ShoppingCart, Package, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { CartDrawer } from "../common/cart-drawer";
+import { useSession } from "next-auth/react";
+import {
+  useCart,
+  useUpdateCart,
+  useRemoveFromCart,
+} from "@/services/queries";
+import { PhoneAuthModal } from "@/components/auth";
+import { useState } from "react";
 
 type Props = {
   cartItemsCount?: number;
@@ -44,22 +52,38 @@ const Navigation = [
   },
 ];
 
-// Mock cart items for drawer
-const mockCartItems = [
-  {
-    id: "1",
-    name: "Paxta yostiqchalari Soft Cotton Lure!, 120 dona",
-    price: 23455,
-    quantity: 2,
-    image:
-      "https://media.moddb.com/images/downloads/1/297/296999/no-photo-or-blank-image-icon-loa.jpg",
-    size: "16 GB",
-    color: "white",
-  },
-];
-
-function BottomNavigation({ cartItemsCount = 2 }: Props) {
+function BottomNavigation({ cartItemsCount: propCartItemsCount }: Props) {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  // Cart API hooks - only fetch when user is authenticated
+  const { data: cartData, isLoading: isCartLoading } = useCart(!!session);
+  const updateCart = useUpdateCart();
+  const removeFromCart = useRemoveFromCart();
+
+  // Handle update cart quantity
+  const handleUpdateCartQuantity = (key: number, quantity: number) => {
+    if (!session) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+    updateCart.mutate({ key, quantity });
+  };
+
+  // Handle remove from cart
+  const handleRemoveFromCart = (key: number) => {
+    if (!session) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+    removeFromCart.mutate({ key });
+  };
+
+  // Get cart items and count
+  const cartItems = cartData?.cart || [];
+  const cartItemsCount =
+    propCartItemsCount ?? cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const isActive = (href: string) => {
     if (href === "/") {
@@ -70,6 +94,10 @@ function BottomNavigation({ cartItemsCount = 2 }: Props) {
 
   return (
     <>
+      <PhoneAuthModal
+        open={isAuthModalOpen}
+        onOpenChange={setIsAuthModalOpen}
+      />
       <nav
         className={cn(
           "fixed bottom-0 left-0 right-0 z-50",
@@ -88,9 +116,10 @@ function BottomNavigation({ cartItemsCount = 2 }: Props) {
               return (
                 <CartDrawer
                   key={item.id}
-                  items={mockCartItems}
-                  onUpdateQuantity={() => {}}
-                  onRemoveItem={() => {}}
+                  items={cartItems}
+                  onUpdateQuantity={handleUpdateCartQuantity}
+                  onRemoveItem={handleRemoveFromCart}
+                  isLoading={isCartLoading}
                 >
                   <button
                     className={cn(

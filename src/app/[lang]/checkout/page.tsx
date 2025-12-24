@@ -8,10 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Textarea } from "@/components/ui/textarea";
-import { MapPin, User, Tag, CreditCard, Truck, Check } from "lucide-react";
+import { User, Tag, CreditCard, Truck, Check } from "lucide-react";
 import { CheckoutOrderSummary } from "@/features/checkout/checkout-order-summary";
-import { MapSelector } from "@/features/checkout/map-selector";
+import DeliveryMap from "@/features/checkout/map";
 
 const checkoutSchema = z.object({
   fullName: z.string().min(2, "Ism kamida 2 ta belgidan iborat bo'lishi kerak"),
@@ -116,81 +115,7 @@ export default function CheckoutPage() {
               </div>
 
               {/* Delivery Address */}
-              <div className="rounded-2xl bg-white p-6 shadow-sm">
-                <h2 className="mb-6 flex items-center gap-2 text-xl font-semibold">
-                  <MapPin className="h-5 w-5 text-primary" />
-                  Yetkazib berish manzili
-                </h2>
-
-                <div className="space-y-4">
-                  <div>
-                    <Label>Manzil turi</Label>
-                    <RadioGroup
-                      defaultValue="home"
-                      onValueChange={(value) =>
-                        setValue("addressType", value as any)
-                      }
-                      className="mt-2 flex gap-4"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="home" id="home" />
-                        <Label
-                          htmlFor="home"
-                          className="cursor-pointer font-normal"
-                        >
-                          Uy
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="office" id="office" />
-                        <Label
-                          htmlFor="office"
-                          className="cursor-pointer font-normal"
-                        >
-                          Ofis
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="other" id="other" />
-                        <Label
-                          htmlFor="other"
-                          className="cursor-pointer font-normal"
-                        >
-                          Boshqa
-                        </Label>
-                      </div>
-                    </RadioGroup>
-                  </div>
-
-                  <div>
-                    <Label>Xaritadan manzilni belgilang</Label>
-                    <MapSelector
-                      onLocationSelect={(location) =>
-                        setSelectedLocation(location)
-                      }
-                      className="mt-2"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="address">
-                      Aniq manzil <span className="text-destructive">*</span>
-                    </Label>
-                    <Textarea
-                      id="address"
-                      placeholder="Ko'cha, uy, kvartira raqamini kiriting..."
-                      {...register("address")}
-                      className="mt-2"
-                      rows={3}
-                    />
-                    {errors.address && (
-                      <p className="mt-1 text-sm text-destructive">
-                        {errors.address.message}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
+              <DeliveryMap />
 
               {/* Delivery Method */}
               <div className="rounded-2xl bg-white p-6 shadow-sm">

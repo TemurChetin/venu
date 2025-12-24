@@ -144,6 +144,15 @@ export interface Product {
   images_full_url?: ImageUrl[];
 }
 
+export interface ProductListResponse {
+  total_size: number;
+  limit: number;
+  offset: number;
+  products: Product[];
+  min_price: number;
+  max_price: number;
+}
+
 // Product Detail Types
 export type ProductDetailResponse = Product & {
   details?: string;
@@ -217,3 +226,153 @@ export type Category = {
 };
 
 export interface CategoriesResponse extends Array<Category> {}
+
+// Wishlist Types
+export type WishlistProduct = {
+  id: number;
+  customer_id: number;
+  product_id: number;
+  created_at: string;
+  updated_at: string;
+  productFullInfo?: ProductFullInfo;
+  product_full_info?: ProductFullInfo;
+};
+
+export type ProductFullInfo = {
+  id: number;
+  added_by: string;
+  user_id: number;
+  name: string;
+  slug: string;
+  product_type: string;
+  category_ids?: Array<{ id: string; position: number }> | string;
+  category_id: number;
+  sub_category_id: number;
+  sub_sub_category_id: number;
+  brand_id: number;
+  unit: string;
+  min_qty: number;
+  refundable: number;
+  digital_product_type: string | null;
+  digital_file_ready: string | null;
+  digital_file_ready_storage_type: string;
+  images: string;
+  color_image: string;
+  thumbnail: string;
+  thumbnail_storage_type: string;
+  preview_file: string | null;
+  preview_file_storage_type: string;
+  featured: number | null;
+  flash_deal: number | null;
+  video_provider: string;
+  video_url: string | null;
+  colors?: any[] | string;
+  variant_product: number;
+  attributes?: any[] | string;
+  choice_options?: any[] | string;
+  variation?: any[] | string;
+  digital_product_file_types: any[];
+  digital_product_extensions: any[];
+  published: number;
+  unit_price: number;
+  purchase_price: number;
+  tax: number;
+  tax_type: string;
+  tax_model: string;
+  discount: number;
+  discount_type: string;
+  current_stock: number;
+  minimum_order_qty: number;
+  details: string;
+  free_shipping: number;
+  attachment: string | null;
+  created_at: string;
+  updated_at: string;
+  status: number;
+  featured_status: number;
+  meta_title: string;
+  meta_description: string;
+  meta_image?: string;
+  request_status?: number;
+  denied_note?: string | null;
+  shipping_cost?: number;
+  multiply_qty?: number;
+  temp_shipping_cost?: number | null;
+  is_shipping_cost_updated?: number | null;
+  code?: string;
+  mxik?: string;
+  weight?: string;
+  height?: string;
+  width?: string;
+  length?: string;
+  package_code?: string;
+  is_install?: number;
+  is_seasonal?: number;
+  is_discount?: number;
+  is_shop_temporary_close?: number;
+  thumbnail_full_url?: {
+    key: string;
+    path: string;
+    status: number;
+  };
+  preview_file_full_url?: {
+    key: string | null;
+    path: string | null;
+    status: number;
+  };
+  color_images_full_url?: Array<any>;
+  meta_image_full_url?: {
+    key: string;
+    path: string;
+    status: number;
+  };
+  images_full_url?: Array<{
+    key: string;
+    path: string;
+    status: number;
+  }>;
+  digital_file_ready_full_url?: {
+    key: string | null;
+    path: string | null;
+    status: number;
+  };
+  clearance_sale?: number | null;
+  translations?: any[];
+  reviews?: any[];
+  colors_formatted?: any[];
+};
+
+export type WishlistResponse = WishlistProduct[];
+
+// Cart Types
+export interface CartItem {
+  id: number;
+  product_id: number;
+  quantity: number;
+  price: number;
+  discount: number;
+  tax: number;
+  product?: ProductFullInfo;
+  product_full_info?: ProductFullInfo;
+  variant?: string;
+  color?: string;
+  size?: string;
+}
+
+export interface CartResponse extends Array<CartItem> {}
+
+export interface AddToCartRequest {
+  id: number;
+  quantity: number;
+  variant?: string;
+  color?: string;
+}
+
+export interface RemoveFromCartRequest {
+  key: number;
+}
+
+export interface UpdateCartRequest {
+  key: number;
+  quantity: number;
+}

@@ -31,9 +31,8 @@ instanceAuth.interceptors.request.use(
   async (config) => {
     const session = await getSession();
 
-    // TODO: Extract access token from session
-    // const accessToken = session?.accessToken;
-    const accessToken = "";
+    // Extract access token from session
+    const accessToken = (session as any)?.accessToken;
 
     if (accessToken) {
       config.headers["Authorization"] = `Bearer ${accessToken}`;

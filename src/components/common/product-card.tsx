@@ -1,12 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Heart, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/format-currency";
 import { TbBasketPlus } from "react-icons/tb";
 import { Button } from "../ui/button";
 import { Link } from "@/i18n/routing";
+import { useSession } from "next-auth/react";
+import { PhoneAuthModal } from "@/components/auth";
+import {
+  useAddToWishlist,
+  useRemoveFromWishlist,
+  useWishlist,
+  useAddToCart,
+} from "@/services/queries";
 
 import { Product } from "@/types/api";
 
@@ -23,8 +31,29 @@ export function ProductCard({
     { name: "Bej", value: "#d4c4b0" },
   ],
 }: ProductCardProps) {
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const { data: session } = useSession();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [selectedColor, setSelectedColor] = useState(0);
+
+  // Wishlist hooks - only fetch when user is authenticated
+  const { data: wishlistData } = useWishlist(!!session);
+  const addToWishlist = useAddToWishlist();
+  const removeFromWishlist = useRemoveFromWishlist();
+
+  // Cart hooks
+  const addToCart = useAddToCart();
+
+  // Check if product is in wishlist
+  const [isWishlisted, setIsWishlisted] = useState(false);
+
+  // Update wishlist status when wishlistData or product changes
+  useEffect(() => {
+    setIsWishlisted(
+      wishlistData?.some(
+        (wishlistProduct) => wishlistProduct.product_id === product.id
+      ) ?? false
+    );
+  }, [wishlistData, product.id]);
 
   // Calculate average rating
   const averageRating =
@@ -56,14 +85,57 @@ export function ProductCard({
   // Get review count
   const reviewCount = product.reviews_count || product.review_count || 0;
 
+  // Handle wishlist toggle
+  const handleWishlistToggle = async () => {
+    // If user is not authenticated, show login modal
+    if (!session) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+
+    // If authenticated, toggle wishlist
+    if (isWishlisted) {
+      removeFromWishlist.mutate(product.id);
+      setIsWishlisted(false);
+    } else {
+      addToWishlist.mutate(product.id);
+      setIsWishlisted(true);
+    }
+  };
+
+  // Handle add to cart
+  const handleAddToCart = async () => {
+    // If user is not authenticated, show login modal
+    if (!session) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+
+    // Add to cart with default quantity 1
+    addToCart.mutate({
+      id: product.id,
+      quantity: 1,
+    });
+  };
+
+  const isLoading =
+    addToWishlist.isPending ||
+    removeFromWishlist.isPending ||
+    addToCart.isPending;
+
   return (
     <>
-      <Link href={`/products/${product.slug}`} className="w-full max-w-[320px]">
+      <PhoneAuthModal
+        open={isAuthModalOpen}
+        onOpenChange={setIsAuthModalOpen}
+      />
+      <div className="w-full max-w-[320px]">
         {/* Header with badge and wishlist */}
         <div className="relative">
           <button
-            onClick={() => setIsWishlisted(!isWishlisted)}
-            className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white transition-colors"
+            onClick={handleWishlistToggle}
+            disabled={isLoading}
+            className="cursor-pointer absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Heart
               className={cn(
@@ -74,13 +146,16 @@ export function ProductCard({
           </button>
 
           {/* Product Image */}
-          <div className="overflow-hidden rounded-xl">
+          <Link
+            href={`/products/${product.slug}`}
+            className="relative block overflow-hidden rounded-xl"
+          >
             <img
               src={thumbnailImage}
               alt={product.name}
               className="h-[250px] hover:scale-105 transition-all duration-300 md:h-[315px] w-full object-cover rounded-xl overflow-hidden"
             />
-          </div>
+          </Link>
 
           {/* Color Options */}
           <div className="absolute bottom-4 left-4 flex gap-2">
@@ -120,12 +195,12 @@ export function ProductCard({
 
           {/* Title */}
           <h3 className="mb-3 text-xs line-clamp-2 leading-snug text-foreground">
-            {product.name}
+            <Link href={`/products/${product.slug}`}>{product.name}</Link>
           </h3>
 
           {/* Prices and Cart Button */}
           <div className="flex items-end justify-between">
-            <div>
+            <Link href={`/products/${product.slug}`}>
               {product.discount > 0 && (
                 <p className="text-xs text-muted-foreground line-through">
                   {formattedOriginalPrice}
@@ -134,13 +209,18 @@ export function ProductCard({
               <p className="text-sm font-bold text-primary">
                 {formatCurrency(discountedPrice)}
               </p>
-            </div>
-            <Button variant="default" size={"icon"}>
+            </Link>
+            <Button
+              variant="default"
+              size={"icon"}
+              onClick={handleAddToCart}
+              disabled={isLoading || product.current_stock <= 0}
+            >
               <TbBasketPlus />
             </Button>
           </div>
         </div>
-      </Link>
+      </div>
     </>
   );
 }

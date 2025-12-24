@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Copy, Package, Clock, CheckCircle2, XCircle } from "lucide-react";
+import { formatCurrency } from "@/lib";
 
 // Mock data - bu yerda API dan ma'lumot keladi
 const orders = [
@@ -205,7 +206,7 @@ export default function OrdersPage() {
                                 <span>{item.quantity} ta tovar</span>
                                 <span>•</span>
                                 <span className="font-semibold text-foreground">
-                                  {item.price.toLocaleString("uz-UZ")} so'm
+                                  {formatCurrency(item.price)}
                                 </span>
                               </div>
                             </div>
@@ -244,7 +245,7 @@ export default function OrdersPage() {
                         )}
                       </div>
                       <span className="text-2xl font-bold">
-                        {order.total.toLocaleString("uz-UZ")} so'm
+                        {formatCurrency(order.total)}
                       </span>
                     </div>
 

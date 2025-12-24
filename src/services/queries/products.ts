@@ -8,6 +8,7 @@ import type {
   ProductReviewsResponse,
   CategoriesResponse,
   Product,
+  ProductListResponse,
 } from "@/types/api";
 
 /**
@@ -26,7 +27,7 @@ export const useBanners = () => {
 
 // Latest Products
 export const useLatestProducts = (limit = 10, offset = 0) => {
-  return usePublicQuery<Product[]>({
+  return usePublicQuery<ProductListResponse>({
     url: "/v1/products/latest",
     query: { limit, offset },
     enabled: true,
@@ -35,7 +36,7 @@ export const useLatestProducts = (limit = 10, offset = 0) => {
 
 // New Arrival Products
 export const useNewArrivalProducts = (limit = 10, offset = 0) => {
-  return usePublicQuery<Product[]>({
+  return usePublicQuery<ProductListResponse>({
     url: "/v1/products/new-arrival",
     query: { limit, offset },
     enabled: true,
@@ -44,7 +45,7 @@ export const useNewArrivalProducts = (limit = 10, offset = 0) => {
 
 // Top Rated Products
 export const useTopRatedProducts = (limit = 10, offset = 0) => {
-  return usePublicQuery<Product[]>({
+  return usePublicQuery<ProductListResponse>({
     url: "/v1/products/top-rated",
     query: { limit, offset },
     enabled: true,
@@ -53,7 +54,7 @@ export const useTopRatedProducts = (limit = 10, offset = 0) => {
 
 // Best Selling Products
 export const useBestSellingProducts = (limit = 10, offset = 0) => {
-  return usePublicQuery<Product[]>({
+  return usePublicQuery<ProductListResponse>({
     url: "/v1/products/best-sellings",
     query: { limit, offset },
     enabled: true,
@@ -62,7 +63,7 @@ export const useBestSellingProducts = (limit = 10, offset = 0) => {
 
 // Featured Products
 export const useFeaturedProducts = (limit = 10, offset = 0) => {
-  return usePublicQuery<Product[]>({
+  return usePublicQuery<ProductListResponse>({
     url: "/v1/products/featured",
     query: { limit, offset },
     enabled: true,
@@ -71,7 +72,7 @@ export const useFeaturedProducts = (limit = 10, offset = 0) => {
 
 // Discounted Products
 export const useDiscountedProducts = (limit = 10, offset = 0) => {
-  return usePublicQuery<Product[]>({
+  return usePublicQuery<ProductListResponse>({
     url: "/v1/products/discounted-product",
     query: { limit, offset },
     enabled: true,
