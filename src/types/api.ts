@@ -347,15 +347,38 @@ export type WishlistResponse = WishlistProduct[];
 // Cart Types
 export interface CartItem {
   id: number;
+  customer_id?: number;
+  cart_group_id?: string;
   product_id: number;
+  product_type?: string;
+  digital_product_type?: string | null;
+  color?: string | null;
+  choices?: any[];
+  variations?: any[];
+  variant?: string;
   quantity: number;
   price: number;
-  discount: number;
   tax: number;
+  discount: number;
+  tax_model?: string;
+  is_checked?: number;
+  slug?: string;
+  name?: string;
+  thumbnail?: string;
+  seller_id?: number;
+  seller_is?: string;
+  created_at?: string;
+  updated_at?: string;
+  shop_info?: string;
+  shipping_cost?: number;
+  shipping_type?: string;
+  is_guest?: number;
+  is_product_available?: number;
+  minimum_order_amount_info?: number;
+  free_delivery_order_amount?: any;
   product?: ProductFullInfo;
   product_full_info?: ProductFullInfo;
-  variant?: string;
-  color?: string;
+  shop?: Shop;
   size?: string;
 }
 
@@ -405,4 +428,83 @@ export interface OrdersResponse {
   total_size?: number;
   limit?: number;
   offset?: number;
+}
+
+// Address Types
+export interface Address {
+  id: number;
+  customer_id: string;
+  is_guest: boolean;
+  contact_person_name: string;
+  email: string | null;
+  address_type: "home" | "office" | "other";
+  address: string;
+  city: string;
+  zip: string;
+  phone: string;
+  created_at: string;
+  updated_at: string;
+  state: string | null;
+  country: string;
+  latitude: string;
+  longitude: string;
+  is_billing: boolean;
+  region_id: number;
+  delivery_method: string;
+  district_id: number;
+}
+
+export interface AddressesResponse extends Array<Address> {}
+
+// Delivery Method Types
+export interface DeliveryMethod {
+  title: string;
+  code: "yandex" | "bts" | "free";
+}
+
+export interface DeliveryMethodsResponse extends Array<DeliveryMethod> {}
+
+// Shipping Method Types
+export interface ChooseShippingMethodRequest {
+  id: number;
+  guest_id: string;
+  cart_group_id: string;
+}
+
+// Calculate Types
+export interface CalculateDeliveryRequest {
+  delivery_method: string;
+  customer_id: number;
+  long: number;
+  lat: number;
+  district: string;
+}
+
+export interface CalculateDeliveryResponse {
+  detail: string;
+  price: number;
+}
+
+// Order Create Types
+export interface CreateOrderRequest {
+  order_note?: string;
+  customer_id: string;
+  address_id: string;
+  billing_address_id: string;
+  coupon_code?: string;
+  coupon_discount?: string;
+  payment_platform?: string;
+  payment_method: "click" | "payme";
+  callback?: string | null;
+  payment_request_from?: string;
+  guest_id: string;
+  is_guest: boolean;
+  is_check_create_account?: string;
+  password?: string;
+  delivery_method: string;
+}
+
+export interface CreateOrderResponse {
+  redirect_link: string;
+  new_user: number;
 }
