@@ -66,9 +66,8 @@ export function usePublicQuery<T>({
     : finalUrl;
 
   // Include data in query key for POST requests to ensure refetch when data changes
-  const queryKey = method === "POST" && data
-    ? [debouncedUrl, data]
-    : [debouncedUrl];
+  const queryKey =
+    method === "POST" && data ? [debouncedUrl, data] : [debouncedUrl];
 
   return useQuery<T>({
     queryKey,

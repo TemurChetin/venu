@@ -163,41 +163,55 @@ export function AddAddressModal({
 
   // Initialize map
   const initMap = useCallback(() => {
-    if (!mapRef.current || mapInstance.current || !isOpen) return;
+    if (!mapRef.current || mapInstance.current) return;
+
+    if (!window.ymaps) {
+      console.warn("Yandex Maps not loaded yet");
+      return;
+    }
 
     window.ymaps.ready(() => {
+      if (!mapRef.current || mapInstance.current) return;
+
       const initialCenter =
         initialData?.latitude && initialData?.longitude
           ? [initialData.latitude, initialData.longitude]
           : TASHKENT_CENTER;
 
-      mapInstance.current = new window.ymaps.Map(
-        mapRef.current,
-        {
-          center: initialCenter,
-          zoom: 16,
-          controls: ["zoomControl"],
-        },
-        {
-          suppressMapOpenBlock: true,
-          yandexMapDisablePoiInteractivity: true,
-        }
-      );
+      try {
+        mapInstance.current = new window.ymaps.Map(
+          mapRef.current,
+          {
+            center: initialCenter,
+            zoom: 16,
+            controls: ["zoomControl"],
+          },
+          {
+            suppressMapOpenBlock: true,
+            yandexMapDisablePoiInteractivity: true,
+          }
+        );
 
-      // When map moves, get address from center
-      mapInstance.current.events.add("actionend", () => {
-        const newCenter = mapInstance.current.getCenter();
-        const [lat, lng] = newCenter;
-        setMapCoords([lat, lng]);
-        setValue("latitude", lat, { shouldValidate: false });
-        setValue("longitude", lng, { shouldValidate: false });
-        getAddressFromMap(newCenter);
-      });
+        // When map moves, get address from center
+        mapInstance.current.events.add("actionend", () => {
+          if (mapInstance.current) {
+            const newCenter = mapInstance.current.getCenter();
+            const [lat, lng] = newCenter;
+            setMapCoords([lat, lng]);
+            setValue("latitude", lat, { shouldValidate: false });
+            setValue("longitude", lng, { shouldValidate: false });
+            getAddressFromMap(newCenter);
+          }
+        });
 
-      getAddressFromMap(initialCenter);
-      setIsMapLoading(false);
+        getAddressFromMap(initialCenter);
+        setIsMapLoading(false);
+      } catch (error) {
+        console.error("Error initializing map:", error);
+        setIsMapLoading(false);
+      }
     });
-  }, [isOpen, initialData, setValue, getAddressFromMap]);
+  }, [initialData, setValue, getAddressFromMap]);
 
   // Locate user
   const locateMe = useCallback(() => {
@@ -205,7 +219,9 @@ export function AddAddressModal({
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           const userCoords = [pos.coords.latitude, pos.coords.longitude];
-          mapInstance.current.setCenter(userCoords, 17, { duration: 500 });
+          if (mapInstance.current) {
+            mapInstance.current.setCenter(userCoords, 17, { duration: 500 });
+          }
         },
         () => {
           console.warn("Geolocation not available");
@@ -214,19 +230,33 @@ export function AddAddressModal({
     }
   }, []);
 
-  // Initialize map when modal opens
+  // Initialize map when modal opens and Yandex Maps is ready
   useEffect(() => {
-    if (isOpen && window.ymaps && !mapInstance.current) {
-      initMap();
+    if (!isOpen) return;
+
+    // Check if Yandex Maps is already loaded
+    if (window.ymaps && window.ymaps.ready) {
+      // Small delay to ensure DOM is ready
+      const timer = setTimeout(() => {
+        if (mapRef.current && !mapInstance.current) {
+          initMap();
+        }
+      }, 100);
+      return () => clearTimeout(timer);
     }
   }, [isOpen, initMap]);
 
   // Cleanup map when modal closes
   useEffect(() => {
     if (!isOpen && mapInstance.current) {
-      mapInstance.current.destroy();
+      try {
+        mapInstance.current.destroy();
+      } catch (error) {
+        console.error("Error destroying map:", error);
+      }
       mapInstance.current = null;
       setIsMapLoading(true);
+      setMapAddress("");
     }
   }, [isOpen]);
 
@@ -380,10 +410,14 @@ export function AddAddressModal({
       {/* Yandex Maps Script */}
       <Script
         src="https://api-maps.yandex.ru/2.1/?apikey=2abfe0ab-2d42-40c3-afad-e74cb318f0d6&lang=uz_UZ"
+        strategy="lazyOnload"
         onLoad={() => {
-          if (isOpen) {
-            initMap();
-          }
+          // Script loaded, map will be initialized by useEffect when modal opens
+          console.log("Yandex Maps script loaded");
+        }}
+        onError={(e) => {
+          console.error("Error loading Yandex Maps script:", e);
+          setIsMapLoading(false);
         }}
       />
 

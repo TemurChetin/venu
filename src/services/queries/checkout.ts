@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
 import { instanceAuth, instance } from "../api";
 import { usePublicQuery } from "./use-public-query";
 import { useGuestId } from "../guest-id";
@@ -42,12 +43,27 @@ export function useCartForCheckout() {
 
 /**
  * Hook to get user's addresses
- * Uses guest_id for public API access
+ * Uses authenticated request with session token and guest_id
  */
 export function useAddresses() {
-  return usePublicQuery<AddressesResponse>({
-    url: "/api/v1/customer/address/list",
-    requiresGuestId: true,
+  const { data: session } = useSession();
+  const { guestId, isLoading: isLoadingGuestId } = useGuestId();
+
+  return useQuery<AddressesResponse>({
+    queryKey: ["/v1/customer/address/list", guestId, session?.user?.id],
+    queryFn: async () => {
+      // Build URL with guest_id query parameter
+      let url = "/v1/customer/address/list";
+      if (guestId) {
+        url += queryGenerator({ guest_id: guestId });
+      }
+
+      // instanceAuth automatically adds Authorization header from session
+      const { data } = await instanceAuth.get<AddressesResponse>(url);
+      return data;
+    },
+    enabled: (!isLoadingGuestId && !!guestId) || !!session, // Enable if guest_id is loaded or user is authenticated
+    retry: false,
   });
 }
 

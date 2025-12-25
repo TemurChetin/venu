@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -96,13 +96,41 @@ export default function CheckoutNewPage() {
     }
   }, [selectedAddress, deliveryMethods]);
 
+  // Track previous values to prevent unnecessary recalculations
+  const prevCalcParamsRef = useRef<{
+    addressId?: number;
+    deliveryMethod?: string | null;
+    isFreeEligible?: boolean;
+  }>({});
+
   // Calculate delivery cost when address and delivery method are selected
   useEffect(() => {
+    const addressId = selectedAddress?.id;
+    const deliveryMethod = selectedDeliveryMethod;
+    const isFreeEligible = isFreeDeliveryEligible;
+
+    // Skip if values haven't changed
+    const prev = prevCalcParamsRef.current;
+    if (
+      prev.addressId === addressId &&
+      prev.deliveryMethod === deliveryMethod &&
+      prev.isFreeEligible === isFreeEligible
+    ) {
+      return;
+    }
+
+    // Update ref
+    prevCalcParamsRef.current = {
+      addressId,
+      deliveryMethod,
+      isFreeEligible,
+    };
+
     if (
       selectedAddress &&
-      selectedDeliveryMethod &&
-      selectedDeliveryMethod !== "free" &&
-      !isFreeDeliveryEligible
+      deliveryMethod &&
+      deliveryMethod !== "free" &&
+      !isFreeEligible
     ) {
       const customerId = session?.user?.id
         ? parseInt(session.user.id, 10)
@@ -111,7 +139,7 @@ export default function CheckoutNewPage() {
       if (customerId) {
         calculateDelivery.mutate(
           {
-            delivery_method: selectedDeliveryMethod,
+            delivery_method: deliveryMethod,
             customer_id: customerId,
             long: parseFloat(selectedAddress.longitude),
             lat: parseFloat(selectedAddress.latitude),
@@ -127,15 +155,17 @@ export default function CheckoutNewPage() {
           }
         );
       }
-    } else if (selectedDeliveryMethod === "free" || isFreeDeliveryEligible) {
+    } else if (deliveryMethod === "free" || isFreeEligible) {
       setDeliveryCost(0);
     }
   }, [
-    selectedAddress,
+    selectedAddress?.id,
+    selectedAddress?.longitude,
+    selectedAddress?.latitude,
+    selectedAddress?.district_id,
     selectedDeliveryMethod,
     isFreeDeliveryEligible,
-    session,
-    calculateDelivery,
+    session?.user?.id,
   ]);
 
   // Handle shipping method selection
