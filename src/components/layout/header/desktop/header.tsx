@@ -213,15 +213,26 @@ export default function DesktopHeader() {
             </button>
           </div>
           <div className="flex items-center gap-4">
-            <button className="text-muted-foreground hover:text-foreground transition-colors">
+            <Link
+              href="https://t.me/Venumarketplace"
+              target="_blank"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
               Sotuvchi bo'lish
-            </button>
-            <button className="text-muted-foreground hover:text-foreground transition-colors">
+            </Link>
+            <Link
+              href={"https://t.me/Venumarketplace"}
+              target="_blank"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
               Savol-javob
-            </button>
-            <button className="text-muted-foreground hover:text-foreground transition-colors">
+            </Link>
+            <Link
+              href={"/orders"}
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
               Mening buyurtmalarim
-            </button>
+            </Link>
             <button className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors">
               <span className="text-base">🇺🇿</span>
               <span>O'zbekcha</span>
