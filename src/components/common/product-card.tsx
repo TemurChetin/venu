@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Heart, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { formatCurrency } from "@/lib/format-currency";
+import { useFormatCurrency } from "@/lib/format-currency";
 import { TbBasketPlus } from "react-icons/tb";
 import { Button } from "../ui/button";
 import { Link } from "@/i18n/routing";
@@ -42,6 +42,9 @@ export function ProductCard({
 
   // Cart hooks
   const addToCart = useAddToCart();
+
+  // Currency formatting hook
+  const formatCurrency = useFormatCurrency();
 
   // Check if product is in wishlist
   const [isWishlisted, setIsWishlisted] = useState(false);

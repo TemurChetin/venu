@@ -16,7 +16,7 @@ import {
   useProductReviews,
   useRelatedProducts,
 } from "@/services/queries/products";
-import { formatCurrency } from "@/lib/format-currency";
+import { useFormatCurrency } from "@/lib/format-currency";
 
 export default function DetailPage() {
   const params = useParams();
@@ -30,6 +30,8 @@ export default function DetailPage() {
   const product = productData;
   const reviews = reviewsData?.reviews || [];
   const relatedProducts = relatedProductsData || [];
+
+  const formatCurrency = useFormatCurrency();
 
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<number | null>(null);

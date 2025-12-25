@@ -13,7 +13,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
 import { CartItem as ApiCartItem } from "@/types/api";
-import { formatCurrency } from "@/lib/format-currency";
+import { useFormatCurrency } from "@/lib/format-currency";
 import { Link } from "@/i18n/routing";
 import { useState } from "react";
 
@@ -43,6 +43,7 @@ export function CartDrawer({
   children,
   isLoading = false,
 }: CartDrawerProps) {
+  const formatCurrency = useFormatCurrency();
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
   // Transform API cart items to display format

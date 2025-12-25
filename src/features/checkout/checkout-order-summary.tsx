@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ShoppingBag, Truck, Minus, Plus, Trash2 } from "lucide-react";
-import { formatCurrency } from "@/lib/format-currency";
+import { useFormatCurrency, formatUZS } from "@/lib/format-currency";
 
 interface OrderItem {
   id: string;
@@ -25,6 +25,7 @@ export function CheckoutOrderSummary({
   isFreeDelivery,
   onSubmit,
 }: CheckoutOrderSummaryProps) {
+  const formatCurrency = useFormatCurrency();
   const [items, setItems] = useState<OrderItem[]>([
     {
       id: "1",
@@ -137,7 +138,7 @@ export function CheckoutOrderSummary({
               {isFreeDelivery ? (
                 <span className="text-green-600">Bepul</span>
               ) : (
-                formatCurrency(deliveryPrice)
+                formatUZS(deliveryPrice)
               )}
             </span>
           </div>
@@ -153,7 +154,7 @@ export function CheckoutOrderSummary({
 
           {subtotal < 1000000 && (
             <p className="rounded-lg bg-primary/10 p-3 text-xs text-primary">
-              Yana {formatCurrency(1000000 - subtotal)} qo'shing va bepul
+              Yana {formatUZS(1000000 - subtotal)} qo'shing va bepul
               yetkazishdan foydalaning!
             </p>
           )}

@@ -14,7 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import { WishlistProduct } from "@/types/api";
-import { formatCurrency } from "@/lib/format-currency";
+import { useFormatCurrency } from "@/lib/format-currency";
 
 interface WishlistDrawerProps {
   items: WishlistProduct[];
@@ -31,6 +31,8 @@ export function WishlistDrawer({
   children,
   isLoading = false,
 }: WishlistDrawerProps) {
+  const formatCurrency = useFormatCurrency();
+  
   // Transform API data to display format
   const transformItem = (item: WishlistProduct) => {
     const product = item.product_full_info || item.productFullInfo;

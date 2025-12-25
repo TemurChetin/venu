@@ -14,7 +14,9 @@ import { Order } from "@/types/api";
 const ITEMS_PER_PAGE = 10;
 
 export default function OrdersPage() {
-  const [activeTab, setActiveTab] = useState<"all" | "delivered" | "out_for_delivery">("all");
+  const [activeTab, setActiveTab] = useState<
+    "all" | "delivered" | "out_for_delivery"
+  >("all");
   const [currentPage, setCurrentPage] = useState(1);
 
   // Calculate offset based on current page
@@ -100,7 +102,11 @@ export default function OrdersPage() {
 
   return (
     <div className="w-full">
-      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+      <Tabs
+        value={activeTab}
+        onValueChange={handleTabChange}
+        className="w-full"
+      >
         <TabsList className="grid w-full max-w-md grid-cols-3 mt-6">
           <TabsTrigger value="all" className="gap-2">
             <Package className="h-4 w-4" />
@@ -162,7 +168,9 @@ export default function OrdersPage() {
                     <CardHeader className="border-b bg-muted/30">
                       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-center gap-3">
-                          <Badge className={`${statusInfo.color} border px-3 py-1`}>
+                          <Badge
+                            className={`${statusInfo.color} border px-3 py-1`}
+                          >
                             <StatusIcon className="mr-1.5 h-3.5 w-3.5" />
                             {statusInfo.label}
                           </Badge>
@@ -181,11 +189,14 @@ export default function OrdersPage() {
                           </div>
                         </div>
                         <time className="text-sm text-muted-foreground">
-                          {new Date(order.created_at).toLocaleDateString("uz-UZ", {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                          })}
+                          {new Date(order.created_at).toLocaleDateString(
+                            "uz-UZ",
+                            {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            }
+                          )}
                         </time>
                       </div>
                     </CardHeader>
@@ -200,7 +211,10 @@ export default function OrdersPage() {
                             </h4>
                             <div className="space-y-4">
                               {order.items.map((item, idx) => (
-                                <div key={idx} className="flex items-start gap-4">
+                                <div
+                                  key={idx}
+                                  className="flex items-start gap-4"
+                                >
                                   {item.image && (
                                     <div className="h-20 w-20 overflow-hidden rounded-lg border bg-muted">
                                       <img
@@ -212,7 +226,8 @@ export default function OrdersPage() {
                                   )}
                                   <div className="flex-1">
                                     <h5 className="font-semibold">
-                                      {item.product_name || `Mahsulot #${item.product_id}`}
+                                      {item.product_name ||
+                                        `Mahsulot #${item.product_id}`}
                                     </h5>
                                     <div className="mt-1 flex items-center gap-4 text-sm text-muted-foreground">
                                       <span>{item.quantity} ta tovar</span>
@@ -229,14 +244,18 @@ export default function OrdersPage() {
                         )}
 
                         {/* Delivery Info - if available */}
-                        {(order.delivery_address || order.recipient || order.phone) && (
+                        {(order.delivery_address ||
+                          order.recipient ||
+                          order.phone) && (
                           <div className="grid gap-4 rounded-lg border bg-muted/30 p-4 md:grid-cols-2">
                             {order.delivery_address && (
                               <div>
                                 <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
                                   Yetkazib berish manzili:
                                 </p>
-                                <p className="text-sm">{order.delivery_address}</p>
+                                <p className="text-sm">
+                                  {order.delivery_address}
+                                </p>
                               </div>
                             )}
                             {(order.recipient || order.phone) && (
@@ -245,7 +264,9 @@ export default function OrdersPage() {
                                   Buyurtmani qabul qiluvchi:
                                 </p>
                                 {order.recipient && (
-                                  <p className="text-sm font-medium">{order.recipient}</p>
+                                  <p className="text-sm font-medium">
+                                    {order.recipient}
+                                  </p>
                                 )}
                                 {order.phone && (
                                   <p className="text-sm text-muted-foreground">

@@ -6,3 +6,4 @@ export * from "./orders";
 export * from "./checkout";
 export * from "./addresses";
 export * from "./regions";
+export * from "./config";
