@@ -12,16 +12,51 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { User, Phone, Calendar, LogOut, Save } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { User, Phone, Calendar, LogOut, Save, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
+import { useMutation } from "@tanstack/react-query";
+import { instanceAuth } from "@/services/api";
+import { signOut } from "next-auth/react";
 
 export default function SettingsPage() {
   const [isEditing, setIsEditing] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
   const [formData, setFormData] = useState({
     firstName: "Muhiddin",
     lastName: "Kabraliev",
     birthDate: "1995-03-15",
     phone: "+998905650213",
+  });
+
+  const deleteAccountMutation = useMutation({
+    mutationFn: async (password: string) => {
+      const { data } = await instanceAuth.post("/v1/customer/account-delete", {
+        password,
+      });
+      return data;
+    },
+    onSuccess: () => {
+      toast.success("Hisobingiz muvaffaqiyatli o'chirildi");
+      setIsDeleteDialogOpen(false);
+      setDeletePassword("");
+      signOut({ callbackUrl: "/" });
+    },
+    onError: (error: any) => {
+      const errorMessage =
+        error?.response?.data?.errors?.[0]?.message ||
+        error?.response?.data?.message ||
+        "Hisobni o'chirishda xatolik yuz berdi";
+      toast.error(errorMessage);
+    },
   });
 
   const handleSave = () => {
@@ -33,6 +68,14 @@ export default function SettingsPage() {
   const handleLogout = () => {
     // Bu yerda logout logikasi bo'ladi
     toast.success("Siz tizimdan muvaffaqiyatli chiqdingiz");
+  };
+
+  const handleDeleteAccount = () => {
+    if (!deletePassword) {
+      toast.error("Parolni kiriting");
+      return;
+    }
+    deleteAccountMutation.mutate(deletePassword);
   };
 
   return (
@@ -156,8 +199,84 @@ export default function SettingsPage() {
               Tizimdan chiqish
             </Button>
           </div>
+
+          <Separator />
+
+          {/* Delete Account Section */}
+          <div className="pt-4">
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold text-destructive">
+                Xavfli sozlamalar
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Hisobingizni o'chirish orqali barcha ma'lumotlaringiz butunlay
+                yo'qoladi. Bu amalni qaytarib bo'lmaydi.
+              </p>
+              <Button
+                variant="destructive"
+                onClick={() => setIsDeleteDialogOpen(true)}
+                className="mt-4"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Hisobni o'chirish
+              </Button>
+            </div>
+          </div>
         </CardContent>
       </Card>
+
+      {/* Delete Account Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-destructive">
+              Hisobni o'chirishni tasdiqlash
+            </DialogTitle>
+            <DialogDescription>
+              Hisobingizni o'chirish uchun parolingizni kiriting. Bu amalni
+              qaytarib bo'lmaydi va barcha ma'lumotlaringiz yo'qoladi.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="deletePassword">Parol</Label>
+              <Input
+                id="deletePassword"
+                type="password"
+                placeholder="Parolingizni kiriting"
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleDeleteAccount();
+                  }
+                }}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsDeleteDialogOpen(false);
+                setDeletePassword("");
+              }}
+              disabled={deleteAccountMutation.isPending}
+            >
+              Bekor qilish
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteAccount}
+              disabled={deleteAccountMutation.isPending || !deletePassword}
+            >
+              {deleteAccountMutation.isPending
+                ? "O'chirilmoqda..."
+                : "Hisobni o'chirish"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

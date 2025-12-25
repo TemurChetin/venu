@@ -376,3 +376,33 @@ export interface UpdateCartRequest {
   key: number;
   quantity: number;
 }
+
+// Order Types
+export interface Order {
+  id: number;
+  order_amount: number;
+  order_status: string;
+  payment_status: string;
+  created_at: string;
+  items?: OrderItem[];
+  delivery_address?: string;
+  recipient?: string;
+  phone?: string;
+}
+
+export interface OrderItem {
+  id: number;
+  product_id: number;
+  product_name?: string;
+  quantity: number;
+  price: number;
+  image?: string;
+  variant?: string;
+}
+
+export interface OrdersResponse {
+  orders: Order[];
+  total_size?: number;
+  limit?: number;
+  offset?: number;
+}
