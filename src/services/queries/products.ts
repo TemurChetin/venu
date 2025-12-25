@@ -114,8 +114,7 @@ export const useCategories = () => {
   return usePublicQuery<CategoriesResponse>({
     url: "/v1/products/home-categories",
     query: {
-      limit: 1,
-      offset: 0,
+      include_children: true,
     },
     enabled: true,
   });

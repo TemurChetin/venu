@@ -6,11 +6,7 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { CartDrawer } from "../common/cart-drawer";
 import { useSession } from "next-auth/react";
-import {
-  useCart,
-  useUpdateCart,
-  useRemoveFromCart,
-} from "@/services/queries";
+import { useCart, useUpdateCart, useRemoveFromCart } from "@/services/queries";
 import { PhoneAuthModal } from "@/components/auth";
 import { useState } from "react";
 
@@ -81,9 +77,10 @@ function BottomNavigation({ cartItemsCount: propCartItemsCount }: Props) {
   };
 
   // Get cart items and count
-  const cartItems = cartData?.cart || [];
+  const cartItems = cartData ?? [];
   const cartItemsCount =
-    propCartItemsCount ?? cartItems.reduce((sum, item) => sum + item.quantity, 0);
+    propCartItemsCount ??
+    cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const isActive = (href: string) => {
     if (href === "/") {

@@ -2,57 +2,13 @@
 
 import type React from "react";
 
-import { useState, useMemo, useEffect } from "react";
-import {
-  Smartphone,
-  Refrigerator,
-  Shirt,
-  Footprints,
-  Glasses,
-  Sparkles,
-  Heart,
-  Home,
-  ChevronRight,
-  Package,
-} from "lucide-react";
+import { useState, useEffect } from "react";
+import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Link, useRouter } from "@/i18n/routing";
+import { useRouter } from "@/i18n/routing";
 import { useCategories } from "@/services/queries/products";
+import type { Category, SubCategory, SubSubCategory } from "@/types/api";
 import Image from "next/image";
-
-interface SubCategory {
-  name: string;
-  items: string[];
-}
-
-interface Category {
-  id: string;
-  name: string;
-  icon: React.ReactNode;
-  subCategories: SubCategory[];
-  featured?: string[];
-}
-
-// Icon mapping function
-const getIconFromString = (iconName?: string): React.ReactNode => {
-  const iconMap: Record<string, React.ReactNode> = {
-    smartphone: <Smartphone className="h-5 w-5" />,
-    refrigerator: <Refrigerator className="h-5 w-5" />,
-    shirt: <Shirt className="h-5 w-5" />,
-    footprints: <Footprints className="h-5 w-5" />,
-    glasses: <Glasses className="h-5 w-5" />,
-    sparkles: <Sparkles className="h-5 w-5" />,
-    heart: <Heart className="h-5 w-5" />,
-    home: <Home className="h-5 w-5" />,
-  };
-
-  if (iconName) {
-    const normalized = iconName.toLowerCase().replace(/[^a-z0-9]/g, "");
-    return iconMap[normalized] || <Package className="h-5 w-5" />;
-  }
-
-  return <Package className="h-5 w-5" />;
-};
 
 export function CatalogModal({
   isOpen,
@@ -163,9 +119,9 @@ export function CatalogModal({
                         : "text-foreground hover:bg-muted"
                     }`}
                   >
-                    {category.icon && (
+                    {category.icon_full_url.path && (
                       <Image
-                        src={category.icon}
+                        src={category.icon_full_url.path}
                         alt={category.name}
                         width={20}
                         height={20}
@@ -185,43 +141,52 @@ export function CatalogModal({
             </div>
 
             {/* Right Content - Subcategories */}
-            {/* <div className="flex-1 p-8">
-              <div className="grid grid-cols-3 gap-8">
-                {activeCategory.subcategories?.map((subCategory, index) => (
-                  <div key={index}>
-                    <h3 className="mb-3 font-semibold text-foreground">
-                      {subCategory.name}
-                    </h3>
-                    <ul className="space-y-2">
-                      {subCategory.subcategories &&
-                      subCategory.subcategories?.length > 0 ? (
-                        subCategory.subcategories?.map((item, itemIndex) => (
-                          <li key={itemIndex}>
-                            <Link
-                              onClick={onClose}
-                              href="/search"
-                              className="text-sm text-muted-foreground transition-colors hover:text-primary"
-                            >
-                              {item.name}
-                            </Link>
-                          </li>
-                        ))
-                      ) : (
-                        <li>
-                          <Link
-                            onClick={onClose}
-                            href={`/search?category=${activeCategory.id}`}
-                            className="text-sm text-muted-foreground transition-colors hover:text-primary"
-                          >
-                            {subCategory.name}
-                          </Link>
-                        </li>
-                      )}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            </div> */}
+            <div className="flex-1 p-8">
+              {activeCategory.childes && activeCategory.childes.length > 0 ? (
+                <div className="grid grid-cols-3 gap-8">
+                  {activeCategory.childes.map((subCategory: SubCategory) => (
+                    <div key={subCategory.id}>
+                      <button
+                        onClick={() => {
+                          router.push(`/search?category=${subCategory.id}`);
+                          onClose();
+                        }}
+                        className="mb-3 font-semibold text-foreground hover:text-primary transition-colors text-left"
+                      >
+                        {subCategory.name}
+                      </button>
+                      {subCategory.childes && subCategory.childes.length > 0 ? (
+                        <ul className="space-y-2">
+                          {subCategory.childes.map(
+                            (subSubCategory: SubSubCategory) => (
+                              <li key={subSubCategory.id}>
+                                <button
+                                  onClick={() => {
+                                    router.push(
+                                      `/search?category=${subSubCategory.id}`
+                                    );
+                                    onClose();
+                                  }}
+                                  className="text-sm text-muted-foreground transition-colors hover:text-primary text-left"
+                                >
+                                  {subSubCategory.name}
+                                </button>
+                              </li>
+                            )
+                          )}
+                        </ul>
+                      ) : null}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-full">
+                  <p className="text-muted-foreground">
+                    Bu kategoriyada subkategoriyalar mavjud emas
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

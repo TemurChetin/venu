@@ -20,20 +20,11 @@ import { Product } from "@/types/api";
 
 interface ProductCardProps {
   product: Product;
-  colors?: { name: string; value: string }[];
 }
 
-export function ProductCard({
-  product,
-  colors = [
-    { name: "Qora", value: "#1a1a2e" },
-    { name: "Pushti", value: "#e8a0a0" },
-    { name: "Bej", value: "#d4c4b0" },
-  ],
-}: ProductCardProps) {
+export function ProductCard({ product }: ProductCardProps) {
   const { data: session } = useSession();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [selectedColor, setSelectedColor] = useState(0);
 
   // Wishlist hooks - only fetch when user is authenticated
   const { data: wishlistData } = useWishlist(!!session);
@@ -159,24 +150,6 @@ export function ProductCard({
               className="h-[250px] hover:scale-105 transition-all duration-300 md:h-[315px] w-full object-cover rounded-xl overflow-hidden"
             />
           </Link>
-
-          {/* Color Options */}
-          <div className="absolute bottom-4 left-4 flex gap-2">
-            {colors.map((color, index) => (
-              <button
-                key={color.name}
-                onClick={() => setSelectedColor(index)}
-                className={cn(
-                  "h-5 w-5 rounded-full border-2 transition-all",
-                  selectedColor === index
-                    ? "border-white ring-2 ring-gray-400"
-                    : "border-transparent"
-                )}
-                style={{ backgroundColor: color.value }}
-                title={color.name}
-              />
-            ))}
-          </div>
         </div>
 
         {/* Product Info */}

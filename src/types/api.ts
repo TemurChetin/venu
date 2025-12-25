@@ -204,13 +204,47 @@ export interface ProductReviewsResponse {
 }
 
 // Category Types
+export interface SubSubCategory {
+  id: number;
+  name: string;
+  slug: string;
+  icon: string | null;
+  parent_id: number;
+  position: number;
+  created_at: string;
+  updated_at: string;
+  icon_full_url?: {
+    key: string;
+    path: string;
+    status: number;
+  };
+  childes?: never; // Sub-subcategoryalarda childes bo'lmaydi
+}
+
+export interface SubCategory {
+  id: number;
+  name: string;
+  slug: string;
+  icon: string | null;
+  parent_id: number;
+  position: number;
+  created_at: string;
+  updated_at: string;
+  icon_full_url?: {
+    key: string;
+    path: string;
+    status: number;
+  };
+  childes?: SubSubCategory[]; // Sub-subcategoryalar
+}
+
 export type Category = {
   id: number;
   name: string;
   slug: string;
   icon: string;
   icon_storage_type: string;
-  parent_id: number;
+  parent_id: number | null;
   position: number;
   created_at: string;
   updated_at: string;
@@ -223,6 +257,7 @@ export type Category = {
     status: number;
   };
   translations: any[];
+  childes?: SubCategory[]; // Subcategoryalar
 };
 
 export interface CategoriesResponse extends Array<Category> {}
