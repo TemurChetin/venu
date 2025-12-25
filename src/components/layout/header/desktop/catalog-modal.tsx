@@ -18,7 +18,6 @@ import {
 import { cn } from "@/lib/utils";
 import { Link, useRouter } from "@/i18n/routing";
 import { useCategories } from "@/services/queries/products";
-import type { Category as ApiCategory } from "@/types/api";
 import Image from "next/image";
 
 interface SubCategory {

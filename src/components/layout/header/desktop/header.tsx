@@ -8,13 +8,14 @@ import {
   Menu,
   X,
   LogOut,
+  ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import { Link } from "@/i18n/routing";
 import IntelisceneSearchInput from "./inteliscene-search-input";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { WishlistDrawer } from "../common/wishlist-drawer";
 import { CartDrawer } from "../common/cart-drawer";
 import { CatalogModal } from "./catalog-modal";
@@ -23,7 +24,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
+import { DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useSession, signOut } from "next-auth/react";
 import { PhoneAuthModal } from "@/components/auth";
 import { toast } from "react-hot-toast";
@@ -34,12 +35,21 @@ import {
   useUpdateCart,
   useRemoveFromCart,
   useAddToCart,
+  useCategories,
 } from "@/services/queries";
 
 export default function DesktopHeader() {
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [visibleCategoriesCount, setVisibleCategoriesCount] = useState<
+    number | null
+  >(null);
+  const navRef = useRef<HTMLElement>(null);
+  const categoryRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
   const { data: session } = useSession();
+  const { data: categoriesData, isLoading: isCategoriesLoading } =
+    useCategories();
+  const categories = categoriesData ?? [];
 
   // Wishlist API hooks
   const { data: wishlistData, isLoading: isWishlistLoading } = useWishlist(
@@ -103,6 +113,94 @@ export default function DesktopHeader() {
       toast.error("Chiqishda xatolik yuz berdi");
     }
   };
+
+  // Calculate visible categories based on available space
+  useEffect(() => {
+    if (categories.length === 0) {
+      setVisibleCategoriesCount(null);
+      return;
+    }
+
+    const calculateVisibleCategories = () => {
+      const nav = navRef.current;
+      if (!nav) return;
+
+      const navWidth = nav.offsetWidth;
+      if (navWidth === 0) return; // Not yet mounted
+
+      const gap = 24; // gap-6 = 24px
+      let totalWidth = 0;
+      let count = 0;
+      const moreButtonWidth = 90; // Approximate width for "Ko'proq" button
+
+      // Check each category to see if it fits
+      for (let i = 0; i < categories.length; i++) {
+        const category = categories[i];
+        const element = categoryRefs.current.get(category.id);
+
+        if (element) {
+          // Use offsetWidth for rendered elements, or scrollWidth as fallback
+          const itemWidth =
+            element.offsetWidth > 0
+              ? element.offsetWidth
+              : element.scrollWidth || 100; // Fallback estimate
+
+          const neededWidth = totalWidth + itemWidth + (count > 0 ? gap : 0);
+
+          // Check if adding this category would exceed available space
+          // Account for "More" button if there are more categories after this one
+          const hasMoreCategories = i < categories.length - 1;
+          const spaceNeeded =
+            neededWidth + (hasMoreCategories ? moreButtonWidth + gap : 0);
+
+          // Always show at least one category, or show if it fits
+          if (count === 0 || spaceNeeded <= navWidth) {
+            totalWidth = neededWidth;
+            count++;
+          } else {
+            break;
+          }
+        } else if (count === 0) {
+          // If first element not yet measured, assume it fits
+          count = 1;
+        }
+      }
+
+      // Ensure at least one category is visible if we have categories
+      if (count === 0 && categories.length > 0) {
+        count = 1;
+      }
+
+      setVisibleCategoriesCount(count);
+    };
+
+    // Delay to ensure DOM is ready and elements are measured
+    const timeoutId = setTimeout(calculateVisibleCategories, 100);
+
+    // Recalculate on window resize with debounce
+    let resizeTimeout: NodeJS.Timeout;
+    const handleResize = () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(calculateVisibleCategories, 150);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      clearTimeout(timeoutId);
+      clearTimeout(resizeTimeout);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [categories]);
+
+  const visibleCategories =
+    visibleCategoriesCount !== null
+      ? categories.slice(0, visibleCategoriesCount)
+      : categories;
+  const hiddenCategories =
+    visibleCategoriesCount !== null
+      ? categories.slice(visibleCategoriesCount)
+      : [];
 
   return (
     <header className="z-50 relative w-full border-b border-border bg-background/95 backdrop-blur">
@@ -234,31 +332,73 @@ export default function DesktopHeader() {
       {/* Categories Navigation */}
       <div className="border-t border-border/50 bg-muted/30">
         <div className="container mx-auto px-4 lg:px-6">
-          <nav className="flex h-12 items-center gap-6 overflow-x-auto text-sm">
-            <button className="whitespace-nowrap text-foreground font-medium hover:text-primary transition-colors">
-              Elektronika
-            </button>
-            <button className="whitespace-nowrap text-muted-foreground hover:text-primary transition-colors">
-              Maishiy texnika
-            </button>
-            <button className="whitespace-nowrap text-muted-foreground hover:text-primary transition-colors">
-              Kiyim
-            </button>
-            <button className="whitespace-nowrap text-muted-foreground hover:text-primary transition-colors">
-              Poyabzal
-            </button>
-            <button className="whitespace-nowrap text-muted-foreground hover:text-primary transition-colors">
-              Aksessuarlar
-            </button>
-            <button className="whitespace-nowrap text-muted-foreground hover:text-primary transition-colors">
-              Go'zallik
-            </button>
-            <button className="whitespace-nowrap text-muted-foreground hover:text-primary transition-colors">
-              Salomatlik
-            </button>
-            <button className="whitespace-nowrap text-muted-foreground hover:text-primary transition-colors">
-              Uy-ro'zg'or
-            </button>
+          <nav
+            ref={navRef}
+            className="flex h-12 items-center gap-6 overflow-hidden text-sm relative"
+          >
+            {/* Render all categories for measurement when visibleCategoriesCount is null,
+                or render visible ones when count is calculated */}
+            {categories.map((category, index) => {
+              const isVisible =
+                visibleCategoriesCount === null ||
+                index < visibleCategoriesCount;
+
+              if (!isVisible && visibleCategoriesCount !== null) {
+                // Don't render hidden categories (they're in the dropdown)
+                return null;
+              }
+
+              return (
+                <button
+                  key={category.id}
+                  ref={(el) => {
+                    if (el) {
+                      categoryRefs.current.set(category.id, el);
+                    } else {
+                      categoryRefs.current.delete(category.id);
+                    }
+                  }}
+                  className="flex items-center gap-2 whitespace-nowrap text-foreground font-medium hover:text-primary transition-colors shrink-0"
+                >
+                  <Image
+                    src={category.icon_full_url.path}
+                    alt={category.name}
+                    width={20}
+                    height={20}
+                  />
+                  {category.name}
+                </button>
+              );
+            })}
+
+            {hiddenCategories.length > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-1 whitespace-nowrap text-foreground font-medium hover:text-primary transition-colors shrink-0">
+                    Ko'proq
+                    <ChevronDown className="h-4 w-4" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="start"
+                  className="max-h-[400px] overflow-y-auto"
+                >
+                  {hiddenCategories.map((category) => (
+                    <DropdownMenuItem key={category.id}>
+                      <div className="flex items-center gap-2 w-full">
+                        <Image
+                          src={category.icon_full_url.path}
+                          alt={category.name}
+                          width={20}
+                          height={20}
+                        />
+                        {category.name}
+                      </div>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </nav>
         </div>
       </div>
