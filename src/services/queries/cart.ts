@@ -2,7 +2,12 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { instanceAuth } from "../api";
-import { CartResponse, AddToCartRequest, RemoveFromCartRequest, UpdateCartRequest } from "@/types/api";
+import {
+  CartResponse,
+  AddToCartRequest,
+  RemoveFromCartRequest,
+  UpdateCartRequest,
+} from "@/types/api";
 import { toast } from "react-hot-toast";
 
 interface SuccessResponse {
@@ -105,4 +110,3 @@ export function useUpdateCart() {
     },
   });
 }
-

@@ -20,6 +20,7 @@ import {
 import { useGuestId } from "@/services/guest-id";
 import { Address } from "@/types/api";
 import { toast } from "react-hot-toast";
+import { useCart } from "@/services";
 
 export default function CheckoutNewPage() {
   const router = useRouter();
@@ -42,7 +43,7 @@ export default function CheckoutNewPage() {
   const [deliveryCost, setDeliveryCost] = useState<number | null>(null);
 
   // Queries
-  const { data: cartData, isLoading: isCartLoading } = useCartForCheckout();
+  const { data: cartData, isLoading: isCartLoading } = useCart(true);
   const { data: addresses, isLoading: isAddressesLoading } = useAddresses();
   const selectedAddress = addresses?.find((a) => a.id === selectedAddressId);
   const { data: deliveryMethods } = useDeliveryMethods(
