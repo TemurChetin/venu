@@ -176,7 +176,7 @@ export const useProductFilter = (params: ProductFilterParams) => {
     product_type: params.product_type || "all",
   };
 
-  return usePublicQuery<Product[]>({
+  return usePublicQuery<ProductListResponse>({
     url: "/v1/products/filter",
     enabled: !isLoadingGuestId,
     method: "POST",

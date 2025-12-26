@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useConfigStore } from "@/stores/config-store";
-import { useConfig } from "@/services/queries/config";
+import { ConfigResponse, useConfig } from "@/services/queries/config";
 
 /**
  * Component that loads website configuration on app initialization
@@ -34,7 +34,7 @@ export function ConfigLoader() {
           : null,
       };
 
-      setConfig(configWithUZS);
+      setConfig(configWithUZS as ConfigResponse);
     }
   }, [data, setConfig]);
 
@@ -47,4 +47,3 @@ export function ConfigLoader() {
   // This component doesn't render anything
   return null;
 }
-
