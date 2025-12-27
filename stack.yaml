@@ -1,0 +1,55 @@
+version: "3.8"
+
+services:
+  venu:
+    image: jscorptech/venu:latest
+    ports:
+      - mode: ingress
+        target: 3000
+        published: ${PORT:?enviromentda PORT topilmadi}
+        protocol: tcp
+    networks:
+      - venu
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 1024M
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+      mode: replicated
+      restart_policy:
+        condition: any
+      update_config:
+        parallelism: 1
+        order: start-first
+        failure_action: rollback
+        monitor: 10s
+        delay: 10s
+        max_failure_ratio: 0.2
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  shepherd:
+    image: containrrr/shepherd
+    environment:
+      - SLEEP_TIME=5m
+      - FILTER_SERVICES=venu
+      - WITH_REGISTRY_AUTH=true
+      - ROLLBACK_ON_FAILURE=true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
+networks:
+  venu:
+    driver: overlay
+    attachable: true
+    external: true
