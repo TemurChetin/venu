@@ -11,6 +11,7 @@ type Props = {};
 function page({}: Props) {
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("query") || "";
+  const categoryParam = searchParams.get("category");
 
   // Helper function to encode search query
   const encodeSearchQuery = (query: string): string => {
@@ -22,9 +23,16 @@ function page({}: Props) {
     }
   };
 
+  // Parse category from URL (can be ID number or slug)
+  const parseCategoryId = (categoryParam: string | null): number | null => {
+    if (!categoryParam) return null;
+    const categoryId = parseInt(categoryParam, 10);
+    return isNaN(categoryId) ? null : categoryId;
+  };
+
   const [filters, setFilters] = useState<ProductFilterParams>({
     search: "",
-    category: "[]",
+    category: parseCategoryId(categoryParam),
     brand: "[]",
     product_authors: "[]",
     publishing_houses: "[]",
@@ -45,6 +53,16 @@ function page({}: Props) {
       offset: 0, // Reset to first page when search changes
     }));
   }, [searchQuery]);
+
+  // Update category filter when categoryParam changes
+  useEffect(() => {
+    const categoryId = parseCategoryId(categoryParam);
+    setFilters((prev) => ({
+      ...prev,
+      category: categoryId,
+      offset: 0, // Reset to first page when category changes
+    }));
+  }, [categoryParam]);
 
   const handleFiltersChange = (newFilters: ProductFilterParams) => {
     setFilters((prev) => ({

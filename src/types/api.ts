@@ -209,15 +209,20 @@ export interface SubSubCategory {
   name: string;
   slug: string;
   icon: string | null;
+  icon_storage_type: string | null;
   parent_id: number;
   position: number;
   created_at: string;
   updated_at: string;
-  icon_full_url?: {
+  home_status: number;
+  priority: number | null;
+  sub_sub_category_product_count: number;
+  icon_full_url: {
     key: string;
-    path: string;
+    path: string | null;
     status: number;
   };
+  translations: any[];
   childes?: never; // Sub-subcategoryalarda childes bo'lmaydi
 }
 
@@ -226,16 +231,21 @@ export interface SubCategory {
   name: string;
   slug: string;
   icon: string | null;
+  icon_storage_type: string | null;
   parent_id: number;
   position: number;
   created_at: string;
   updated_at: string;
-  icon_full_url?: {
+  home_status: number;
+  priority: number | null;
+  sub_category_product_count: number;
+  icon_full_url: {
     key: string;
-    path: string;
+    path: string | null;
     status: number;
   };
   childes?: SubSubCategory[]; // Sub-subcategoryalar
+  translations: any[];
 }
 
 export type Category = {
@@ -249,11 +259,11 @@ export type Category = {
   created_at: string;
   updated_at: string;
   home_status: number;
-  priority: number;
-  products: any[];
+  priority: number | null;
+  product_count: number;
   icon_full_url: {
     key: string;
-    path: string;
+    path: string | null;
     status: number;
   };
   translations: any[];
@@ -261,6 +271,10 @@ export type Category = {
 };
 
 export interface CategoriesResponse extends Array<Category> {}
+
+export interface CategoriesListResponse {
+  ok: Category[];
+}
 
 // Wishlist Types
 export type WishlistProduct = {

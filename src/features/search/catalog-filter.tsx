@@ -11,13 +11,41 @@ import {
   useBrands,
   type ProductFilterParams,
 } from "@/services/queries/products";
-import type { Category } from "@/types/api";
+import type { Category, SubCategory, SubSubCategory } from "@/types/api";
 
 interface CatalogFiltersProps {
   searchQuery?: string;
   filters: ProductFilterParams;
   onFiltersChange: (filters: ProductFilterParams) => void;
 }
+
+// Helper function to flatten all categories (parent, sub, sub-sub) into a single array
+const flattenCategories = (
+  categories: Category[]
+): (Category | SubCategory | SubSubCategory)[] => {
+  const flattened: (Category | SubCategory | SubSubCategory)[] = [];
+
+  categories.forEach((category) => {
+    // Add parent category
+    flattened.push(category);
+
+    // Add subcategories
+    if (category.childes) {
+      category.childes.forEach((subCategory) => {
+        flattened.push(subCategory);
+
+        // Add sub-subcategories
+        if (subCategory.childes) {
+          subCategory.childes.forEach((subSubCategory) => {
+            flattened.push(subSubCategory);
+          });
+        }
+      });
+    }
+  });
+
+  return flattened;
+};
 
 export function CatalogFilters({
   searchQuery,
@@ -29,6 +57,7 @@ export function CatalogFilters({
   const { data: brandsData, isLoading: brandsLoading } = useBrands();
 
   const categories = categoriesData || [];
+  const allCategories = flattenCategories(categories);
   const brands = brandsData?.brands || [];
 
   const [priceRange, setPriceRange] = useState<[number, number]>([
@@ -36,8 +65,8 @@ export function CatalogFilters({
     filters.price_max || 150000,
   ]);
 
-  const [selectedCategories, setSelectedCategories] = useState<number[]>(
-    filters.category ? JSON.parse(filters.category) : []
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(
+    filters.category && filters.category > 0 ? filters.category : null
   );
   const [selectedBrands, setSelectedBrands] = useState<number[]>(
     filters.brand ? JSON.parse(filters.brand) : []
@@ -59,12 +88,12 @@ export function CatalogFilters({
     }
   }, [filters.price_min, filters.price_max]);
 
-  // Update selected categories/brands when filters change externally
+  // Update selected category/brands when filters change externally
   useEffect(() => {
-    if (filters.category) {
-      setSelectedCategories(
-        filters.category ? JSON.parse(filters.category) : []
-      );
+    if (filters.category && filters.category > 0) {
+      setSelectedCategory(filters.category);
+    } else {
+      setSelectedCategory(null);
     }
     if (filters.brand) {
       setSelectedBrands(filters.brand ? JSON.parse(filters.brand) : []);
@@ -76,13 +105,12 @@ export function CatalogFilters({
   };
 
   const handleCategoryToggle = (categoryId: number) => {
-    const newSelected = selectedCategories.includes(categoryId)
-      ? selectedCategories.filter((id) => id !== categoryId)
-      : [...selectedCategories, categoryId];
-    setSelectedCategories(newSelected);
+    // Only one category can be selected at a time
+    const newSelected = selectedCategory === categoryId ? null : categoryId;
+    setSelectedCategory(newSelected);
     onFiltersChange({
       ...filters,
-      category: newSelected.length > 0 ? JSON.stringify(newSelected) : "[]",
+      category: newSelected,
     });
   };
 
@@ -127,12 +155,12 @@ export function CatalogFilters({
               <div className="text-sm text-muted-foreground">
                 Yuklanmoqda...
               </div>
-            ) : categories.length > 0 ? (
-              categories.map((category: Category) => (
+            ) : allCategories.length > 0 ? (
+              allCategories.map((category) => (
                 <div key={category.id} className="flex items-center space-x-2">
                   <Checkbox
                     id={`cat-${category.id}`}
-                    checked={selectedCategories.includes(category.id)}
+                    checked={selectedCategory === category.id}
                     onCheckedChange={() => handleCategoryToggle(category.id)}
                   />
                   <Label

@@ -7,7 +7,7 @@ import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useRouter } from "@/i18n/routing";
 import { useCategories } from "@/services/queries/products";
-import type { Category, SubCategory, SubSubCategory } from "@/types/api";
+import type { SubCategory, SubSubCategory } from "@/types/api";
 import Image from "next/image";
 
 export function CatalogModal({

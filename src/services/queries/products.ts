@@ -112,16 +112,27 @@ export const useRelatedProducts = (
 // Categories
 export const useCategories = () => {
   return usePublicQuery<CategoriesResponse>({
-    url: "/v1/products/home-categories",
-    query: {
-      include_children: true,
-    },
+    url: "/v1/categories/list",
     enabled: true,
+    queryOptions: {
+      select: (data: any): CategoriesResponse => {
+        // Handle response structure: {"ok": [...]}
+        if (
+          data &&
+          typeof data === "object" &&
+          "ok" in data &&
+          Array.isArray(data.ok)
+        ) {
+          return data.ok;
+        }
+        // Fallback: if data is already an array, return it
+        return (Array.isArray(data) ? data : []) as CategoriesResponse;
+      },
+    },
   });
 };
 
 export const useAllCategories = () => {
-  // TODO: add useCategories query
   return useCategories();
 };
 
@@ -146,7 +157,7 @@ export const useBrands = () => {
 // Product Filter
 export interface ProductFilterParams {
   search: string;
-  category: string;
+  category: number | null;
   brand: string;
   product_authors: string;
   publishing_houses: string;
@@ -161,10 +172,23 @@ export interface ProductFilterParams {
 export const useProductFilter = (params: ProductFilterParams) => {
   const { isLoading: isLoadingGuestId } = useGuestId();
 
-  // Build filter payload according to ProductFilterParams interface
-  const filterPayload: ProductFilterParams = {
+  // If category is selected, use category-specific endpoint
+  if (params.category && params.category > 0) {
+    return usePublicQuery<ProductListResponse>({
+      url: `/v1/categories/products/${params.category}`,
+      query: {
+        limit: params.limit || "20",
+        offset: params.offset || 0,
+      },
+      enabled: !isLoadingGuestId,
+    });
+  }
+
+  // Otherwise, use the general filter endpoint
+  const filterPayload: Omit<ProductFilterParams, "category"> & {
+    category?: number;
+  } = {
     search: params.search || "",
-    category: params.category || "[]",
     brand: params.brand || "[]",
     product_authors: params.product_authors || "[]",
     publishing_houses: params.publishing_houses || "[]",
