@@ -20,7 +20,9 @@ const convertToYandexCoords = (coords: [number, number]): [number, number] => {
 };
 
 // Convert [lat, lng] to [lng, lat] for form
-const convertFromYandexCoords = (coords: [number, number]): [number, number] => {
+const convertFromYandexCoords = (
+  coords: [number, number]
+): [number, number] => {
   return [coords[1], coords[0]]; // [lng, lat]
 };
 
@@ -31,7 +33,7 @@ export function AddressMapSelector({
 }: AddressMapSelectorProps) {
   const [mapAddress, setMapAddress] = useState<string>("");
   const [isSearching, setIsSearching] = useState(false);
-  
+
   // Yandex Maps uses [lat, lng] format
   const [coords, setCoords] = useState<[number, number]>(() => {
     if (initialCoords) {
@@ -86,7 +88,7 @@ export function AddressMapSelector({
     (e: any) => {
       const clickedCoords = e.get("coords") as [number, number];
       setCoords(clickedCoords);
-      
+
       // Convert to form format [lng, lat]
       const formCoords = convertFromYandexCoords(clickedCoords);
       onLocationChange(formCoords, mapAddress);
@@ -100,7 +102,7 @@ export function AddressMapSelector({
       const target = e.get("target");
       const newCoords = target.geometry.getCoordinates() as [number, number];
       setCoords(newCoords);
-      
+
       // Convert to form format [lng, lat]
       const formCoords = convertFromYandexCoords(newCoords);
       onLocationChange(formCoords, mapAddress);
@@ -116,14 +118,14 @@ export function AddressMapSelector({
           const lat = pos.coords.latitude;
           const lng = pos.coords.longitude;
           const yandexCoords: [number, number] = [lat, lng];
-          
+
           setCoords(yandexCoords);
-          
+
           if (mapRef.current) {
             mapRef.current.setCenter(yandexCoords);
             mapRef.current.setZoom(17);
           }
-          
+
           // Convert to form format [lng, lat]
           const formCoords: [number, number] = [lng, lat];
           onLocationChange(formCoords, mapAddress);
@@ -176,7 +178,7 @@ export function AddressMapSelector({
     <div>
       <Label className="mb-2 block">Xaritadan manzil tanlash</Label>
       <div className="relative h-[300px] w-full rounded-lg border border-border overflow-hidden">
-        <YMaps query={{ apikey: apiKey, lang: "uz_UZ" }}>
+        <YMaps query={{ apikey: apiKey, lang: "en_US" }}>
           <Map
             defaultState={mapState}
             width="100%"

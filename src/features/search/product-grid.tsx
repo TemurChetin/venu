@@ -10,7 +10,7 @@ import {
   useProductFilter,
   type ProductFilterParams,
 } from "@/services/queries/products";
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 
 interface ProductGridProps {
   searchQuery?: string;
@@ -90,8 +90,8 @@ export function ProductGrid({ searchQuery, filters }: ProductGridProps) {
               Filtr
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-80 p-0">
-            <div className="py-6">
+          <SheetContent side="left" className="w-80 p-0 flex flex-col">
+            <div className="flex-1 overflow-y-auto py-6">
               <CatalogFilters
                 searchQuery={searchQuery}
                 filters={currentFilters}

@@ -1,8 +1,16 @@
+"use client";
+
 import { Mail, Phone, MapPin, User } from "lucide-react";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 
 export function Footer() {
+  const session = useSession();
+  const params = useParams();
+  const lang = (params?.lang as string) || "uz";
+
   return (
     <footer className="border-t bg-background mt-12">
       <div className="container mx-auto px-4 py-12">
@@ -36,63 +44,6 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Quick Links (Russian) */}
-          <div>
-            <h3 className="mb-4 text-base font-semibold uppercase tracking-wide text-foreground">
-              Быстрые Ссылки
-            </h3>
-            <ul className="space-y-3">
-              <li>
-                <Link
-                  href="#"
-                  className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  Информация Профиля
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#"
-                  className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  Рекомендуемые Товары
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#"
-                  className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  Самый Продаваемый Товар
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#"
-                  className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  Новые Товары
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#"
-                  className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  Товар С Наивысшей Оценкой
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#"
-                  className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  Отслеживание Заказа
-                </Link>
-              </li>
-            </ul>
-          </div>
-
           {/* For Customers (Uzbek) */}
           <div>
             <h3 className="mb-4 text-base font-semibold uppercase tracking-wide text-foreground">
@@ -101,7 +52,7 @@ export function Footer() {
             <ul className="space-y-3">
               <li>
                 <Link
-                  href="#"
+                  href={`/${lang}/business-page/biz-haqimizda-o-nas-about-us`}
                   className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                 >
                   Biz Haqimizda
@@ -109,7 +60,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="#"
+                  href={`/${lang}/business-page/maxfiylik-siyosati-politika-konfidencialnosti-privacy-policy`}
                   className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                 >
                   Maxfiylik Siyosati
@@ -117,7 +68,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="#"
+                  href={`/${lang}/business-page/promokod-haqida`}
                   className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                 >
                   Promokod Haqida
@@ -127,29 +78,31 @@ export function Footer() {
           </div>
 
           {/* User Section (Uzbek) */}
-          <div>
-            <h3 className="mb-4 text-base font-semibold uppercase tracking-wide text-foreground">
-              Foydalanuvchi
-            </h3>
-            <ul className="space-y-3">
-              <li>
-                <Link
-                  href="#"
-                  className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  Kirish
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#"
-                  className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  Ro&apos;yxatdan O&apos;tish
-                </Link>
-              </li>
-            </ul>
-          </div>
+          {session.status === "unauthenticated" && (
+            <div>
+              <h3 className="mb-4 text-base font-semibold uppercase tracking-wide text-foreground">
+                Foydalanuvchi
+              </h3>
+              <ul className="space-y-3">
+                <li>
+                  <Link
+                    href="#"
+                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    Kirish
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#"
+                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    Ro&apos;yxatdan O&apos;tish
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          )}
         </div>
 
         {/* Bottom Contact Section */}
@@ -172,7 +125,7 @@ export function Footer() {
             </Link>
 
             <Link
-              href="#"
+              href="https://t.me/Venumarketplace"
               className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
             >
               <User className="h-4 w-4" />
@@ -180,10 +133,13 @@ export function Footer() {
             </Link>
           </div>
 
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <MapPin className="h-4 w-4 flex-shrink-0" />
+          <Link
+            href="https://share.google/nI1wuUbpekBIy728T"
+            className="flex items-center gap-2 text-sm text-muted-foreground"
+          >
+            <MapPin className="h-4 w-4 shrink-0" />
             <span>Toshkent shahar Yunusobod tuman Yangishahar 3A</span>
-          </div>
+          </Link>
         </div>
       </div>
     </footer>

@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
-import { Link } from "@/i18n/routing";
+import { Link, useRouter } from "@/i18n/routing";
 import IntelisceneSearchInput from "./inteliscene-search-input";
 import { useState, useRef, useEffect } from "react";
 import { WishlistDrawer } from "../common/wishlist-drawer";
@@ -51,6 +51,8 @@ export default function DesktopHeader() {
   const { data: categoriesData, isLoading: isCategoriesLoading } =
     useCategories();
   const categories = categoriesData ?? [];
+
+  const router = useRouter();
 
   // Wishlist API hooks
   const { data: wishlistData, isLoading: isWishlistLoading } = useWishlist(
@@ -383,13 +385,18 @@ export default function DesktopHeader() {
                     }
                   }}
                   className="flex items-center gap-2 whitespace-nowrap text-foreground font-medium hover:text-primary transition-colors shrink-0"
+                  onClick={() => {
+                    router.push(`/search?category=${category.id}`);
+                  }}
                 >
-                  <Image
-                    src={category.icon_full_url.path}
-                    alt={category.name}
-                    width={20}
-                    height={20}
-                  />
+                  {category.icon_full_url.path && (
+                    <Image
+                      src={category.icon_full_url.path}
+                      alt={category.name}
+                      width={20}
+                      height={20}
+                    />
+                  )}
                   {category.name}
                 </button>
               );
@@ -408,14 +415,21 @@ export default function DesktopHeader() {
                   className="max-h-[400px] overflow-y-auto"
                 >
                   {hiddenCategories.map((category) => (
-                    <DropdownMenuItem key={category.id}>
+                    <DropdownMenuItem
+                      key={category.id}
+                      onClick={() => {
+                        router.push(`/search?category=${category.id}`);
+                      }}
+                    >
                       <div className="flex items-center gap-2 w-full">
-                        <Image
-                          src={category.icon_full_url.path}
-                          alt={category.name}
-                          width={20}
-                          height={20}
-                        />
+                        {category.icon_full_url.path && (
+                          <Image
+                            src={category.icon_full_url.path}
+                            alt={category.name}
+                            width={20}
+                            height={20}
+                          />
+                        )}
                         {category.name}
                       </div>
                     </DropdownMenuItem>

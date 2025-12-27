@@ -1,21 +1,14 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  MessageCircle,
   Store,
-  MapPin,
-  Phone,
   Clock,
   Star,
-  ExternalLink,
 } from "lucide-react";
 import { ProductDetailResponse } from "@/types/api";
-import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Link } from "@/i18n/routing";
 
 export function SellerInfo({
   seller,
@@ -132,41 +125,6 @@ export function SellerInfo({
               </div>
             )}
 
-            <Separator />
-
-            {/* Contact Information */}
-            <div className="space-y-3">
-              {shop.address && (
-                <div className="flex items-start gap-3">
-                  <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-                  <div>
-                    <p className="text-sm font-medium text-foreground">
-                      Manzil
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {shop.address}
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {shop.contact && (
-                <div className="flex items-start gap-3">
-                  <Phone className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-                  <div>
-                    <p className="text-sm font-medium text-foreground">
-                      Kontakt
-                    </p>
-                    <a
-                      href={`tel:${shop.contact}`}
-                      className="text-sm text-primary hover:underline"
-                    >
-                      {shop.contact}
-                    </a>
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
         </div>
       </CardContent>

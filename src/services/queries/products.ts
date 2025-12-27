@@ -172,6 +172,8 @@ export interface ProductFilterParams {
 export const useProductFilter = (params: ProductFilterParams) => {
   const { isLoading: isLoadingGuestId } = useGuestId();
 
+  // Stop here
+
   // If category is selected, use category-specific endpoint
   if (params.category && params.category > 0) {
     return usePublicQuery<ProductListResponse>({
@@ -184,11 +186,10 @@ export const useProductFilter = (params: ProductFilterParams) => {
     });
   }
 
-  // Otherwise, use the general filter endpoint
-  const filterPayload: Omit<ProductFilterParams, "category"> & {
-    category?: number;
-  } = {
+  // Build filter payload according to ProductFilterParams interface
+  const filterPayload: ProductFilterParams = {
     search: params.search || "",
+    category: params.category || ("[]" as any),
     brand: params.brand || "[]",
     product_authors: params.product_authors || "[]",
     publishing_houses: params.publishing_houses || "[]",

@@ -18,7 +18,6 @@ import {
 import { AddAddressModal } from "@/features/checkout/add-address-modal";
 import { useFormatCurrency, formatUZS } from "@/lib/format-currency";
 import {
-  useCartForCheckout,
   useAddresses,
   useDeliveryMethods,
   useChooseShippingMethod,
@@ -26,7 +25,6 @@ import {
   useCreateOrder,
 } from "@/services/queries/checkout";
 import { useGuestId } from "@/services/guest-id";
-import { Address } from "@/types/api";
 import { toast } from "react-hot-toast";
 import { useCart } from "@/services";
 import { useConfigStore } from "@/stores";
@@ -215,6 +213,13 @@ export default function CheckoutNewPage() {
       // Note: Shipping method choose step might be optional or needs proper ID
       // Skipping for now as the ID mapping is unclear from the API docs
       // If needed, we can add it later with proper shipping method ID mapping
+
+      // Choose shipping method before creating order
+      await chooseShippingMethod.mutateAsync({
+        id: 2, // Shipping method ID (from API documentation)
+        guest_id: guestId.toString(),
+        cart_group_id: "all_cart_group",
+      });
 
       // Create order
       const orderData = {

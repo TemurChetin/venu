@@ -5,13 +5,12 @@ import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, ChevronRight } from "lucide-react";
 import {
   useAllCategories,
   useBrands,
   type ProductFilterParams,
 } from "@/services/queries/products";
-import type { Category, SubCategory, SubSubCategory } from "@/types/api";
 
 interface CatalogFiltersProps {
   searchQuery?: string;
@@ -19,36 +18,7 @@ interface CatalogFiltersProps {
   onFiltersChange: (filters: ProductFilterParams) => void;
 }
 
-// Helper function to flatten all categories (parent, sub, sub-sub) into a single array
-const flattenCategories = (
-  categories: Category[]
-): (Category | SubCategory | SubSubCategory)[] => {
-  const flattened: (Category | SubCategory | SubSubCategory)[] = [];
-
-  categories.forEach((category) => {
-    // Add parent category
-    flattened.push(category);
-
-    // Add subcategories
-    if (category.childes) {
-      category.childes.forEach((subCategory) => {
-        flattened.push(subCategory);
-
-        // Add sub-subcategories
-        if (subCategory.childes) {
-          subCategory.childes.forEach((subSubCategory) => {
-            flattened.push(subSubCategory);
-          });
-        }
-      });
-    }
-  });
-
-  return flattened;
-};
-
 export function CatalogFilters({
-  searchQuery,
   filters,
   onFiltersChange,
 }: CatalogFiltersProps) {
@@ -57,7 +27,6 @@ export function CatalogFilters({
   const { data: brandsData, isLoading: brandsLoading } = useBrands();
 
   const categories = categoriesData || [];
-  const allCategories = flattenCategories(categories);
   const brands = brandsData?.brands || [];
 
   const [priceRange, setPriceRange] = useState<[number, number]>([
@@ -72,14 +41,79 @@ export function CatalogFilters({
     filters.brand ? JSON.parse(filters.brand) : []
   );
 
+  // Track which parent categories are expanded
+  const [expandedParentCategories, setExpandedParentCategories] = useState<
+    Set<number>
+  >(new Set());
+
+  // Track which subcategories are expanded
+  const [expandedSubCategories, setExpandedSubCategories] = useState<
+    Set<number>
+  >(new Set());
+
   const [expandedSections, setExpandedSections] = useState({
     categories: true,
     brands: true,
     price: true,
-    stock: true,
-    language: true,
-    country: true,
   });
+
+  // Auto-expand parent category if a subcategory is selected
+  useEffect(() => {
+    if (selectedCategory) {
+      categories.forEach((category) => {
+        // Check if selected category is in this parent category
+        if (category.id === selectedCategory) {
+          setExpandedParentCategories((prev) => new Set(prev).add(category.id));
+        }
+        // Check subcategories
+        category.childes?.forEach((subCategory) => {
+          if (subCategory.id === selectedCategory) {
+            setExpandedParentCategories((prev) =>
+              new Set(prev).add(category.id)
+            );
+            setExpandedSubCategories((prev) =>
+              new Set(prev).add(subCategory.id)
+            );
+          }
+          // Check sub-subcategories
+          subCategory.childes?.forEach((subSubCategory) => {
+            if (subSubCategory.id === selectedCategory) {
+              setExpandedParentCategories((prev) =>
+                new Set(prev).add(category.id)
+              );
+              setExpandedSubCategories((prev) =>
+                new Set(prev).add(subCategory.id)
+              );
+            }
+          });
+        });
+      });
+    }
+  }, [selectedCategory, categories]);
+
+  const toggleParentCategory = (categoryId: number) => {
+    setExpandedParentCategories((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(categoryId)) {
+        newSet.delete(categoryId);
+      } else {
+        newSet.add(categoryId);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleSubCategory = (subCategoryId: number) => {
+    setExpandedSubCategories((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(subCategoryId)) {
+        newSet.delete(subCategoryId);
+      } else {
+        newSet.add(subCategoryId);
+      }
+      return newSet;
+    });
+  };
 
   // Update price range when filters change externally
   useEffect(() => {
@@ -150,27 +184,150 @@ export function CatalogFilters({
           )}
         </button>
         {expandedSections.categories && (
-          <div className="space-y-2.5">
+          <div className="space-y-1">
             {categoriesLoading ? (
               <div className="text-sm text-muted-foreground">
                 Yuklanmoqda...
               </div>
-            ) : allCategories.length > 0 ? (
-              allCategories.map((category) => (
-                <div key={category.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`cat-${category.id}`}
-                    checked={selectedCategory === category.id}
-                    onCheckedChange={() => handleCategoryToggle(category.id)}
-                  />
-                  <Label
-                    htmlFor={`cat-${category.id}`}
-                    className="text-sm font-normal cursor-pointer"
-                  >
-                    {category.name}
-                  </Label>
-                </div>
-              ))
+            ) : categories.length > 0 ? (
+              categories.map((category) => {
+                const isParentExpanded = expandedParentCategories.has(
+                  category.id
+                );
+                const hasSubCategories =
+                  category.childes && category.childes.length > 0;
+
+                return (
+                  <div key={category.id} className="space-y-1">
+                    {/* Parent Category */}
+                    <div className="flex items-center gap-2 group">
+                      {hasSubCategories && (
+                        <button
+                          onClick={() => toggleParentCategory(category.id)}
+                          className="p-0.5 hover:bg-muted rounded transition-colors"
+                          aria-label={
+                            isParentExpanded
+                              ? "Kategoriyani yig'ish"
+                              : "Kategoriyani ochish"
+                          }
+                        >
+                          {isParentExpanded ? (
+                            <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                          ) : (
+                            <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+                          )}
+                        </button>
+                      )}
+                      {!hasSubCategories && (
+                        <div className="w-4" /> // Spacer for alignment
+                      )}
+                      <div className="flex items-center space-x-2 flex-1 min-w-0">
+                        <Checkbox
+                          id={`cat-${category.id}`}
+                          checked={selectedCategory === category.id}
+                          onCheckedChange={() =>
+                            handleCategoryToggle(category.id)
+                          }
+                        />
+                        <Label
+                          htmlFor={`cat-${category.id}`}
+                          className="text-sm font-normal cursor-pointer flex-1 truncate"
+                        >
+                          {category.name}
+                        </Label>
+                      </div>
+                    </div>
+
+                    {/* Subcategories - Collapsed */}
+                    {hasSubCategories && isParentExpanded && (
+                      <div className="ml-6 space-y-1">
+                        {category.childes?.map((subCategory) => {
+                          const isSubExpanded = expandedSubCategories.has(
+                            subCategory.id
+                          );
+                          const hasSubSubCategories =
+                            subCategory.childes &&
+                            subCategory.childes.length > 0;
+
+                          return (
+                            <div key={subCategory.id} className="space-y-1">
+                              {/* Subcategory */}
+                              <div className="flex items-center gap-2 group">
+                                {hasSubSubCategories && (
+                                  <button
+                                    onClick={() =>
+                                      toggleSubCategory(subCategory.id)
+                                    }
+                                    className="p-0.5 hover:bg-muted rounded transition-colors"
+                                    aria-label={
+                                      isSubExpanded
+                                        ? "Kategoriyani yig'ish"
+                                        : "Kategoriyani ochish"
+                                    }
+                                  >
+                                    {isSubExpanded ? (
+                                      <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                                    ) : (
+                                      <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+                                    )}
+                                  </button>
+                                )}
+                                {!hasSubSubCategories && (
+                                  <div className="w-4" /> // Spacer
+                                )}
+                                <div className="flex items-center space-x-2 flex-1 min-w-0">
+                                  <Checkbox
+                                    id={`cat-${subCategory.id}`}
+                                    checked={
+                                      selectedCategory === subCategory.id
+                                    }
+                                    onCheckedChange={() =>
+                                      handleCategoryToggle(subCategory.id)
+                                    }
+                                  />
+                                  <Label
+                                    htmlFor={`cat-${subCategory.id}`}
+                                    className="text-sm font-normal cursor-pointer flex-1 truncate text-muted-foreground"
+                                  >
+                                    {subCategory.name}
+                                  </Label>
+                                </div>
+                              </div>
+
+                              {/* Sub-subcategories */}
+                              {hasSubSubCategories &&
+                                isSubExpanded &&
+                                subCategory.childes?.map((subSubCategory) => (
+                                  <div
+                                    key={subSubCategory.id}
+                                    className="ml-6 flex items-center space-x-2"
+                                  >
+                                    <div className="w-4" /> {/* Spacer */}
+                                    <Checkbox
+                                      id={`cat-${subSubCategory.id}`}
+                                      checked={
+                                        selectedCategory === subSubCategory.id
+                                      }
+                                      onCheckedChange={() =>
+                                        handleCategoryToggle(subSubCategory.id)
+                                      }
+                                    />
+                                    <Label
+                                      htmlFor={`cat-${subSubCategory.id}`}
+                                      className="text-sm font-normal cursor-pointer flex-1 truncate text-muted-foreground"
+                                    >
+                                      {subSubCategory.name}
+                                    </Label>
+                                  </div>
+                                ))}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })
             ) : (
               <div className="text-sm text-muted-foreground">
                 Kategoriyalar topilmadi
@@ -277,141 +434,6 @@ export function CatalogFilters({
               step={1000}
               className="w-full"
             />
-          </div>
-        )}
-      </div>
-
-      <div className="h-px bg-border" />
-
-      {/* Stock Status */}
-      <div className="space-y-3">
-        <button
-          onClick={() => toggleSection("stock")}
-          className="flex w-full items-center justify-between text-base font-semibold text-foreground"
-        >
-          Omborda
-          {expandedSections.stock ? (
-            <ChevronUp className="h-4 w-4" />
-          ) : (
-            <ChevronDown className="h-4 w-4" />
-          )}
-        </button>
-        {expandedSections.stock && (
-          <div className="space-y-2.5">
-            <div className="flex items-center space-x-2">
-              <Checkbox id="stock1" />
-              <Label
-                htmlFor="stock1"
-                className="text-sm font-normal cursor-pointer"
-              >
-                Mahsulot mavjud
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox id="stock2" />
-              <Label
-                htmlFor="stock2"
-                className="text-sm font-normal cursor-pointer"
-              >
-                Tezkor yetkazish
-              </Label>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="h-px bg-border" />
-
-      {/* Language */}
-      <div className="space-y-3">
-        <button
-          onClick={() => toggleSection("language")}
-          className="flex w-full items-center justify-between text-base font-semibold text-foreground"
-        >
-          Til
-          {expandedSections.language ? (
-            <ChevronUp className="h-4 w-4" />
-          ) : (
-            <ChevronDown className="h-4 w-4" />
-          )}
-        </button>
-        {expandedSections.language && (
-          <div className="space-y-2.5">
-            <div className="flex items-center space-x-2">
-              <Checkbox id="lang1" />
-              <Label
-                htmlFor="lang1"
-                className="text-sm font-normal cursor-pointer"
-              >
-                O'zbekcha
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox id="lang2" />
-              <Label
-                htmlFor="lang2"
-                className="text-sm font-normal cursor-pointer"
-              >
-                Ruscha
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox id="lang3" />
-              <Label
-                htmlFor="lang3"
-                className="text-sm font-normal cursor-pointer"
-              >
-                Inglizcha
-              </Label>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="h-px bg-border" />
-
-      {/* Country */}
-      <div className="space-y-3">
-        <button
-          onClick={() => toggleSection("country")}
-          className="flex w-full items-center justify-between text-base font-semibold text-foreground"
-        >
-          Ishlab chiqaruvchi mamlakat
-          {expandedSections.country ? (
-            <ChevronUp className="h-4 w-4" />
-          ) : (
-            <ChevronDown className="h-4 w-4" />
-          )}
-        </button>
-        {expandedSections.country && (
-          <div className="space-y-2.5">
-            <div className="flex items-center space-x-2">
-              <Checkbox id="country1" />
-              <Label
-                htmlFor="country1"
-                className="text-sm font-normal cursor-pointer"
-              >
-                O'zbekiston
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox id="country2" />
-              <Label
-                htmlFor="country2"
-                className="text-sm font-normal cursor-pointer"
-              >
-                Rossiya
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox id="country3" />
-              <Label
-                htmlFor="country3"
-                className="text-sm font-normal cursor-pointer"
-              >
-                Xitoy
-              </Label>
-            </div>
           </div>
         )}
       </div>
