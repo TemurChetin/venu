@@ -405,9 +405,7 @@ export default function CheckoutNewPage() {
                           </Label>
                         </div>
                         <span className="font-semibold">
-                          {cost === null ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : cost === 0 ? (
+                          {cost === null ? null : cost === 0 ? (
                             <span className="text-green-600">Bepul</span>
                           ) : (
                             formatUZS(cost)
