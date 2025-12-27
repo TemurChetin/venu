@@ -2,66 +2,126 @@
 
 import type React from "react";
 
-import { useState, useRef, useEffect } from "react";
-import { Search, Package, Tag, TrendingUp, Clock, X } from "lucide-react";
+import { useState, useRef, useEffect, useMemo } from "react";
+import { Search, Package, Tag, Clock, X, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Link, useRouter } from "@/i18n/routing";
+import { useProductSuggestion } from "@/services/queries/products";
+import { useCategories } from "@/services/queries/products";
+import type { Category } from "@/types/api";
 
-// Namunaviy mahsulotlar va kategoriyalar
-const PRODUCTS = [
-  {
-    id: 1,
-    name: "Samsung Galaxy S24",
-    category: "Smartfonlar",
-    trending: true,
-  },
-  { id: 2, name: 'Samsung TV 55"', category: "Televizorlar", trending: false },
-  { id: 3, name: "Samsung Galaxy Watch", category: "Soatlar", trending: true },
-  { id: 4, name: "Savat", category: "Uy-jihozlari", trending: false },
-  { id: 5, name: "Sabzi", category: "Oziq-ovqat", trending: false },
-  { id: 6, name: "Salat", category: "Oziq-ovqat", trending: false },
-  { id: 7, name: "Sony PlayStation 5", category: "O'yinlar", trending: true },
-  { id: 8, name: "Samsung Buds Pro", category: "Audio", trending: true },
-];
+// Recent searches storage utilities
+const RECENT_SEARCHES_KEY = "venu_recent_searches";
+const MAX_RECENT_SEARCHES = 5;
 
-const CATEGORIES = [
-  { id: 1, name: "Smartfonlar", icon: Package, count: 156 },
-  { id: 2, name: "Televizorlar", icon: Package, count: 89 },
-  { id: 3, name: "Soatlar", icon: Package, count: 234 },
-  { id: 4, name: "Audio", icon: Package, count: 167 },
-];
+function getRecentSearches(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const stored = localStorage.getItem(RECENT_SEARCHES_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (error) {
+    console.error("Error reading recent searches:", error);
+  }
+  return [];
+}
 
-const RECENT_SEARCHES = ["Samsung Galaxy", "iPhone 15", "Noutbuk"];
+function saveRecentSearch(query: string): void {
+  if (typeof window === "undefined" || !query.trim()) return;
+  try {
+    const recent = getRecentSearches();
+    const filtered = recent.filter(
+      (q) => q.toLowerCase() !== query.toLowerCase()
+    );
+    const updated = [query, ...filtered].slice(0, MAX_RECENT_SEARCHES);
+    localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(updated));
+  } catch (error) {
+    console.error("Error saving recent search:", error);
+  }
+}
 
 export default function IntelisceneSearchInput() {
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const router = useRouter();
 
-  // Qidiruv natijalarini filter qilish
-  const filteredProducts =
-    query.length > 0
-      ? PRODUCTS.filter(
-          (product) =>
-            product.name.toLowerCase().includes(query.toLowerCase()) ||
-            product.category.toLowerCase().includes(query.toLowerCase())
-        ).slice(0, 5)
-      : [];
+  // Load recent searches on mount
+  useEffect(() => {
+    setRecentSearches(getRecentSearches());
+  }, []);
 
-  const filteredCategories =
-    query.length > 0
-      ? CATEGORIES.filter((cat) =>
-          cat.name.toLowerCase().includes(query.toLowerCase())
-        ).slice(0, 3)
-      : [];
+  // API hooks
+  const { data: productSuggestions, isLoading: isLoadingProducts } =
+    useProductSuggestion(query, query.length > 0);
+  const { data: categoriesData, isLoading: isLoadingCategories } =
+    useCategories();
+
+  // Filter categories based on query
+  const filteredCategories = useMemo(() => {
+    if (!categoriesData || query.length === 0) return [];
+
+    const searchLower = query.toLowerCase();
+    const results: Array<{
+      id: number;
+      name: string;
+      slug: string;
+      count?: number;
+    }> = [];
+
+    // Search in main categories
+    categoriesData.forEach((category: Category) => {
+      if (category.name.toLowerCase().includes(searchLower)) {
+        results.push({
+          id: category.id,
+          name: category.name,
+          slug: category.slug,
+          count: category.products?.length || 0,
+        });
+      }
+
+      // Search in subcategories
+      category.childes?.forEach((subCategory) => {
+        if (subCategory.name.toLowerCase().includes(searchLower)) {
+          results.push({
+            id: subCategory.id,
+            name: subCategory.name,
+            slug: subCategory.slug,
+          });
+        }
+
+        // Search in sub-subcategories
+        subCategory.childes?.forEach((subSubCategory) => {
+          if (subSubCategory.name.toLowerCase().includes(searchLower)) {
+            results.push({
+              id: subSubCategory.id,
+              name: subSubCategory.name,
+              slug: subSubCategory.slug,
+            });
+          }
+        });
+      });
+    });
+
+    return results.slice(0, 3);
+  }, [categoriesData, query]);
+
+  // Get products from API
+  const filteredProducts = useMemo(() => {
+    if (!productSuggestions?.products || query.length === 0) return [];
+    return productSuggestions.products.slice(0, 5);
+  }, [productSuggestions, query]);
 
   const totalResults = filteredProducts.length + filteredCategories.length;
-  const showRecentSearches = query.length === 0 && isOpen;
+  const showRecentSearches =
+    query.length === 0 && isOpen && recentSearches.length > 0;
+  const isLoading = isLoadingProducts || isLoadingCategories;
 
   // Tashqarida bosilganda yopish
   useEffect(() => {
@@ -82,13 +142,52 @@ export default function IntelisceneSearchInput() {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!isOpen) return;
 
-    if (e.key === "Enter") {
+    const allItems = [
+      ...(showRecentSearches ? recentSearches : []),
+      ...filteredCategories,
+      ...filteredProducts,
+    ];
+
+    if (e.key === "ArrowDown") {
       e.preventDefault();
-      router.push("/search?query=" + query);
-      setIsOpen(false);
+      setSelectedIndex((prev) =>
+        prev < allItems.length - 1 ? prev + 1 : prev
+      );
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev > 0 ? prev - 1 : -1));
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (selectedIndex >= 0 && selectedIndex < allItems.length) {
+        const selectedItem = allItems[selectedIndex];
+        if (typeof selectedItem === "string") {
+          // Recent search
+          handleSearch(selectedItem);
+        } else if ("slug" in selectedItem) {
+          // Category
+          router.push(`/search?category=${selectedItem.slug}`);
+          setIsOpen(false);
+        } else if ("id" in selectedItem && selectedItem.id) {
+          // Product
+          router.push(`/products/${selectedItem.id}`);
+          setIsOpen(false);
+        }
+      } else {
+        // No selection, search with query
+        handleSearch(query);
+      }
     } else if (e.key === "Escape") {
       setIsOpen(false);
       inputRef.current?.blur();
+    }
+  };
+
+  const handleSearch = (searchQuery: string) => {
+    if (searchQuery.trim()) {
+      saveRecentSearch(searchQuery.trim());
+      setRecentSearches(getRecentSearches());
+      router.push("/search?query=" + encodeURIComponent(searchQuery));
+      setIsOpen(false);
     }
   };
 
@@ -102,6 +201,11 @@ export default function IntelisceneSearchInput() {
     setQuery("");
     setSelectedIndex(-1);
     inputRef.current?.focus();
+  };
+
+  const handleRecentSearchClick = (search: string) => {
+    setQuery(search);
+    handleSearch(search);
   };
 
   return (
@@ -137,11 +241,16 @@ export default function IntelisceneSearchInput() {
                 <span>So'nggi qidiruvlar</span>
               </div>
               <div className="space-y-1">
-                {RECENT_SEARCHES.map((search, idx) => (
+                {recentSearches.map((search, idx) => (
                   <button
                     key={idx}
-                    className="w-full text-left px-3 py-2 rounded-md hover:bg-accent transition-colors text-sm"
-                    onClick={() => handleQueryChange(search)}
+                    className={cn(
+                      "w-full text-left px-3 py-2 rounded-md hover:bg-accent transition-colors text-sm",
+                      selectedIndex === idx
+                        ? "bg-primary text-primary-foreground"
+                        : ""
+                    )}
+                    onClick={() => handleRecentSearchClick(search)}
                   >
                     {search}
                   </button>
@@ -150,8 +259,16 @@ export default function IntelisceneSearchInput() {
             </div>
           )}
 
+          {/* Loading state */}
+          {isLoading && query.length > 0 && (
+            <div className="p-8 text-center text-muted-foreground">
+              <Loader2 className="h-6 w-6 mx-auto mb-2 animate-spin" />
+              <p className="text-sm">Qidirilmoqda...</p>
+            </div>
+          )}
+
           {/* Categories */}
-          {filteredCategories.length > 0 && (
+          {!isLoading && filteredCategories.length > 0 && (
             <div className="p-3 border-b border-border">
               <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground mb-2">
                 <Tag className="h-3 w-3" />
@@ -159,68 +276,28 @@ export default function IntelisceneSearchInput() {
               </div>
               <div className="space-y-1">
                 {filteredCategories.map((category, idx) => {
-                  const Icon = category.icon;
+                  const categoryIndex =
+                    (showRecentSearches ? recentSearches.length : 0) + idx;
                   return (
-                    <button
+                    <Link
                       key={category.id}
+                      href={`/search?category=${category.slug}`}
                       className={cn(
                         "w-full flex items-center gap-3 px-3 py-2.5 rounded-md transition-colors text-sm group",
-                        selectedIndex === idx
+                        selectedIndex === categoryIndex
                           ? "bg-primary text-primary-foreground"
                           : "hover:bg-accent"
                       )}
+                      onClick={() => setIsOpen(false)}
                     >
-                      <Icon className="h-4 w-4 text-muted-foreground group-hover:text-foreground" />
+                      <Package className="h-4 w-4 text-muted-foreground group-hover:text-foreground" />
                       <span className="flex-1 text-left font-medium">
                         {category.name}
                       </span>
-                      <span className="text-xs text-muted-foreground">
-                        {category.count} mahsulot
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Products */}
-          {filteredProducts.length > 0 && (
-            <div className="p-3">
-              <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground mb-2">
-                <Package className="h-3 w-3" />
-                <span>Mahsulotlar</span>
-              </div>
-              <div className="space-y-1">
-                {filteredProducts.map((product, idx) => {
-                  const currentIndex = filteredCategories.length + idx;
-                  return (
-                    <Link
-                      href={`/products/${product.id}`}
-                      key={product.id}
-                      className={cn(
-                        "w-full flex items-center gap-3 px-3 py-2.5 rounded-md transition-colors text-sm group",
-                        selectedIndex === currentIndex
-                          ? "bg-primary text-primary-foreground"
-                          : "hover:bg-accent"
-                      )}
-                    >
-                      <div className="h-10 w-10 rounded-md bg-accent flex items-center justify-center flex-shrink-0">
-                        <Package className="h-5 w-5 text-muted-foreground" />
-                      </div>
-                      <div className="flex-1 text-left min-w-0">
-                        <div className="font-medium truncate">
-                          {product.name}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {product.category}
-                        </div>
-                      </div>
-                      {product.trending && (
-                        <div className="flex items-center gap-1 text-xs text-primary">
-                          <TrendingUp className="h-3 w-3" />
-                          <span className="hidden sm:inline">Ommabop</span>
-                        </div>
+                      {category.count !== undefined && (
+                        <span className="text-xs text-muted-foreground">
+                          {category.count} mahsulot
+                        </span>
                       )}
                     </Link>
                   );
@@ -229,17 +306,66 @@ export default function IntelisceneSearchInput() {
             </div>
           )}
 
-          {/* No results */}
-          {query.length > 0 && totalResults === 0 && (
-            <div className="p-8 text-center text-muted-foreground z-50">
-              <Search className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p className="text-sm">"{query}" uchun natija topilmadi</p>
-              <p className="text-xs mt-1">Boshqa so'z bilan qidiring</p>
+          {/* Products */}
+          {!isLoading && filteredProducts.length > 0 && (
+            <div className="p-3">
+              <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground mb-2">
+                <Package className="h-3 w-3" />
+                <span>Mahsulotlar</span>
+              </div>
+              <div className="space-y-1">
+                {filteredProducts.map((product, idx) => {
+                  const productIndex =
+                    (showRecentSearches ? recentSearches.length : 0) +
+                    filteredCategories.length +
+                    idx;
+                  return (
+                    <Link
+                      href={`/search?query=${encodeURIComponent(product.name)}`}
+                      key={product.id || idx}
+                      className={cn(
+                        "w-full flex items-center gap-3 px-3 py-2.5 rounded-md transition-colors text-sm group",
+                        selectedIndex === productIndex
+                          ? "bg-primary text-primary-foreground"
+                          : "hover:bg-accent"
+                      )}
+                      onClick={() => {
+                        if (product.name) {
+                          saveRecentSearch(product.name);
+                          setRecentSearches(getRecentSearches());
+                        }
+                        setIsOpen(false);
+                      }}
+                    >
+                      <div className="h-10 w-10 rounded-md bg-accent flex items-center justify-center shrink-0">
+                        <Package className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                      <div className="flex-1 text-left min-w-0">
+                        <div className="font-medium truncate">
+                          {product.name}
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
           )}
 
+          {/* No results */}
+          {!isLoading &&
+            query.length > 0 &&
+            totalResults === 0 &&
+            !showRecentSearches && (
+              <div className="p-8 text-center text-muted-foreground z-50">
+                <Search className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">"{query}" uchun natija topilmadi</p>
+                <p className="text-xs mt-1">Boshqa so'z bilan qidiring</p>
+              </div>
+            )}
+
           {/* Footer tip */}
-          {totalResults > 0 && (
+          {!isLoading && totalResults > 0 && (
             <div className="px-3 py-2 bg-accent/30 border-t border-border">
               <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span>↑↓ tanlash • Enter kirish • Esc yopish</span>

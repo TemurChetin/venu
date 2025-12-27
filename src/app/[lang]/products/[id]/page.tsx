@@ -17,6 +17,14 @@ import {
   useRelatedProducts,
 } from "@/services/queries/products";
 import { useFormatCurrency } from "@/lib/format-currency";
+import { useSession } from "next-auth/react";
+import { PhoneAuthModal } from "@/components/auth";
+import {
+  useAddToCart,
+  useWishlist,
+  useAddToWishlist,
+  useRemoveFromWishlist,
+} from "@/services/queries";
 
 export default function DetailPage() {
   const params = useParams();
@@ -33,8 +41,18 @@ export default function DetailPage() {
 
   const formatCurrency = useFormatCurrency();
 
+  const { data: session } = useSession();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const addToCart = useAddToCart();
+
+  // Wishlist hooks - only fetch when user is authenticated
+  const { data: wishlistData } = useWishlist(!!session);
+  const addToWishlist = useAddToWishlist();
+  const removeFromWishlist = useRemoveFromWishlist();
+
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<number | null>(null);
+  const [isWishlisted, setIsWishlisted] = useState(false);
 
   // Calculate price with discount
   const priceInfo = useMemo(() => {
@@ -89,6 +107,63 @@ export default function DetailPage() {
   useEffect(() => {
     console.log(product);
   }, [product]);
+
+  // Update wishlist status when wishlistData or product changes
+  useEffect(() => {
+    if (product && wishlistData) {
+      setIsWishlisted(
+        wishlistData.some(
+          (wishlistProduct) => wishlistProduct.product_id === product.id
+        ) ?? false
+      );
+    }
+  }, [wishlistData, product]);
+
+  // Handle wishlist toggle
+  const handleWishlistToggle = () => {
+    // If user is not authenticated, show login modal
+    if (!session) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+
+    if (!product) return;
+
+    // If authenticated, toggle wishlist
+    if (isWishlisted) {
+      removeFromWishlist.mutate(product.id);
+      setIsWishlisted(false);
+    } else {
+      addToWishlist.mutate(product.id);
+      setIsWishlisted(true);
+    }
+  };
+
+  // Handle add to cart
+  const handleAddToCart = () => {
+    // If user is not authenticated, show login modal
+    if (!session) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+
+    if (!product) return;
+
+    // Find selected color name
+    const selectedColorObj = product.colors?.find(
+      (color: { id: number; name: string; code: string }) =>
+        color.id === selectedColor
+    );
+    const colorName = selectedColorObj?.name || selectedColorObj?.code;
+
+    // Add to cart with selected options
+    addToCart.mutate({
+      id: product.id,
+      quantity: 1,
+      variant: selectedSize || undefined,
+      color: colorName || undefined,
+    });
+  };
 
   if (isLoadingProduct) {
     return (
@@ -268,26 +343,41 @@ export default function DetailPage() {
 
             {/* Action Buttons */}
             <div className="flex gap-3 flex-col sm:flex-row">
-              <Button size="lg" className="flex-1 h-12 text-base font-medium">
+              <Button
+                size="lg"
+                className="flex-1 h-12 text-base font-medium"
+                onClick={handleAddToCart}
+                disabled={addToCart.isPending}
+              >
                 <ShoppingCart className="mr-2 h-5 w-5" />
-                Savatga qo'shish
+                {addToCart.isPending ? "Qo'shilmoqda..." : "Savatga qo'shish"}
               </Button>
               <Button
                 size="lg"
                 variant="outline"
                 className="sm:w-auto h-12 bg-transparent"
+                onClick={handleWishlistToggle}
+                disabled={
+                  addToWishlist.isPending || removeFromWishlist.isPending
+                }
               >
-                <Heart className="h-5 w-5" />
+                <Heart
+                  className={`h-5 w-5 ${
+                    isWishlisted
+                      ? "fill-primary text-primary"
+                      : "text-muted-foreground"
+                  }`}
+                />
               </Button>
             </div>
-
+            {/* 
             <Button
               size="lg"
               variant="secondary"
               className="w-full h-12 text-base font-medium"
             >
               1 bosishda xarid qiling
-            </Button>
+            </Button> */}
 
             {/* Stats */}
             <div className="grid grid-cols-3 gap-4 pt-4">
@@ -341,6 +431,12 @@ export default function DetailPage() {
         {relatedProducts.length > 0 && (
           <RelatedProducts products={relatedProducts} />
         )}
+
+        {/* Auth Modal */}
+        <PhoneAuthModal
+          open={isAuthModalOpen}
+          onOpenChange={setIsAuthModalOpen}
+        />
       </main>
     );
 }

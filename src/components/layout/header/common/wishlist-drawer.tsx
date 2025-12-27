@@ -22,6 +22,7 @@ interface WishlistDrawerProps {
   onAddToCart: (productId: number) => void;
   children: React.ReactNode;
   isLoading?: boolean;
+  addingProductId?: number | null;
 }
 
 export function WishlistDrawer({
@@ -30,9 +31,10 @@ export function WishlistDrawer({
   onAddToCart,
   children,
   isLoading = false,
+  addingProductId = null,
 }: WishlistDrawerProps) {
   const formatCurrency = useFormatCurrency();
-  
+
   // Transform API data to display format
   const transformItem = (item: WishlistProduct) => {
     const product = item.product_full_info || item.productFullInfo;
@@ -168,9 +170,12 @@ export function WishlistDrawer({
                           size="sm"
                           className="w-full h-9"
                           onClick={() => onAddToCart(item.productId)}
+                          disabled={addingProductId === item.productId}
                         >
                           <ShoppingCart className="h-4 w-4 mr-2" />
-                          Savatga qo'shish
+                          {addingProductId === item.productId
+                            ? "Qo'shilmoqda..."
+                            : "Savatga qo'shish"}
                         </Button>
                       ) : (
                         <Badge

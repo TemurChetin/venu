@@ -44,6 +44,7 @@ export default function DesktopHeader() {
   const [visibleCategoriesCount, setVisibleCategoriesCount] = useState<
     number | null
   >(null);
+  const [addingProductId, setAddingProductId] = useState<number | null>(null);
   const navRef = useRef<HTMLElement>(null);
   const categoryRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
   const { data: session } = useSession();
@@ -74,10 +75,21 @@ export default function DesktopHeader() {
       setIsAuthModalOpen(true);
       return;
     }
-    addToCart.mutate({
-      id: productId,
-      quantity: 1,
-    });
+    setAddingProductId(productId);
+    addToCart.mutate(
+      {
+        id: productId,
+        quantity: 1,
+      },
+      {
+        onSuccess: () => {
+          setAddingProductId(null);
+        },
+        onError: () => {
+          setAddingProductId(null);
+        },
+      }
+    );
   };
 
   // Handle update cart quantity
@@ -311,6 +323,7 @@ export default function DesktopHeader() {
               items={wishlistData || []}
               onAddToCart={handleAddToCart}
               isLoading={isWishlistLoading}
+              addingProductId={addingProductId}
             >
               <Button variant="ghost" size="icon" className="relative">
                 <Heart className="h-5 w-5" />
