@@ -1,3 +1,79 @@
 {
-  "hello": "Здравствуйте"
+  "common": {
+    "city": "Ташкент",
+    "becomeSeller": "Стать продавцом",
+    "faq": "Вопросы и ответы",
+    "myOrders": "Мои заказы",
+    "catalog": "Каталог",
+    "more": "Еще",
+    "search": "Поиск",
+    "searchPlaceholder": "Поиск товаров и категорий"
+  },
+  "navigation": {
+    "home": "Главная",
+    "search": "Поиск",
+    "cart": "Корзина",
+    "orders": "Заказы",
+    "profile": "Профиль"
+  },
+  "header": {
+    "account": "Мой аккаунт",
+    "orders": "Мои заказы",
+    "logout": "Выход"
+  },
+  "auth": {
+    "title": "Вход / Регистрация",
+    "phoneDescription": "Мы отправим SMS-код на ваш номер телефона",
+    "otpDescription": "Введите код, отправленный на номер {phone}",
+    "phoneLabel": "Номер телефона",
+    "phonePlaceholder": "+998901234567",
+    "sendCode": "Отправить код",
+    "waiting": "Ожидание...",
+    "otpLabel": "SMS-код",
+    "otpPlaceholder": "123456",
+    "otpHint": "Введите 6-значный код, отправленный на номер {phone}",
+    "verify": "Подтвердить",
+    "verifying": "Проверка...",
+    "changePhone": "Изменить номер телефона",
+    "resendCode": "Отправить код повторно",
+    "invalidPhone": "Введите правильный номер телефона (например: +998901234567)",
+    "invalidOtp": "OTP-код должен состоять из 6 цифр",
+    "wrongOtp": "Неверный OTP-код",
+    "smsSent": "SMS-код отправлен",
+    "loginSuccess": "Успешный вход",
+    "loginError": "Ошибка при входе",
+    "sendCodeError": "Ошибка при отправке кода",
+    "verifyError": "Ошибка при подтверждении OTP-кода",
+    "error": "Произошла ошибка"
+  },
+  "cart": {
+    "title": "Корзина",
+    "description": "Ваши товары",
+    "empty": "Корзина пуста",
+    "emptyDescription": "Начните добавлять товары",
+    "loading": "Загрузка...",
+    "goShopping": "Начать покупки",
+    "subtotal": "Промежуточная сумма:",
+    "delivery": "Доставка:",
+    "deliveryFree": "Бесплатно",
+    "total": "Итого:",
+    "checkout": "Оформить заказ",
+    "addToCart": "Добавить в корзину",
+    "remove": "Удалить"
+  },
+  "wishlist": {
+    "title": "Избранное",
+    "description": "Ваши избранные товары",
+    "empty": "Избранное пусто",
+    "emptyDescription": "Добавьте товары в избранное",
+    "loading": "Загрузка...",
+    "addToCart": "Добавить в корзину",
+    "adding": "Добавление...",
+    "outOfStock": "Нет в наличии",
+    "remove": "Удалить"
+  },
+  "toast": {
+    "logoutSuccess": "Успешный выход",
+    "logoutError": "Ошибка при выходе"
+  }
 }

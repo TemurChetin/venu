@@ -7,10 +7,8 @@
 // Language Configuration
 // ===============================================================
 export const LANGUAGES = [
-  { code: "uz", name: "Uzbek" },
-  { code: "ru", name: "Russian" },
-  { code: "en", name: "English" },
-  { code: "jp", name: "Japanese" },
+  { code: "uz", name: "O'zbekcha", flag: "🇺🇿" },
+  { code: "ru", name: "Русский", flag: "🇷🇺" },
 ] as const;
 
 export type Language = (typeof LANGUAGES)[number]["code"];

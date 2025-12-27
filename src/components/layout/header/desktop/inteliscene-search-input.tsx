@@ -10,6 +10,7 @@ import { Link, useRouter } from "@/i18n/routing";
 import { useProductSuggestion } from "@/services/queries/products";
 import { useCategories } from "@/services/queries/products";
 import type { Category } from "@/types/api";
+import { useTranslations } from "next-intl";
 
 // Recent searches storage utilities
 const RECENT_SEARCHES_KEY = "venu_recent_searches";
@@ -43,6 +44,7 @@ function saveRecentSearch(query: string): void {
 }
 
 export default function IntelisceneSearchInput() {
+  const t = useTranslations();
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -214,7 +216,7 @@ export default function IntelisceneSearchInput() {
       <Input
         ref={inputRef}
         type="text"
-        placeholder="Mahsulot va turkumlarni izlash"
+        placeholder={t("common.searchPlaceholder")}
         value={query}
         onChange={(e) => handleQueryChange(e.target.value)}
         onFocus={() => setIsOpen(true)}

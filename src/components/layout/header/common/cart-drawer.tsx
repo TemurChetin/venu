@@ -16,6 +16,7 @@ import { CartItem as ApiCartItem } from "@/types/api";
 import { useFormatCurrency } from "@/lib/format-currency";
 import { Link } from "@/i18n/routing";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 interface DisplayCartItem {
   id: number;
@@ -43,6 +44,7 @@ export function CartDrawer({
   children,
   isLoading = false,
 }: CartDrawerProps) {
+  const t = useTranslations();
   const formatCurrency = useFormatCurrency();
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
@@ -103,9 +105,9 @@ export function CartDrawer({
         <SheetHeader className="p-6 pb-4">
           <SheetTitle className="flex items-center gap-2 text-xl">
             <ShoppingCart className="h-5 w-5" />
-            Savat ({itemCount})
+            {t("cart.title")} ({itemCount})
           </SheetTitle>
-          <SheetDescription>Sizning mahsulotlaringiz</SheetDescription>
+          <SheetDescription>{t("cart.description")}</SheetDescription>
         </SheetHeader>
 
         <Separator />
@@ -113,14 +115,14 @@ export function CartDrawer({
         <div className="flex-1 overflow-y-auto p-6">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
-              <p className="text-sm text-muted-foreground">Yuklanmoqda...</p>
+              <p className="text-sm text-muted-foreground">{t("cart.loading")}</p>
             </div>
           ) : displayItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
               <ShoppingCart className="h-16 w-16 text-muted-foreground mb-4" />
-              <p className="text-lg font-medium mb-2">Savat bo'sh</p>
+              <p className="text-lg font-medium mb-2">{t("cart.empty")}</p>
               <p className="text-sm text-muted-foreground">
-                Mahsulotlar qo'shib boshlang
+                {t("cart.emptyDescription")}
               </p>
             </div>
           ) : (
@@ -205,18 +207,18 @@ export function CartDrawer({
             <div className="p-6 space-y-4">
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Oraliq summa:</span>
+                  <span className="text-muted-foreground">{t("cart.subtotal")}</span>
                   <span className="font-medium">{formatCurrency(total)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">
-                    Yetkazib berish:
+                    {t("cart.delivery")}
                   </span>
-                  <span className="font-medium text-green-600">Bepul</span>
+                  <span className="font-medium text-green-600">{t("cart.deliveryFree")}</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between text-lg font-bold">
-                  <span>Jami:</span>
+                  <span>{t("cart.total")}</span>
                   <span className="text-primary">{formatCurrency(total)}</span>
                 </div>
               </div>
@@ -228,7 +230,7 @@ export function CartDrawer({
                   variant: "default",
                 })}
               >
-                Rasmiylashtirish
+                {t("cart.checkout")}
               </Link>
             </div>
           </>

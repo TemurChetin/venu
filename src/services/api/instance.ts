@@ -8,12 +8,60 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API || "";
 const API_PREFIX = "/api";
 
 /**
+ * Get current locale from URL path or cookie
+ * Priority: URL path > Cookie > Default
+ */
+function getCurrentLocale(): string {
+  if (typeof window === "undefined") {
+    return "uz"; // Default for server-side
+  }
+
+  // First, try to get from URL path (most reliable)
+  const pathname = window.location.pathname;
+  const langMatch = pathname.match(/^\/(uz|ru)(\/|$)/);
+  if (langMatch && langMatch[1]) {
+    return langMatch[1];
+  }
+
+  // Fallback: try to get from cookie
+  // next-intl may store locale in various cookie names
+  const cookies = document.cookie.split(";");
+  const localeCookieNames = ["NEXT_LOCALE", "locale", "lang"];
+
+  for (const cookie of cookies) {
+    const [name, value] = cookie.trim().split("=");
+    if (
+      localeCookieNames.includes(name) &&
+      value &&
+      (value === "uz" || value === "ru")
+    ) {
+      return value;
+    }
+  }
+
+  // Default locale
+  return "uz";
+}
+
+/**
  * Public Axios Instance
  * Used for unauthenticated API requests
  */
 export const instance: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
 });
+
+// Add lang header to all public requests
+instance.interceptors.request.use(
+  (config) => {
+    const locale = getCurrentLocale();
+    config.headers["lang"] = locale;
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 /**
  * Authenticated Axios Instance
@@ -25,7 +73,7 @@ export const instanceAuth: AxiosInstance = axios.create({
 
 /**
  * Request Interceptor for Authenticated Instance
- * Automatically adds Authorization header with access token
+ * Automatically adds Authorization header with access token and lang header
  */
 instanceAuth.interceptors.request.use(
   async (config) => {
@@ -37,6 +85,10 @@ instanceAuth.interceptors.request.use(
     if (accessToken) {
       config.headers["Authorization"] = `Bearer ${accessToken}`;
     }
+
+    // Add lang header
+    const locale = getCurrentLocale();
+    config.headers["lang"] = locale;
 
     return config;
   },

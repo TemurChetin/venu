@@ -1,6 +1,6 @@
 "use client";
 
-import { Link, usePathname } from "@/i18n/routing";
+import { Link, usePathname, useRouter } from "@/i18n/routing";
 import { Home, Search, ShoppingCart, Package, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -9,47 +9,53 @@ import { useSession } from "next-auth/react";
 import { useCart, useUpdateCart, useRemoveFromCart } from "@/services/queries";
 import { PhoneAuthModal } from "@/components/auth";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 type Props = {
   cartItemsCount?: number;
 };
 
-const Navigation = [
-  {
-    name: "Bosh sahifa",
-    href: "/",
-    icon: Home,
-    id: "home",
-  },
-  {
-    name: "Qidiruv",
-    href: "/search",
-    icon: Search,
-    id: "search",
-  },
-  {
-    name: "Savatcha",
-    icon: ShoppingCart,
-    id: "cart",
-    showBadge: true,
-    isDrawer: true, // Cart opens drawer, doesn't navigate
-  },
-  {
-    name: "Buyurtmalar",
-    href: "/orders",
-    icon: Package,
-    id: "orders",
-  },
-  {
-    name: "Profil",
-    href: "/settings",
-    icon: User,
-    id: "settings",
-  },
-];
-
 function BottomNavigation({ cartItemsCount: propCartItemsCount }: Props) {
+  const t = useTranslations();
+  
+  const Navigation = [
+    {
+      name: t("navigation.home"),
+      href: "/",
+      icon: Home,
+      id: "home",
+    },
+    {
+      name: t("navigation.search"),
+      href: "/search",
+      icon: Search,
+      id: "search",
+    },
+    {
+      name: t("navigation.cart"),
+      icon: ShoppingCart,
+      id: "cart",
+      showBadge: true,
+      isDrawer: true, // Cart opens drawer, doesn't navigate
+      auth_required: true,
+    },
+    {
+      name: t("navigation.orders"),
+      href: "/orders",
+      icon: Package,
+      id: "orders",
+      auth_required: true,
+    },
+    {
+      name: t("navigation.profile"),
+      href: "/settings",
+      icon: User,
+      id: "settings",
+      auth_required: true,
+    },
+  ];
   const pathname = usePathname();
+  const router = useRouter();
   const { data: session } = useSession();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
@@ -110,6 +116,15 @@ function BottomNavigation({ cartItemsCount: propCartItemsCount }: Props) {
 
             // Special handling for cart with drawer
             if (item.isDrawer && item.id === "cart") {
+              const handleCartClick = (e: React.MouseEvent) => {
+                if (item.auth_required && !session) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsAuthModalOpen(true);
+                  return false;
+                }
+              };
+
               return (
                 <CartDrawer
                   key={item.id}
@@ -119,6 +134,7 @@ function BottomNavigation({ cartItemsCount: propCartItemsCount }: Props) {
                   isLoading={isCartLoading}
                 >
                   <button
+                    onClick={handleCartClick}
                     className={cn(
                       "relative flex flex-col items-center justify-center",
                       "min-w-0 flex-1 gap-1 p-2",
@@ -150,6 +166,52 @@ function BottomNavigation({ cartItemsCount: propCartItemsCount }: Props) {
             }
 
             if (!item.href) return null;
+
+            // Handle auth required items
+            if (item.auth_required) {
+              const handleClick = (e: React.MouseEvent) => {
+                if (!session) {
+                  e.preventDefault();
+                  setIsAuthModalOpen(true);
+                  return;
+                }
+                // If authenticated, navigate to the href
+                if (item.href) {
+                  router.push(item.href);
+                }
+              };
+
+              return (
+                <button
+                  key={item.id}
+                  onClick={handleClick}
+                  className={cn(
+                    "flex flex-col items-center justify-center",
+                    "min-w-0 flex-1 gap-1 p-2",
+                    "transition-colors duration-200",
+                    "hover:bg-accent/50 active:bg-accent",
+                    "rounded-lg",
+                    active && "text-primary"
+                  )}
+                >
+                  <Icon
+                    className={cn(
+                      "h-5 w-5 transition-colors",
+                      active ? "text-primary" : "text-muted-foreground"
+                    )}
+                  />
+                  <span
+                    className={cn(
+                      "text-[10px] font-medium leading-tight transition-colors",
+                      "line-clamp-1",
+                      active ? "text-primary" : "text-muted-foreground"
+                    )}
+                  >
+                    {item.name}
+                  </span>
+                </button>
+              );
+            }
 
             return (
               <Link

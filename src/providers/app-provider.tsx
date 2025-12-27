@@ -8,6 +8,7 @@ import { ConfigLoader } from "@/components/config/config-loader";
 interface AppProviderProps {
   children: React.ReactNode;
   locale: string;
+  messages: any;
 }
 
 /**
@@ -17,11 +18,11 @@ interface AppProviderProps {
  * - Next Auth Session Provider for authentication
  * - Config Loader for website configurations
  */
-export function AppProvider({ children, locale }: AppProviderProps) {
+export function AppProvider({ children, locale, messages }: AppProviderProps) {
   return (
     <SessionProvider>
       <ReactQueryProvider>
-        <NextIntlClientProvider locale={locale}>
+        <NextIntlClientProvider locale={locale} messages={messages}>
           <ConfigLoader />
           {children}
         </NextIntlClientProvider>

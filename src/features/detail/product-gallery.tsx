@@ -16,7 +16,7 @@ export function ProductGallery({ images = [] }: ProductGalleryProps) {
 
   return (
     <div className="space-y-4">
-      <Card className="relative overflow-hidden bg-muted h-[650px] p-0">
+      <Card className="relative overflow-hidden bg-muted h-[350px] md:h-[650px] p-0">
         <img
           src={displayImages[currentImage] || "/placeholder.svg"}
           alt="Product"

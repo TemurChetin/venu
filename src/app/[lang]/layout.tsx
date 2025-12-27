@@ -5,6 +5,7 @@ import { Toaster } from "react-hot-toast";
 import { Footer } from "@/components/layout/footer";
 import { AppProvider } from "@/providers";
 import NextTopLoader from "nextjs-toploader";
+import { getMessages } from "next-intl/server";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -32,13 +33,14 @@ export default async function RootLayout({
   params,
 }: RootLayoutProps) {
   const { lang } = await params;
+  const messages = await getMessages();
 
   return (
     <html lang={lang} suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AppProvider locale={lang}>
+        <AppProvider locale={lang} messages={messages}>
           <main>
             <NextTopLoader
               color="#ff0042"

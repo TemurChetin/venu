@@ -345,7 +345,7 @@ export default function DetailPage() {
             <div className="flex gap-3 flex-col sm:flex-row">
               <Button
                 size="lg"
-                className="flex-1 h-12 text-base font-medium"
+                className="md:flex-1 h-10 md:h-12 text-base font-medium"
                 onClick={handleAddToCart}
                 disabled={addToCart.isPending}
               >

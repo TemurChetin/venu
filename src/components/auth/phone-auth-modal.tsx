@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "react-hot-toast";
 import { checkPhone, verifyOtp } from "@/services/requests/auth";
+import { useTranslations } from "next-intl";
 
 interface PhoneAuthModalProps {
   open: boolean;
@@ -21,6 +22,7 @@ interface PhoneAuthModalProps {
 }
 
 export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
+  const t = useTranslations();
   const [phone, setPhone] = useState("");
   const [otpCode, setOtpCode] = useState("");
   const [loading, setLoading] = useState(false);
@@ -54,7 +56,7 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
     const formattedPhone = formatPhone(phone);
 
     if (!validatePhone(formattedPhone)) {
-      toast.error("To'g'ri telefon raqam kiriting (masalan: +998901234567)");
+      toast.error(t("auth.invalidPhone"));
       return;
     }
 
@@ -64,7 +66,7 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
       const response = await checkPhone(formattedPhone);
 
       if (response.errors) {
-        const errorMessage = response.errors[0]?.message || "Xatolik yuz berdi";
+        const errorMessage = response.errors[0]?.message || t("auth.error");
         toast.error(errorMessage);
 
         // Handle rate limiting - start countdown
@@ -87,7 +89,7 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
           }
         }
       } else {
-        toast.success("SMS kod yuborildi");
+        toast.success(t("auth.smsSent"));
         setPhone(formattedPhone);
         setStep("otp");
       }
@@ -95,7 +97,7 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
       console.error("Send code error:", error);
       toast.error(
         error?.response?.data?.errors?.[0]?.message ||
-          "Kod yuborishda xatolik yuz berdi"
+          t("auth.sendCodeError")
       );
     } finally {
       setSendingCode(false);
@@ -106,7 +108,7 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
     e.preventDefault();
 
     if (!otpCode || otpCode.length !== 6) {
-      toast.error("OTP kod 6 xonali bo'lishi kerak");
+      toast.error(t("auth.invalidOtp"));
       return;
     }
 
@@ -127,20 +129,20 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
         });
 
         if (result?.error) {
-          toast.error("Kirishda xatolik yuz berdi");
+          toast.error(t("auth.loginError"));
         } else {
-          toast.success("Muvaffaqiyatli kirildi");
+          toast.success(t("auth.loginSuccess"));
           onOpenChange(false);
           resetForm();
         }
       } else {
-        toast.error("Noto'g'ri OTP kod");
+        toast.error(t("auth.wrongOtp"));
       }
     } catch (error: any) {
       console.error("Verify OTP error:", error);
       toast.error(
         error?.response?.data?.errors?.[0]?.message ||
-          "OTP kodni tasdiqlashda xatolik yuz berdi"
+          t("auth.verifyError")
       );
     } finally {
       setLoading(false);
@@ -171,22 +173,22 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Kirish / Ro'yxatdan o'tish</DialogTitle>
+          <DialogTitle>{t("auth.title")}</DialogTitle>
           <DialogDescription>
             {step === "phone"
-              ? "Telefon raqamingizga SMS kod yuboramiz"
-              : `${phone} raqamiga yuborilgan kodni kiriting`}
+              ? t("auth.phoneDescription")
+              : t("auth.otpDescription", { phone })}
           </DialogDescription>
         </DialogHeader>
 
         {step === "phone" ? (
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="phone">Telefon raqam</Label>
+              <Label htmlFor="phone">{t("auth.phoneLabel")}</Label>
               <Input
                 id="phone"
                 type="tel"
-                placeholder="+998901234567"
+                placeholder={t("auth.phonePlaceholder")}
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 disabled={sendingCode}
@@ -201,17 +203,17 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
               disabled={sendingCode || !phone}
               className="w-full"
             >
-              {sendingCode ? "Kutilmoqda..." : "Kod yuborish"}
+              {sendingCode ? t("auth.waiting") : t("auth.sendCode")}
             </Button>
           </div>
         ) : (
           <form onSubmit={handleVerifyOtp} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="otp">SMS kod</Label>
+              <Label htmlFor="otp">{t("auth.otpLabel")}</Label>
               <Input
                 id="otp"
                 type="text"
-                placeholder="123456"
+                placeholder={t("auth.otpPlaceholder")}
                 value={otpCode}
                 onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
                 disabled={loading}
@@ -221,13 +223,13 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
                 className="text-center text-2xl tracking-widest"
               />
               <p className="text-xs text-muted-foreground">
-                {phone} raqamiga yuborilgan 6 xonali kodni kiriting
+                {t("auth.otpHint", { phone })}
               </p>
             </div>
 
             <div className="flex flex-col gap-2">
               <Button type="submit" disabled={loading} className="w-full">
-                {loading ? "Tekshirilmoqda..." : "Tasdiqlash"}
+                {loading ? t("auth.verifying") : t("auth.verify")}
               </Button>
 
               <div className="flex items-center justify-between text-sm">
@@ -241,7 +243,7 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
                   disabled={loading}
                   className="text-xs"
                 >
-                  Telefon raqamni o'zgartirish
+                  {t("auth.changePhone")}
                 </Button>
 
                 {canResend ? (
@@ -252,7 +254,7 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
                     disabled={loading}
                     className="text-xs"
                   >
-                    Kodni qayta yuborish
+                    {t("auth.resendCode")}
                   </Button>
                 ) : (
                   <span className="text-xs text-muted-foreground">

@@ -28,6 +28,8 @@ import { DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useSession, signOut } from "next-auth/react";
 import { PhoneAuthModal } from "@/components/auth";
 import { toast } from "react-hot-toast";
+import { LanguageSwitcher } from "@/components/common";
+import { useTranslations } from "next-intl";
 import {
   useWishlist,
   useRemoveFromWishlist,
@@ -39,6 +41,7 @@ import {
 } from "@/services/queries";
 
 export default function DesktopHeader() {
+  const t = useTranslations();
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [visibleCategoriesCount, setVisibleCategoriesCount] = useState<
@@ -122,9 +125,9 @@ export default function DesktopHeader() {
   const handleLogout = async () => {
     try {
       await signOut({ redirect: false });
-      toast.success("Muvaffaqiyatli chiqildi");
+      toast.success(t("toast.logoutSuccess"));
     } catch (error) {
-      toast.error("Chiqishda xatolik yuz berdi");
+      toast.error(t("toast.logoutError"));
     }
   };
 
@@ -223,7 +226,7 @@ export default function DesktopHeader() {
         <div className="container mx-auto flex h-10 items-center justify-between px-4 text-sm lg:px-6">
           <div className="flex items-center gap-4">
             <button className="text-muted-foreground hover:text-foreground transition-colors">
-              Toshkent
+              {t("common.city")}
             </button>
           </div>
           <div className="flex items-center gap-4">
@@ -232,25 +235,22 @@ export default function DesktopHeader() {
               target="_blank"
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
-              Sotuvchi bo'lish
+              {t("common.becomeSeller")}
             </Link>
             <Link
               href={"https://t.me/Venumarketplace"}
               target="_blank"
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
-              Savol-javob
+              {t("common.faq")}
             </Link>
             <Link
               href={"/orders"}
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
-              Mening buyurtmalarim
+              {t("common.myOrders")}
             </Link>
-            <button className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors">
-              <span className="text-base">🇺🇿</span>
-              <span>O'zbekcha</span>
-            </button>
+            <LanguageSwitcher />
           </div>
         </div>
       </div>
@@ -278,7 +278,7 @@ export default function DesktopHeader() {
               ) : (
                 <Menu className="h-5 w-5" />
               )}
-              Katalog
+              {t("common.catalog")}
             </Button>
 
             <IntelisceneSearchInput />
@@ -299,14 +299,14 @@ export default function DesktopHeader() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem asChild>
-                    <Link href="/settings">Hisobim</Link>
+                    <Link href="/settings">{t("header.account")}</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/orders">Buyurtmalarim</Link>
+                    <Link href="/orders">{t("header.orders")}</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
-                    Chiqish
+                    {t("header.logout")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -406,7 +406,7 @@ export default function DesktopHeader() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center gap-1 whitespace-nowrap text-foreground font-medium hover:text-primary transition-colors shrink-0">
-                    Ko'proq
+                    {t("common.more")}
                     <ChevronDown className="h-4 w-4" />
                   </button>
                 </DropdownMenuTrigger>

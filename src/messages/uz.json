@@ -1,3 +1,79 @@
 {
-  "hello": "Assalomu alaykum"
+  "common": {
+    "city": "Toshkent",
+    "becomeSeller": "Sotuvchi bo'lish",
+    "faq": "Savol-javob",
+    "myOrders": "Mening buyurtmalarim",
+    "catalog": "Katalog",
+    "more": "Ko'proq",
+    "search": "Qidiruv",
+    "searchPlaceholder": "Mahsulot va turkumlarni izlash"
+  },
+  "navigation": {
+    "home": "Bosh sahifa",
+    "search": "Qidiruv",
+    "cart": "Savatcha",
+    "orders": "Buyurtmalar",
+    "profile": "Profil"
+  },
+  "header": {
+    "account": "Hisobim",
+    "orders": "Buyurtmalarim",
+    "logout": "Chiqish"
+  },
+  "auth": {
+    "title": "Kirish / Ro'yxatdan o'tish",
+    "phoneDescription": "Telefon raqamingizga SMS kod yuboramiz",
+    "otpDescription": "{phone} raqamiga yuborilgan kodni kiriting",
+    "phoneLabel": "Telefon raqam",
+    "phonePlaceholder": "+998901234567",
+    "sendCode": "Kod yuborish",
+    "waiting": "Kutilmoqda...",
+    "otpLabel": "SMS kod",
+    "otpPlaceholder": "123456",
+    "otpHint": "{phone} raqamiga yuborilgan 6 xonali kodni kiriting",
+    "verify": "Tasdiqlash",
+    "verifying": "Tekshirilmoqda...",
+    "changePhone": "Telefon raqamni o'zgartirish",
+    "resendCode": "Kodni qayta yuborish",
+    "invalidPhone": "To'g'ri telefon raqam kiriting (masalan: +998901234567)",
+    "invalidOtp": "OTP kod 6 xonali bo'lishi kerak",
+    "wrongOtp": "Noto'g'ri OTP kod",
+    "smsSent": "SMS kod yuborildi",
+    "loginSuccess": "Muvaffaqiyatli kirildi",
+    "loginError": "Kirishda xatolik yuz berdi",
+    "sendCodeError": "Kod yuborishda xatolik yuz berdi",
+    "verifyError": "OTP kodni tasdiqlashda xatolik yuz berdi",
+    "error": "Xatolik yuz berdi"
+  },
+  "cart": {
+    "title": "Savatcha",
+    "description": "Sizning mahsulotlaringiz",
+    "empty": "Savatcha bo'sh",
+    "emptyDescription": "Mahsulotlar qo'shib boshlang",
+    "loading": "Yuklanmoqda...",
+    "goShopping": "Xarid qilishni boshlash",
+    "subtotal": "Oraliq summa:",
+    "delivery": "Yetkazib berish:",
+    "deliveryFree": "Bepul",
+    "total": "Jami:",
+    "checkout": "Rasmiylashtirish",
+    "addToCart": "Savatga qo'shish",
+    "remove": "O'chirish"
+  },
+  "wishlist": {
+    "title": "Sevimlilar",
+    "description": "Sizning sevimli mahsulotlaringiz",
+    "empty": "Sevimlilar bo'sh",
+    "emptyDescription": "Mahsulotlarni sevimlilarga qo'shing",
+    "loading": "Yuklanmoqda...",
+    "addToCart": "Savatga qo'shish",
+    "adding": "Qo'shilmoqda...",
+    "outOfStock": "Sotuvda yo'q",
+    "remove": "O'chirish"
+  },
+  "toast": {
+    "logoutSuccess": "Muvaffaqiyatli chiqildi",
+    "logoutError": "Chiqishda xatolik yuz berdi"
+  }
 }

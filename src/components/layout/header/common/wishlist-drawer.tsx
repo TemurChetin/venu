@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import { WishlistProduct } from "@/types/api";
 import { useFormatCurrency } from "@/lib/format-currency";
+import { useTranslations } from "next-intl";
 
 interface WishlistDrawerProps {
   items: WishlistProduct[];
@@ -33,6 +34,7 @@ export function WishlistDrawer({
   isLoading = false,
   addingProductId = null,
 }: WishlistDrawerProps) {
+  const t = useTranslations();
   const formatCurrency = useFormatCurrency();
 
   // Transform API data to display format
@@ -93,9 +95,9 @@ export function WishlistDrawer({
         <SheetHeader className="p-6 pb-4">
           <SheetTitle className="flex items-center gap-2 text-xl">
             <Heart className="h-5 w-5 fill-primary text-primary" />
-            Sevimlilar ({displayItems.length})
+            {t("wishlist.title")} ({displayItems.length})
           </SheetTitle>
-          <SheetDescription>Sizning sevimli mahsulotlaringiz</SheetDescription>
+          <SheetDescription>{t("wishlist.description")}</SheetDescription>
         </SheetHeader>
 
         <Separator />
@@ -103,14 +105,14 @@ export function WishlistDrawer({
         <div className="flex-1 overflow-y-auto p-6">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
-              <p className="text-sm text-muted-foreground">Yuklanmoqda...</p>
+              <p className="text-sm text-muted-foreground">{t("wishlist.loading")}</p>
             </div>
           ) : displayItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
               <Heart className="h-16 w-16 text-muted-foreground mb-4" />
-              <p className="text-lg font-medium mb-2">Sevimlilar bo'sh</p>
+              <p className="text-lg font-medium mb-2">{t("wishlist.empty")}</p>
               <p className="text-sm text-muted-foreground">
-                Mahsulotlarni sevimlilarga qo'shing
+                {t("wishlist.emptyDescription")}
               </p>
             </div>
           ) : (
@@ -174,15 +176,15 @@ export function WishlistDrawer({
                         >
                           <ShoppingCart className="h-4 w-4 mr-2" />
                           {addingProductId === item.productId
-                            ? "Qo'shilmoqda..."
-                            : "Savatga qo'shish"}
+                            ? t("wishlist.adding")
+                            : t("wishlist.addToCart")}
                         </Button>
                       ) : (
                         <Badge
                           variant="secondary"
                           className="w-full justify-center"
                         >
-                          Sotuvda yo'q
+                          {t("wishlist.outOfStock")}
                         </Badge>
                       )}
                     </div>
