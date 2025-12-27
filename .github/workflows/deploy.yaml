@@ -1,0 +1,56 @@
+name: Build and Push Docker Image (tag + latest)
+
+on:
+  push:
+    tags:
+      - "*-prod"
+      - "*-dev"
+
+env:
+  PROJECT_NAME: botmother-market
+
+permissions:
+  contents: read
+
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Prepare .env
+        run: |
+          cp .env.example .env
+          sed -i "s|^DEBUG=.*|DEBUG=true|" .env
+          sed -i "s|^NODE_ENV=.*|NODE_ENV=production|" .env
+          sed -i "s|^NEXT_PUBLIC_API=.*|NEXT_PUBLIC_API=${{ vars.NEXT_PUBLIC_URL }}|" .env
+          sed -i "s|^CONSTRUCTOR_URL=.*|CONSTRUCTOR_URL=${{ vars.CONSTRUCTOR_URL }}|" .env
+          sed -i "s|^NEXTAUTH_SECRET=.*|NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}|" .env
+          sed -i "s|^NEXTAUTH_URL=.*|NEXTAUTH_URL=${{ vars.NEXTAUTH_URL }}|" .env
+          sed -i "s|^MANAGER_URL=.*|MANAGER_URL=${{ vars.MANAGER_URL }}|" .env
+          sed -i "s|^TELEGRAM_BOT_TOKEN=.*|TELEGRAM_BOT_TOKEN=${{ secrets.BOT_TOKEN }}|" .env
+          sed -i "s|^SALES_URL=.*|SALES_URL=${{ vars.SALES_URL }}|" .env
+          sed -i "s|^ADMIN_PANEL=.*|ADMIN_PANEL=${{ vars.ADMIN_PANEL }}|" .env
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ vars.DOCKER_REGISTRY }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and Push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          no-cache: true
+          tags: |
+            ${{ vars.DOCKER_REGISTRY }}/${{ env.PROJECT_NAME }}:${{ github.ref_name }}
+            ${{ vars.DOCKER_REGISTRY }}/${{ env.PROJECT_NAME }}:latest
