@@ -268,6 +268,7 @@ export type Category = {
   };
   translations: any[];
   childes?: SubCategory[]; // Subcategoryalar
+  products?: Product[];
 };
 
 export interface CategoriesResponse extends Array<Category> {}
