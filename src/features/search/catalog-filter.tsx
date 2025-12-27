@@ -48,7 +48,6 @@ export function CatalogFilters({
     brands: true,
     price: true,
     stock: true,
-    color: true,
     language: true,
     country: true,
   });
@@ -129,7 +128,7 @@ export function CatalogFilters({
                 Yuklanmoqda...
               </div>
             ) : categories.length > 0 ? (
-              categories.slice(0, 10).map((category: Category) => (
+              categories.map((category: Category) => (
                 <div key={category.id} className="flex items-center space-x-2">
                   <Checkbox
                     id={`cat-${category.id}`}
@@ -289,33 +288,6 @@ export function CatalogFilters({
                 Tezkor yetkazish
               </Label>
             </div>
-          </div>
-        )}
-      </div>
-
-      <div className="h-px bg-border" />
-
-      {/* Color */}
-      <div className="space-y-3">
-        <button
-          onClick={() => toggleSection("color")}
-          className="flex w-full items-center justify-between text-base font-semibold text-foreground"
-        >
-          Rang
-          {expandedSections.color ? (
-            <ChevronUp className="h-4 w-4" />
-          ) : (
-            <ChevronDown className="h-4 w-4" />
-          )}
-        </button>
-        {expandedSections.color && (
-          <div className="flex flex-wrap gap-2">
-            <button className="h-8 w-8 rounded-full border-2 border-border bg-red-500 hover:border-primary transition-colors" />
-            <button className="h-8 w-8 rounded-full border-2 border-border bg-blue-500 hover:border-primary transition-colors" />
-            <button className="h-8 w-8 rounded-full border-2 border-border bg-yellow-500 hover:border-primary transition-colors" />
-            <button className="h-8 w-8 rounded-full border-2 border-border bg-green-500 hover:border-primary transition-colors" />
-            <button className="h-8 w-8 rounded-full border-2 border-border bg-purple-500 hover:border-primary transition-colors" />
-            <button className="h-8 w-8 rounded-full border-2 border-border bg-pink-500 hover:border-primary transition-colors" />
           </div>
         )}
       </div>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -33,9 +33,17 @@ import { useConfigStore } from "@/stores";
 
 export default function CheckoutNewPage() {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const { guestId } = useGuestId();
   const formatCurrency = useFormatCurrency();
+
+  // Redirect to auth page if not authenticated
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      const currentPath = window.location.pathname;
+      router.push(`/auth?returnUrl=${encodeURIComponent(currentPath)}`);
+    }
+  }, [status, router]);
 
   // State
   const [selectedAddressId, setSelectedAddressId] = useState<number | null>(
@@ -77,7 +85,11 @@ export default function CheckoutNewPage() {
     }, 0);
   }, [cartItems]);
 
-  const isFreeDeliveryEligible = subtotal >= 1000000;
+  const isFreeDeliveryEligible =
+    subtotal * (config?.uzsCurrency?.exchange_rate || 0) >= 1000000;
+  const howMuchToAdd =
+    1000000 - subtotal * (config?.uzsCurrency?.exchange_rate || 0);
+
   const finalDeliveryCost =
     selectedDeliveryMethod === "free" || isFreeDeliveryEligible
       ? 0
@@ -231,12 +243,18 @@ export default function CheckoutNewPage() {
     }
   };
 
-  if (isCartLoading || isAddressesLoading) {
+  // Show loading while checking authentication or loading data
+  if (status === "loading" || isCartLoading || isAddressesLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
+  }
+
+  // Don't render if not authenticated (will redirect)
+  if (status === "unauthenticated") {
+    return null;
   }
 
   if (!cartData) {
@@ -523,11 +541,8 @@ export default function CheckoutNewPage() {
                 {!isFreeDeliveryEligible &&
                   config?.uzsCurrency?.exchange_rate && (
                     <p className="rounded-lg bg-primary/10 p-3 text-xs text-primary">
-                      Yana{" "}
-                      {formatUZS(
-                        1000000 - subtotal * config?.uzsCurrency?.exchange_rate
-                      )}{" "}
-                      qo'shing va bepul yetkazishdan foydalaning!
+                      Yana {howMuchToAdd} qo'shing va bepul yetkazishdan
+                      foydalaning!
                     </p>
                   )}
               </div>

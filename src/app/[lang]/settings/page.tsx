@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "@/i18n/routing";
 import {
   Card,
   CardContent,
@@ -20,21 +22,39 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { User, Phone, Calendar, LogOut, Save, Trash2 } from "lucide-react";
+import {
+  User,
+  Phone,
+  Calendar,
+  LogOut,
+  Save,
+  Trash2,
+  Loader2,
+} from "lucide-react";
 import toast from "react-hot-toast";
 import { useMutation } from "@tanstack/react-query";
 import { instanceAuth } from "@/services/api";
 import { signOut } from "next-auth/react";
 
 export default function SettingsPage() {
+  const router = useRouter();
+  const { data: session, status } = useSession();
+
+  // Redirect to auth page if not authenticated
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      const currentPath = window.location.pathname;
+      router.push(`/auth?returnUrl=${encodeURIComponent(currentPath)}`);
+    }
+  }, [status, router]);
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deletePassword, setDeletePassword] = useState("");
   const [formData, setFormData] = useState({
-    firstName: "Muhiddin",
-    lastName: "Kabraliev",
-    birthDate: "1995-03-15",
-    phone: "+998905650213",
+    firstName: session?.user?.first_name || "",
+    lastName: session?.user?.last_name || "",
+    birthDate: session?.user?.birth_date || "",
+    phone: session?.user?.phone || "",
   });
 
   const deleteAccountMutation = useMutation({
@@ -65,10 +85,24 @@ export default function SettingsPage() {
     setIsEditing(false);
   };
 
-  const handleLogout = () => {
-    // Bu yerda logout logikasi bo'ladi
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: "/" });
     toast.success("Siz tizimdan muvaffaqiyatli chiqdingiz");
   };
+
+  // Show loading while checking authentication
+  if (status === "loading") {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // Don't render if not authenticated (will redirect)
+  if (status === "unauthenticated") {
+    return null;
+  }
 
   const handleDeleteAccount = () => {
     if (!deletePassword) {
