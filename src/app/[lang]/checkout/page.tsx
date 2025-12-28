@@ -83,6 +83,29 @@ export default function CheckoutNewPage() {
     }, 0);
   }, [cartItems]);
 
+  // Calculate total discount
+  const totalDiscount = useMemo(() => {
+    return cartItems.reduce((sum, item) => {
+      const product = item.product_full_info || item.product;
+      if (!product) return sum;
+
+      const originalPrice = product.unit_price || item.price || 0;
+      const discount = product.discount || 0;
+      const discountType = product.discount_type || "";
+
+      // Calculate discount amount for this item
+      const discountAmount =
+        discount > 0
+          ? discountType === "percentage" || discountType === "percent"
+            ? (originalPrice * discount) / 100
+            : discount
+          : 0;
+
+      const quantity = item.quantity || 0;
+      return sum + discountAmount * quantity;
+    }, 0);
+  }, [cartItems]);
+
   const isFreeDeliveryEligible =
     subtotal * (config?.uzsCurrency?.exchange_rate || 0) >= 1000000;
   const howMuchToAdd =
@@ -494,8 +517,42 @@ export default function CheckoutNewPage() {
                       item.product_full_info?.thumbnail_full_url?.path ||
                       "/placeholder.svg";
 
+                  // Get product info for discount calculation
+                  const product = item.product_full_info || item.product;
+                  const originalPrice = product?.unit_price || item.price;
+                  const discount = product?.discount || 0;
+                  const discountType = product?.discount_type || "";
+
+                  // Calculate discount amount
+                  const discountAmount =
+                    discount > 0
+                      ? discountType === "percentage" ||
+                        discountType === "percent"
+                        ? (originalPrice * discount) / 100
+                        : discount
+                      : 0;
+
+                  const hasDiscount = discount > 0 && discountAmount > 0;
+                  const discountedPrice = hasDiscount
+                    ? originalPrice - discountAmount
+                    : item.price;
+
+                  // Discount display text
+                  const discountText = hasDiscount
+                    ? discountType === "percentage" ||
+                      discountType === "percent"
+                      ? `-${discount}%`
+                      : `-${formatCurrency(discount)}`
+                    : null;
+
                   return (
-                    <div key={item.id} className="flex gap-3">
+                    <div key={item.id} className="flex gap-3 relative">
+                      {/* Discount Badge */}
+                      {discountText && (
+                        <div className="absolute left-0 top-0 z-10 flex items-center justify-center rounded-md bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white shadow-sm">
+                          {discountText}
+                        </div>
+                      )}
                       <img
                         src={thumbnailUrl}
                         alt={itemName}
@@ -505,9 +562,16 @@ export default function CheckoutNewPage() {
                         <h3 className="line-clamp-2 text-sm font-medium">
                           {itemName}
                         </h3>
-                        <p className="mt-1 text-sm font-semibold">
-                          {formatCurrency(item.price)} x {item.quantity}
-                        </p>
+                        <div className="mt-1 space-y-0.5">
+                          {hasDiscount && (
+                            <p className="text-xs text-muted-foreground line-through">
+                              {formatCurrency(originalPrice)} x {item.quantity}
+                            </p>
+                          )}
+                          <p className="text-sm font-semibold">
+                            {formatCurrency(discountedPrice)} x {item.quantity}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   );
@@ -540,6 +604,17 @@ export default function CheckoutNewPage() {
                     )}
                   </span>
                 </div>
+
+                {totalDiscount > 0 && (
+                  <div className="flex justify-between">
+                    <span className="flex items-center gap-1 text-muted-foreground">
+                      Chegirma
+                    </span>
+                    <span className="font-medium text-green-600">
+                      -{formatCurrency(totalDiscount)}
+                    </span>
+                  </div>
+                )}
 
                 {!isFreeDeliveryEligible &&
                   config?.uzsCurrency?.exchange_rate && (

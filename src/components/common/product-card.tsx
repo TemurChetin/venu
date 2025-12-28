@@ -79,6 +79,15 @@ export function ProductCard({ product }: ProductCardProps) {
   // Get review count
   const reviewCount = product.reviews_count || product.review_count || 0;
 
+  // Calculate discount display text
+  const discountDisplayText =
+    product.discount > 0
+      ? product.discount_type === "percentage" ||
+        product.discount_type === "percent"
+        ? `-${product.discount}%`
+        : `-${formatCurrency(product.discount)}`
+      : null;
+
   // Handle wishlist toggle
   const handleWishlistToggle = async () => {
     // If user is not authenticated, show login modal
@@ -126,6 +135,13 @@ export function ProductCard({ product }: ProductCardProps) {
       <div className="w-full max-w-[320px]">
         {/* Header with badge and wishlist */}
         <div className="relative">
+          {/* Discount Badge */}
+          {discountDisplayText && (
+            <div className="absolute left-3 top-3 z-10 flex items-center justify-center rounded-md bg-red-500 px-2.5 py-1 text-xs font-bold text-white shadow-md">
+              {discountDisplayText}
+            </div>
+          )}
+
           <button
             onClick={handleWishlistToggle}
             disabled={isLoading}
