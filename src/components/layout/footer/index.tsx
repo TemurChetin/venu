@@ -5,14 +5,81 @@ import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useBanners } from "@/services/queries/products";
 
 export function Footer() {
   const session = useSession();
   const params = useParams();
   const lang = (params?.lang as string) || "uz";
+  
+  // Fetch banners
+  const { data: bannersData, isLoading: bannersLoading } = useBanners();
+
+  // Filter Footer Banners (published only)
+  const footerBanners =
+    bannersData?.filter(
+      (banner) =>
+        banner.banner_type === "Footer Banner" && banner.published === 1
+    ) || [];
 
   return (
     <footer className="border-t bg-background mt-12">
+      {/* Footer Banners */}
+      {bannersLoading ? (
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="w-full h-32 md:h-40 bg-gray-200 animate-pulse rounded-xl"
+              />
+            ))}
+          </div>
+        </div>
+      ) : (
+        footerBanners.length > 0 && (
+          <div className="bg-muted/30 border-b">
+            <div className="container mx-auto px-4 py-6 md:py-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                {footerBanners.map((banner) => (
+                  <div
+                    key={banner.id}
+                    className="group relative overflow-hidden rounded-xl bg-white shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1"
+                  >
+                    {banner.url ? (
+                      <Link
+                        href={banner.url}
+                        className="block w-full h-full"
+                        aria-label={banner.title || "Banner"}
+                      >
+                        <div className="relative w-full aspect-[16/9] overflow-hidden rounded-xl">
+                          <img
+                            src={banner.photo_full_url?.path || "/placeholder.svg"}
+                            alt={banner.title || "Banner"}
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            loading="lazy"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        </div>
+                      </Link>
+                    ) : (
+                      <div className="relative w-full aspect-[16/9] overflow-hidden rounded-xl">
+                        <img
+                          src={banner.photo_full_url?.path || "/placeholder.svg"}
+                          alt={banner.title || "Banner"}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )
+      )}
+
       <div className="container mx-auto px-4 py-12">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
@@ -86,7 +153,7 @@ export function Footer() {
               <ul className="space-y-3">
                 <li>
                   <Link
-                    href="#"
+                    href="/auth"
                     className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                   >
                     Kirish
@@ -94,7 +161,7 @@ export function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="#"
+                    href="/auth"
                     className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                   >
                     Ro&apos;yxatdan O&apos;tish

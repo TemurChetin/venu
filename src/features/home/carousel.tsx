@@ -5,6 +5,7 @@ import { Navigation, Pagination } from "swiper/modules";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRef } from "react";
 import type { Swiper as SwiperType } from "swiper";
+import Link from "next/link";
 import { useBanners } from "@/services/queries/products";
 
 import "swiper/css";
@@ -16,7 +17,10 @@ export function Carousel() {
   const { data: bannersData, isLoading } = useBanners();
 
   const slides =
-    bannersData?.filter((banner) => banner.banner_type === "Main Banner") || [];
+    bannersData?.filter(
+      (banner) =>
+        banner.banner_type === "Main Banner" && banner.published === 1
+    ) || [];
 
   if (isLoading) {
     return (
@@ -65,13 +69,26 @@ export function Carousel() {
       >
         {slides.map((slide) => (
           <SwiperSlide key={slide.id}>
-            <div className="overflow-hidden rounded-2xl">
-              <img
-                src={slide.photo_full_url?.path || "/placeholder.svg"}
-                alt={slide.title || ""}
-                className="w-full h-auto object-cover aspect-[16/7]"
-              />
-            </div>
+            {slide.url ? (
+              <Link
+                href={slide.url}
+                className="block overflow-hidden rounded-2xl hover:opacity-90 transition-opacity"
+              >
+                <img
+                  src={slide.photo_full_url?.path || "/placeholder.svg"}
+                  alt={slide.title || ""}
+                  className="w-full h-auto object-cover aspect-[16/7]"
+                />
+              </Link>
+            ) : (
+              <div className="overflow-hidden rounded-2xl">
+                <img
+                  src={slide.photo_full_url?.path || "/placeholder.svg"}
+                  alt={slide.title || ""}
+                  className="w-full h-auto object-cover aspect-[16/7]"
+                />
+              </div>
+            )}
           </SwiperSlide>
         ))}
       </Swiper>

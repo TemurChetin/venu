@@ -2,13 +2,14 @@
 
 import { ProductCard } from "@/components/common/product-card";
 import { Carousel } from "@/features/home/carousel";
-import Image from "next/image";
+import Link from "next/link";
 import {
   useLatestProducts,
   useNewArrivalProducts,
   useTopRatedProducts,
   useBestSellingProducts,
   useFeaturedProducts,
+  useBanners,
 } from "@/services/queries/products";
 
 type Props = {};
@@ -29,6 +30,16 @@ function Page({}: Props) {
   const { data: featuredData, isLoading: featuredLoading } =
     useFeaturedProducts(10, 0);
 
+  // Fetch banners
+  const { data: bannersData, isLoading: bannersLoading } = useBanners();
+
+  // Filter Main Section Banners (published only)
+  const mainSectionBanners =
+    bannersData?.filter(
+      (banner) =>
+        banner.banner_type === "Main Section Banner" && banner.published === 1
+    ) || [];
+
   return (
     <>
       <Carousel />
@@ -42,6 +53,38 @@ function Page({}: Props) {
               <ProductCard key={`latest-${product.slug}`} product={product} />
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Main Section Banner 1 */}
+      {mainSectionBanners.length > 0 && mainSectionBanners[0] && (
+        <div className="px-4 py-6">
+          {mainSectionBanners[0].url ? (
+            <Link
+              href={mainSectionBanners[0].url}
+              className="block overflow-hidden rounded-2xl hover:opacity-90 transition-opacity"
+            >
+              <img
+                src={
+                  mainSectionBanners[0].photo_full_url?.path ||
+                  "/placeholder.svg"
+                }
+                alt={mainSectionBanners[0].title || "Banner"}
+                className="w-full h-auto object-cover rounded-2xl"
+              />
+            </Link>
+          ) : (
+            <div className="overflow-hidden rounded-2xl">
+              <img
+                src={
+                  mainSectionBanners[0].photo_full_url?.path ||
+                  "/placeholder.svg"
+                }
+                alt={mainSectionBanners[0].title || "Banner"}
+                className="w-full h-auto object-cover rounded-2xl"
+              />
+            </div>
+          )}
         </div>
       )}
 
@@ -60,18 +103,6 @@ function Page({}: Props) {
         </div>
       )}
 
-      {/* Timeout Banner  */}
-      {/* Timeout banner only works on large screens */}
-      <div className="px-4">
-        <Image
-          src="https://venu.uz/storage/banner/2025-09-17-68ca3be65996d.webp"
-          alt="Timeout Banner"
-          className="w-full h-auto hidden lg:block my-8 rounded-lg"
-          width={1200}
-          height={720}
-        />
-      </div>
-
       {/* Top Rated Products */}
       {topRatedData?.products && topRatedData.products.length > 0 && (
         <div className="px-4">
@@ -84,6 +115,38 @@ function Page({}: Props) {
               />
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Main Section Banner 2 */}
+      {mainSectionBanners.length > 1 && mainSectionBanners[1] && (
+        <div className="px-4 py-6">
+          {mainSectionBanners[1].url ? (
+            <Link
+              href={mainSectionBanners[1].url}
+              className="block overflow-hidden rounded-2xl hover:opacity-90 transition-opacity"
+            >
+              <img
+                src={
+                  mainSectionBanners[1].photo_full_url?.path ||
+                  "/placeholder.svg"
+                }
+                alt={mainSectionBanners[1].title || "Banner"}
+                className="w-full h-auto object-cover rounded-2xl"
+              />
+            </Link>
+          ) : (
+            <div className="overflow-hidden rounded-2xl">
+              <img
+                src={
+                  mainSectionBanners[1].photo_full_url?.path ||
+                  "/placeholder.svg"
+                }
+                alt={mainSectionBanners[1].title || "Banner"}
+                className="w-full h-auto object-cover rounded-2xl"
+              />
+            </div>
+          )}
         </div>
       )}
 
@@ -113,6 +176,33 @@ function Page({}: Props) {
           </div>
         </div>
       )}
+
+      {/* Additional Main Section Banners */}
+      {mainSectionBanners.length > 2 &&
+        mainSectionBanners.slice(2).map((banner, index) => (
+          <div key={banner.id} className="px-4 py-6">
+            {banner.url ? (
+              <Link
+                href={banner.url}
+                className="block overflow-hidden rounded-2xl hover:opacity-90 transition-opacity"
+              >
+                <img
+                  src={banner.photo_full_url?.path || "/placeholder.svg"}
+                  alt={banner.title || "Banner"}
+                  className="w-full h-auto object-cover rounded-2xl"
+                />
+              </Link>
+            ) : (
+              <div className="overflow-hidden rounded-2xl">
+                <img
+                  src={banner.photo_full_url?.path || "/placeholder.svg"}
+                  alt={banner.title || "Banner"}
+                  className="w-full h-auto object-cover rounded-2xl"
+                />
+              </div>
+            )}
+          </div>
+        ))}
     </>
   );
 }

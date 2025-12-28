@@ -12,6 +12,11 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
+        hostname: "api.venu.uz",
+        pathname: "/storage/**", // This ensures any path under /storage is allowed
+      },
+      {
+        protocol: "https",
         hostname: "venu.jscorp.uz",
         pathname: "/storage/**", // This ensures any path under /storage is allowed
       },

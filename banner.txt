@@ -1,0 +1,396 @@
+Request URL
+https://venu.jscorp.uz/api/v1/banners
+
+Response Success:[
+    {
+        "id": 17,
+        "photo": "2025-12-22-694933613b89e.webp",
+        "banner_type": "Main Section Banner",
+        "theme": "default",
+        "published": 1,
+        "created_at": "2025-12-22T12:02:41.000000Z",
+        "updated_at": "2025-12-22T12:22:21.000000Z",
+        "url": "https:\/\/venu.uz",
+        "resource_type": "product",
+        "resource_id": 37,
+        "title": null,
+        "sub_title": null,
+        "button_text": null,
+        "background_color": null,
+        "product": {
+            "id": 37,
+            "added_by": "seller",
+            "user_id": 3,
+            "name": "Dell Inspiron 15 3530 (i5-1334U \/ 8\/512GB \/ 15.6\" FHD 120\u0413\u0446) \u0427\u0435\u0440\u043d\u044b\u0439 \u2014 \u043e\u0444\u0438\u0446\u0438\u0430\u043b\u044c\u043d\u044b",
+            "slug": "dell-vostro-3530-i5-13-avlod-8gb-ram-512gb-ssd-120hz-ekran-eng-yaxshi-narx-Oae5zP",
+            "product_type": "physical",
+            "category_ids": [
+                {
+                    "id": "423",
+                    "position": 1
+                },
+                {
+                    "id": "430",
+                    "position": 2
+                },
+                {
+                    "id": "441",
+                    "position": 3
+                }
+            ],
+            "category_id": 423,
+            "sub_category_id": 430,
+            "sub_sub_category_id": 441,
+            "brand_id": 4,
+            "unit": "pc",
+            "min_qty": 1,
+            "refundable": 1,
+            "digital_product_type": null,
+            "digital_file_ready": "",
+            "digital_file_ready_storage_type": null,
+            "images": "[{\"image_name\":\"2025-07-29-6888bb2bf15bc.webp\",\"storage\":\"public\"},{\"image_name\":\"2025-07-29-6888bb2c1df67.webp\",\"storage\":\"public\"},{\"image_name\":\"2025-12-05-69328bbace049.webp\",\"storage\":\"public\"}]",
+            "color_image": "[{\"color\":\"000000\",\"image_name\":\"2025-12-05-69328bbace049.webp\",\"storage\":\"public\"},{\"color\":null,\"image_name\":\"2025-07-29-6888bb2bf15bc.webp\",\"storage\":\"public\"},{\"color\":null,\"image_name\":\"2025-07-29-6888bb2c1df67.webp\",\"storage\":\"public\"}]",
+            "thumbnail": "2025-08-26-68ad0ff1a33db.webp",
+            "thumbnail_storage_type": "public",
+            "preview_file": "",
+            "preview_file_storage_type": "public",
+            "featured": null,
+            "flash_deal": null,
+            "video_provider": "youtube",
+            "video_url": null,
+            "colors": [
+                "#000000"
+            ],
+            "variant_product": 0,
+            "attributes": [],
+            "choice_options": [],
+            "variation": [
+                {
+                    "type": "Black",
+                    "price": 435,
+                    "sku": "DI13(\/8\/1F1\ufffd\ufffd\ufffd-Black",
+                    "qty": 1
+                }
+            ],
+            "digital_product_file_types": [],
+            "digital_product_extensions": [],
+            "published": 0,
+            "unit_price": 435,
+            "purchase_price": 0,
+            "tax": 0,
+            "tax_type": "percent",
+            "tax_model": "include",
+            "discount": 0,
+            "discount_type": "flat",
+            "current_stock": 1,
+            "minimum_order_qty": 1,
+            "details": "<h2 data-start=\"96\" data-end=\"168\"><p data-start=\"48\" data-end=\"114\"><strong data-start=\"48\" data-end=\"114\">Dell Vostro 3530 \u2013 \u0438\u0434\u0435\u0430\u043b\u044c\u043d\u044b\u0439 \u0432\u044b\u0431\u043e\u0440 \u0434\u043b\u044f \u0440\u0430\u0431\u043e\u0442\u044b \u0438 \u043f\u0440\u043e\u0434\u0443\u043a\u0442\u0438\u0432\u043d\u043e\u0441\u0442\u0438<\/strong><\/p>\r\n<p data-start=\"116\" data-end=\"424\">\u0411\u044b\u0441\u0442\u0440\u044b\u0439 \u0438 \u043d\u0430\u0434\u0435\u0436\u043d\u044b\u0439 \u2014 \u043d\u043e\u0443\u0442\u0431\u0443\u043a <strong data-start=\"145\" data-end=\"165\">Dell Vostro 3530<\/strong> \u0438\u0434\u0435\u0430\u043b\u044c\u043d\u043e \u043f\u043e\u0434\u0445\u043e\u0434\u0438\u0442 \u0434\u043b\u044f \u0441\u043e\u0432\u0440\u0435\u043c\u0435\u043d\u043d\u043e\u0433\u043e \u043e\u0444\u0438\u0441\u043d\u043e\u0433\u043e \u0442\u0440\u0443\u0434\u0430, \u0443\u0434\u0430\u043b\u0451\u043d\u043d\u043e\u0439 \u0440\u0430\u0431\u043e\u0442\u044b \u0438 \u0443\u0447\u0451\u0431\u044b. \u041e\u0441\u043d\u0430\u0449\u0451\u043d \u043d\u043e\u0432\u0435\u0439\u0448\u0438\u043c \u043f\u0440\u043e\u0446\u0435\u0441\u0441\u043e\u0440\u043e\u043c <strong data-start=\"272\" data-end=\"313\">Intel\u00ae Core\u2122 i5-1334U 13-\u0433\u043e \u043f\u043e\u043a\u043e\u043b\u0435\u043d\u0438\u044f<\/strong>, \u043e\u043d \u043e\u0431\u0435\u0441\u043f\u0435\u0447\u0438\u0432\u0430\u0435\u0442 \u0432\u044b\u0441\u043e\u043a\u0443\u044e \u043f\u0440\u043e\u0438\u0437\u0432\u043e\u0434\u0438\u0442\u0435\u043b\u044c\u043d\u043e\u0441\u0442\u044c \u043a\u0430\u043a \u0434\u043b\u044f \u043f\u043e\u0432\u0441\u0435\u0434\u043d\u0435\u0432\u043d\u044b\u0445 \u0437\u0430\u0434\u0430\u0447, \u0442\u0430\u043a \u0438 \u0434\u043b\u044f \u0438\u043d\u0442\u0435\u043d\u0441\u0438\u0432\u043d\u043e\u0439 \u043c\u043d\u043e\u0433\u043e\u0437\u0430\u0434\u0430\u0447\u043d\u043e\u0441\u0442\u0438.<\/p>\r\n<p data-start=\"426\" data-end=\"652\">\u0411\u043b\u0430\u0433\u043e\u0434\u0430\u0440\u044f <strong data-start=\"436\" data-end=\"468\">8 \u0413\u0411 \u043e\u043f\u0435\u0440\u0430\u0442\u0438\u0432\u043d\u043e\u0439 \u043f\u0430\u043c\u044f\u0442\u0438 DDR4<\/strong> \u0432\u044b \u043c\u043e\u0436\u0435\u0442\u0435 \u043b\u0435\u0433\u043a\u043e \u0437\u0430\u043f\u0443\u0441\u043a\u0430\u0442\u044c \u043d\u0435\u0441\u043a\u043e\u043b\u044c\u043a\u043e \u043f\u0440\u043e\u0433\u0440\u0430\u043c\u043c \u043e\u0434\u043d\u043e\u0432\u0440\u0435\u043c\u0435\u043d\u043d\u043e, \u0430 <strong data-start=\"530\" data-end=\"544\">512 \u0413\u0411 SSD<\/strong> \u043e\u0431\u0435\u0441\u043f\u0435\u0447\u0438\u0432\u0430\u044e\u0442 \u043c\u043e\u043b\u043d\u0438\u0435\u043d\u043e\u0441\u043d\u0443\u044e \u0437\u0430\u0433\u0440\u0443\u0437\u043a\u0443 \u0441\u0438\u0441\u0442\u0435\u043c\u044b, \u0431\u044b\u0441\u0442\u0440\u044b\u0439 \u0434\u043e\u0441\u0442\u0443\u043f \u043a \u0444\u0430\u0439\u043b\u0430\u043c \u0438 \u0431\u0435\u0437\u043e\u043f\u0430\u0441\u043d\u043e\u0435 \u0445\u0440\u0430\u043d\u0435\u043d\u0438\u0435 \u0431\u043e\u043b\u044c\u0448\u0438\u0445 \u043f\u0440\u043e\u0435\u043a\u0442\u043e\u0432.<\/p>\r\n<p data-start=\"654\" data-end=\"978\">\u042d\u043a\u0440\u0430\u043d <strong data-start=\"660\" data-end=\"695\">15,6\" Full HD \u0441 \u0447\u0430\u0441\u0442\u043e\u0442\u043e\u0439 120 \u0413\u0446<\/strong> \u043f\u0440\u0435\u0434\u043b\u0430\u0433\u0430\u0435\u0442 \u0447\u0435\u0442\u043a\u043e\u0435, \u043d\u0430\u0441\u044b\u0449\u0435\u043d\u043d\u043e\u0435 \u0438 \u0441\u0432\u0435\u0440\u0445\u043f\u043b\u0430\u0432\u043d\u043e\u0435 \u0438\u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u0438\u0435, \u0447\u0442\u043e \u0434\u0435\u043b\u0430\u0435\u0442 \u0435\u0433\u043e \u043e\u0442\u043b\u0438\u0447\u043d\u044b\u043c \u0432\u0430\u0440\u0438\u0430\u043d\u0442\u043e\u043c \u043d\u0435 \u0442\u043e\u043b\u044c\u043a\u043e \u0434\u043b\u044f \u0440\u0430\u0431\u043e\u0442\u044b, \u043d\u043e \u0438 \u0434\u043b\u044f \u043f\u0440\u043e\u0441\u043c\u043e\u0442\u0440\u0430 \u0432\u0438\u0434\u0435\u043e, \u0441\u043e\u0437\u0434\u0430\u043d\u0438\u044f \u043a\u043e\u043d\u0442\u0435\u043d\u0442\u0430 \u0438 \u043b\u0451\u0433\u043a\u043e\u0433\u043e \u0434\u0438\u0437\u0430\u0439\u043d\u0430. \u041f\u043e\u0434\u0441\u0432\u0435\u0442\u043a\u0430 \u043a\u043b\u0430\u0432\u0438\u0430\u0442\u0443\u0440\u044b \u043e\u0431\u0435\u0441\u043f\u0435\u0447\u0438\u0432\u0430\u0435\u0442 \u043a\u043e\u043c\u0444\u043e\u0440\u0442 \u0438 \u044d\u0444\u0444\u0435\u043a\u0442\u0438\u0432\u043d\u043e\u0441\u0442\u044c, \u043f\u043e\u0437\u0432\u043e\u043b\u044f\u044f \u0443\u0434\u043e\u0431\u043d\u043e \u0440\u0430\u0431\u043e\u0442\u0430\u0442\u044c \u043f\u0440\u0438 \u0441\u043b\u0430\u0431\u043e\u043c \u043e\u0441\u0432\u0435\u0449\u0435\u043d\u0438\u0438.<\/p>\r\n<hr data-start=\"980\" data-end=\"983\">\r\n<\/h2><h3 data-start=\"985\" data-end=\"1016\"><strong data-start=\"989\" data-end=\"1016\">\u041e\u0441\u043d\u043e\u0432\u043d\u044b\u0435 \u0445\u0430\u0440\u0430\u043a\u0442\u0435\u0440\u0438\u0441\u0442\u0438\u043a\u0438<\/strong><\/h3><h2 data-start=\"96\" data-end=\"168\">\r\n<p data-start=\"1018\" data-end=\"1554\"><strong data-start=\"1018\" data-end=\"1032\">\u041f\u0440\u043e\u0446\u0435\u0441\u0441\u043e\u0440:<\/strong> Intel\u00ae Core\u2122 i5-1334U (13-\u0435 \u043f\u043e\u043a\u043e\u043b\u0435\u043d\u0438\u0435) \u2014 \u0432\u044b\u0441\u043e\u043a\u0430\u044f \u043f\u0440\u043e\u0438\u0437\u0432\u043e\u0434\u0438\u0442\u0435\u043b\u044c\u043d\u043e\u0441\u0442\u044c \u0438 \u044d\u043d\u0435\u0440\u0433\u043e\u044d\u0444\u0444\u0435\u043a\u0442\u0438\u0432\u043d\u043e\u0441\u0442\u044c<br data-start=\"1122\" data-end=\"1125\">\r\n<strong data-start=\"1125\" data-end=\"1148\">\u041e\u043f\u0435\u0440\u0430\u0442\u0438\u0432\u043d\u0430\u044f \u043f\u0430\u043c\u044f\u0442\u044c:<\/strong> 8 \u0413\u0411 DDR4 \u2014 \u043c\u043e\u0436\u043d\u043e \u0440\u0430\u0441\u0448\u0438\u0440\u0438\u0442\u044c \u0434\u043b\u044f \u0435\u0449\u0435 \u0431\u043e\u043b\u044c\u0448\u0435\u0439 \u043c\u043d\u043e\u0433\u043e\u0437\u0430\u0434\u0430\u0447\u043d\u043e\u0441\u0442\u0438<br data-start=\"1208\" data-end=\"1211\">\r\n<strong data-start=\"1211\" data-end=\"1226\">\u041d\u0430\u043a\u043e\u043f\u0438\u0442\u0435\u043b\u044c:<\/strong> 512 \u0413\u0411 SSD \u2014 \u0431\u044b\u0441\u0442\u0440\u043e, \u043d\u0430\u0434\u0435\u0436\u043d\u043e \u0438 \u0431\u0435\u0437\u043e\u043f\u0430\u0441\u043d\u043e<br data-start=\"1267\" data-end=\"1270\">\r\n<strong data-start=\"1270\" data-end=\"1280\">\u042d\u043a\u0440\u0430\u043d:<\/strong> 15,6\" Full HD (1920\u00d71080), 120 \u0413\u0446 \u2014 \u0447\u0435\u0442\u043a\u043e\u0435 \u0438 \u043f\u043b\u0430\u0432\u043d\u043e\u0435 \u0438\u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u0438\u0435<br data-start=\"1345\" data-end=\"1348\">\r\n<strong data-start=\"1348\" data-end=\"1360\">\u0413\u0440\u0430\u0444\u0438\u043a\u0430:<\/strong> Intel\u00ae Iris\u00ae Xe Graphics \u2014 \u043f\u043e\u0434\u0445\u043e\u0434\u0438\u0442 \u0434\u043b\u044f \u0440\u0430\u0431\u043e\u0442\u044b \u0441 \u0433\u0440\u0430\u0444\u0438\u043a\u043e\u0439 \u0438 \u043c\u0443\u043b\u044c\u0442\u0438\u043c\u0435\u0434\u0438\u0430<br data-start=\"1432\" data-end=\"1435\">\r\n<strong data-start=\"1435\" data-end=\"1450\">\u041a\u043b\u0430\u0432\u0438\u0430\u0442\u0443\u0440\u0430:<\/strong> \u0441 \u043f\u043e\u0434\u0441\u0432\u0435\u0442\u043a\u043e\u0439 \u2014 \u0443\u0434\u043e\u0431\u043d\u043e \u0440\u0430\u0431\u043e\u0442\u0430\u0442\u044c \u0432 \u0442\u0435\u043c\u043d\u043e\u0442\u0435<br data-start=\"1491\" data-end=\"1494\">\r\n<strong data-start=\"1494\" data-end=\"1503\">\u0426\u0432\u0435\u0442:<\/strong> \u0427\u0435\u0440\u043d\u044b\u0439<br data-start=\"1510\" data-end=\"1513\">\r\n<strong data-start=\"1513\" data-end=\"1521\" data-is-only-node=\"\">\u0412\u0435\u0441:<\/strong> ~1,7 \u043a\u0433 \u2014 \u043b\u0435\u0433\u043a\u0438\u0439 \u0438 \u043f\u043e\u0440\u0442\u0430\u0442\u0438\u0432\u043d\u044b\u0439<\/p>\r\n<hr data-start=\"1556\" data-end=\"1559\">\r\n<\/h2><h3 data-start=\"1561\" data-end=\"1594\"><strong data-start=\"1565\" data-end=\"1594\">\u041f\u043e\u0447\u0435\u043c\u0443 \u0432\u0430\u043c \u044d\u0442\u043e \u043f\u043e\u043d\u0440\u0430\u0432\u0438\u0442\u0441\u044f<\/strong><\/h3><h2 data-start=\"96\" data-end=\"168\">\r\n<ul data-start=\"1596\" data-end=\"1868\">\r\n<li data-start=\"1596\" data-end=\"1636\">\r\n<p data-start=\"1598\" data-end=\"1636\">\u041c\u043e\u0449\u043d\u044b\u0439 Intel Core i5 13-\u0433\u043e \u043f\u043e\u043a\u043e\u043b\u0435\u043d\u0438\u044f<\/p>\r\n<\/li>\r\n<li data-start=\"1637\" data-end=\"1693\">\r\n<p data-start=\"1639\" data-end=\"1693\">\u041f\u043b\u0430\u0432\u043d\u0430\u044f \u0447\u0430\u0441\u0442\u043e\u0442\u0430 \u043e\u0431\u043d\u043e\u0432\u043b\u0435\u043d\u0438\u044f 120 \u0413\u0446 \u2014 \u043a\u043e\u043c\u0444\u043e\u0440\u0442 \u0434\u043b\u044f \u0433\u043b\u0430\u0437<\/p>\r\n<\/li>\r\n<li data-start=\"1694\" data-end=\"1750\">\r\n<p data-start=\"1696\" data-end=\"1750\">\u041a\u043b\u0430\u0432\u0438\u0430\u0442\u0443\u0440\u0430 \u0441 \u043f\u043e\u0434\u0441\u0432\u0435\u0442\u043a\u043e\u0439 \u2014 \u0443\u0434\u043e\u0431\u043d\u043e \u043f\u0440\u0438 \u043b\u044e\u0431\u043e\u043c \u043e\u0441\u0432\u0435\u0449\u0435\u043d\u0438\u0438<\/p>\r\n<\/li>\r\n<li data-start=\"1751\" data-end=\"1813\">\r\n<p data-start=\"1753\" data-end=\"1813\">SSD \u0438 8 \u0413\u0411 \u041e\u0417\u0423 \u2014 \u0431\u044b\u0441\u0442\u0440\u044b\u0435 \u0437\u0430\u0433\u0440\u0443\u0437\u043a\u0438 \u0438 \u043b\u0451\u0433\u043a\u0430\u044f \u043c\u043d\u043e\u0433\u043e\u0437\u0430\u0434\u0430\u0447\u043d\u043e\u0441\u0442\u044c<\/p>\r\n<\/li>\r\n<li data-start=\"1814\" data-end=\"1868\">\r\n<p data-start=\"1816\" data-end=\"1868\">\u0421\u0442\u0438\u043b\u044c\u043d\u044b\u0439 \u0438 \u043f\u0440\u043e\u0447\u043d\u044b\u0439 \u0434\u0438\u0437\u0430\u0439\u043d \u0441 \u043f\u0440\u043e\u0444\u0435\u0441\u0441\u0438\u043e\u043d\u0430\u043b\u044c\u043d\u044b\u043c \u0432\u0438\u0434\u043e\u043c<\/p>\r\n<\/li>\r\n<\/ul>\r\n<p data-start=\"1870\" data-end=\"2044\">\ud83d\udcbc <strong data-start=\"1873\" data-end=\"1890\">\u041f\u043e\u0434\u0445\u043e\u0434\u0438\u0442 \u0434\u043b\u044f:<\/strong> \u043e\u0444\u0438\u0441\u043d\u044b\u0445 \u0441\u043f\u0435\u0446\u0438\u0430\u043b\u0438\u0441\u0442\u043e\u0432, \u0441\u0442\u0443\u0434\u0435\u043d\u0442\u043e\u0432, \u0443\u0434\u0430\u043b\u0451\u043d\u043d\u044b\u0445 \u0441\u043e\u0442\u0440\u0443\u0434\u043d\u0438\u043a\u043e\u0432, \u0434\u0438\u0437\u0430\u0439\u043d\u0435\u0440\u043e\u0432 \u0438 \u0431\u0438\u0437\u043d\u0435\u0441-\u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u0435\u0439.<br data-start=\"1981\" data-end=\"1984\">\r\n\ud83d\uded2 <strong data-start=\"1987\" data-end=\"2044\">\u041b\u0443\u0447\u0448\u0438\u0439 \u043d\u043e\u0443\u0442\u0431\u0443\u043a \u0434\u043b\u044f \u0440\u0430\u0431\u043e\u0442\u044b \u2014 \u0437\u0430\u043a\u0430\u0437\u044b\u0432\u0430\u0439\u0442\u0435 \u043f\u0440\u044f\u043c\u043e \u0441\u0435\u0439\u0447\u0430\u0441!<\/strong><\/p><\/h2>",
+            "free_shipping": 0,
+            "attachment": null,
+            "created_at": "2025-07-29T12:14:36.000000Z",
+            "updated_at": "2025-12-05T07:37:30.000000Z",
+            "status": 1,
+            "featured_status": 1,
+            "meta_title": "Dell Inspiron 15 3530 (i5-1334U \/ 8\/512GB \/ 15.6\" FHD 120\u0413\u0446) \u0427\u0435\u0440\u043d\u044b\u0439 \u2014 \u043e\u0444\u0438\u0446\u0438\u0430\u043b\u044c\u043d\u044b\u0439",
+            "meta_description": "Tezkor va ishonchli Dell Vostro 3530 Core i5-1334U, 8GB DDR4 RAM, 512GB SSD, 15.6\" FHD 120Hz ekran, Backlit klaviatura bilan. Ish uchun eng yaxshi noutbuk \u2013 hoz",
+            "meta_image": "2025-08-26-68ad0ff14bec6.png",
+            "request_status": 1,
+            "denied_note": null,
+            "shipping_cost": 0,
+            "multiply_qty": 0,
+            "temp_shipping_cost": null,
+            "is_shipping_cost_updated": null,
+            "code": "PP5IC2",
+            "mxik": "08471001001000000",
+            "weight": "1700",
+            "height": "3",
+            "width": "36",
+            "length": "24",
+            "package_code": "1501886",
+            "is_install": 0,
+            "is_seasonal": 0,
+            "is_discount": 0,
+            "colors_formatted": [
+                {
+                    "name": "Black",
+                    "code": "#000000",
+                    "image": "2025-12-05-69328bbace049.webp"
+                }
+            ],
+            "is_shop_temporary_close": 0,
+            "thumbnail_full_url": {
+                "key": "2025-08-26-68ad0ff1a33db.webp",
+                "path": "https:\/\/venu.jscorp.uz\/storage\/product\/thumbnail\/2025-08-26-68ad0ff1a33db.webp",
+                "status": 200
+            },
+            "preview_file_full_url": {
+                "key": "",
+                "path": null,
+                "status": 404
+            },
+            "color_images_full_url": [
+                {
+                    "color": "000000",
+                    "image_name": {
+                        "key": "2025-12-05-69328bbace049.webp",
+                        "path": "https:\/\/venu.jscorp.uz\/storage\/product\/2025-12-05-69328bbace049.webp",
+                        "status": 200
+                    }
+                },
+                {
+                    "color": null,
+                    "image_name": {
+                        "key": "2025-07-29-6888bb2bf15bc.webp",
+                        "path": "https:\/\/venu.jscorp.uz\/storage\/product\/2025-07-29-6888bb2bf15bc.webp",
+                        "status": 200
+                    }
+                },
+                {
+                    "color": null,
+                    "image_name": {
+                        "key": "2025-07-29-6888bb2c1df67.webp",
+                        "path": "https:\/\/venu.jscorp.uz\/storage\/product\/2025-07-29-6888bb2c1df67.webp",
+                        "status": 200
+                    }
+                }
+            ],
+            "meta_image_full_url": {
+                "key": "2025-08-26-68ad0ff14bec6.png",
+                "path": "https:\/\/venu.jscorp.uz\/storage\/product\/meta\/2025-08-26-68ad0ff14bec6.png",
+                "status": 200
+            },
+            "images_full_url": [
+                {
+                    "key": "2025-07-29-6888bb2bf15bc.webp",
+                    "path": "https:\/\/venu.jscorp.uz\/storage\/product\/2025-07-29-6888bb2bf15bc.webp",
+                    "status": 200
+                },
+                {
+                    "key": "2025-07-29-6888bb2c1df67.webp",
+                    "path": "https:\/\/venu.jscorp.uz\/storage\/product\/2025-07-29-6888bb2c1df67.webp",
+                    "status": 200
+                },
+                {
+                    "key": "2025-12-05-69328bbace049.webp",
+                    "path": "https:\/\/venu.jscorp.uz\/storage\/product\/2025-12-05-69328bbace049.webp",
+                    "status": 200
+                }
+            ],
+            "digital_file_ready_full_url": {
+                "key": "",
+                "path": null,
+                "status": 404
+            },
+            "translations": [],
+            "reviews": []
+        },
+        "photo_full_url": {
+            "key": "2025-12-22-694933613b89e.webp",
+            "path": "https:\/\/venu.jscorp.uz\/storage\/banner\/2025-12-22-694933613b89e.webp",
+            "status": 200
+        },
+        "storage": [
+            {
+                "id": 7331,
+                "data_type": "App\\Models\\Banner",
+                "data_id": "17",
+                "key": "photo",
+                "value": "public",
+                "created_at": "2025-12-22T12:02:41.000000Z",
+                "updated_at": "2025-12-22T12:02:41.000000Z"
+            }
+        ]
+    },
+    {
+        "id": 16,
+        "photo": "2025-12-22-69493344b514d.webp",
+        "banner_type": "Footer Banner",
+        "theme": "default",
+        "published": 1,
+        "created_at": "2025-12-22T12:02:12.000000Z",
+        "updated_at": "2025-12-22T12:22:18.000000Z",
+        "url": "https:\/\/venu.uz",
+        "resource_type": "product",
+        "resource_id": 37,
+        "title": null,
+        "sub_title": null,
+        "button_text": null,
+        "background_color": null,
+        "photo_full_url": {
+            "key": "2025-12-22-69493344b514d.webp",
+            "path": "https:\/\/venu.jscorp.uz\/storage\/banner\/2025-12-22-69493344b514d.webp",
+            "status": 200
+        },
+        "storage": [
+            {
+                "id": 7330,
+                "data_type": "App\\Models\\Banner",
+                "data_id": "16",
+                "key": "photo",
+                "value": "public",
+                "created_at": "2025-12-22T12:02:12.000000Z",
+                "updated_at": "2025-12-22T12:02:12.000000Z"
+            }
+        ]
+    },
+    {
+        "id": 15,
+        "photo": "2025-12-22-6949331fc12b8.webp",
+        "banner_type": "Footer Banner",
+        "theme": "default",
+        "published": 1,
+        "created_at": "2025-12-22T11:33:55.000000Z",
+        "updated_at": "2025-12-22T12:01:35.000000Z",
+        "url": "https:\/\/venu.uz",
+        "resource_type": "product",
+        "resource_id": 37,
+        "title": null,
+        "sub_title": null,
+        "button_text": null,
+        "background_color": null,
+        "photo_full_url": {
+            "key": "2025-12-22-6949331fc12b8.webp",
+            "path": "https:\/\/venu.jscorp.uz\/storage\/banner\/2025-12-22-6949331fc12b8.webp",
+            "status": 200
+        },
+        "storage": [
+            {
+                "id": 7329,
+                "data_type": "App\\Models\\Banner",
+                "data_id": "15",
+                "key": "photo",
+                "value": "public",
+                "created_at": "2025-12-22T12:01:35.000000Z",
+                "updated_at": "2025-12-22T12:01:35.000000Z"
+            }
+        ]
+    },
+    {
+        "id": 11,
+        "photo": "2025-09-25-68d4e982e9362.webp",
+        "banner_type": "Footer Banner",
+        "theme": "default",
+        "published": 1,
+        "created_at": "2025-09-17T04:44:56.000000Z",
+        "updated_at": "2025-09-25T07:04:34.000000Z",
+        "url": "https:\/\/venu.uz\/products?sub_category_id=486&data_from=category&offer_type=&page=1",
+        "resource_type": "category",
+        "resource_id": 422,
+        "title": null,
+        "sub_title": null,
+        "button_text": null,
+        "background_color": null,
+        "photo_full_url": {
+            "key": "2025-09-25-68d4e982e9362.webp",
+            "path": "https:\/\/venu.jscorp.uz\/storage\/banner\/2025-09-25-68d4e982e9362.webp",
+            "status": 200
+        },
+        "storage": [
+            {
+                "id": 506,
+                "data_type": "App\\Models\\Banner",
+                "data_id": "11",
+                "key": "photo",
+                "value": "public",
+                "created_at": "2025-09-25T07:04:34.000000Z",
+                "updated_at": "2025-09-25T07:04:34.000000Z"
+            }
+        ]
+    },
+    {
+        "id": 10,
+        "photo": "2025-09-25-68d4e994a52b5.webp",
+        "banner_type": "Footer Banner",
+        "theme": "default",
+        "published": 1,
+        "created_at": "2025-09-17T04:44:27.000000Z",
+        "updated_at": "2025-09-25T07:04:52.000000Z",
+        "url": "https:\/\/venu.uz\/products?category_id=429&data_from=category&offer_type=&page=1",
+        "resource_type": "category",
+        "resource_id": 422,
+        "title": null,
+        "sub_title": null,
+        "button_text": null,
+        "background_color": null,
+        "photo_full_url": {
+            "key": "2025-09-25-68d4e994a52b5.webp",
+            "path": "https:\/\/venu.jscorp.uz\/storage\/banner\/2025-09-25-68d4e994a52b5.webp",
+            "status": 200
+        },
+        "storage": [
+            {
+                "id": 505,
+                "data_type": "App\\Models\\Banner",
+                "data_id": "10",
+                "key": "photo",
+                "value": "public",
+                "created_at": "2025-09-25T07:04:52.000000Z",
+                "updated_at": "2025-09-25T07:04:52.000000Z"
+            }
+        ]
+    },
+    {
+        "id": 9,
+        "photo": "2025-09-17-68ca3be65996d.webp",
+        "banner_type": "Main Section Banner",
+        "theme": "default",
+        "published": 1,
+        "created_at": "2025-09-17T04:41:10.000000Z",
+        "updated_at": "2025-09-22T05:42:41.000000Z",
+        "url": "https:\/\/venu.uz\/products?category_id=423&data_from=category&offer_type=&page=1",
+        "resource_type": "category",
+        "resource_id": 423,
+        "title": null,
+        "sub_title": null,
+        "button_text": null,
+        "background_color": null,
+        "photo_full_url": {
+            "key": "2025-09-17-68ca3be65996d.webp",
+            "path": "https:\/\/venu.jscorp.uz\/storage\/banner\/2025-09-17-68ca3be65996d.webp",
+            "status": 200
+        },
+        "storage": [
+            {
+                "id": 504,
+                "data_type": "App\\Models\\Banner",
+                "data_id": "9",
+                "key": "photo",
+                "value": "public",
+                "created_at": "2025-09-17T04:41:10.000000Z",
+                "updated_at": "2025-09-17T04:41:10.000000Z"
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "photo": "2025-12-22-6948f27baeebc.webp",
+        "banner_type": "Main Banner",
+        "theme": "default",
+        "published": 1,
+        "created_at": "2025-08-14T06:56:31.000000Z",
+        "updated_at": "2025-12-23T04:05:59.000000Z",
+        "url": "https:\/\/venu.uz\/products?category_id=427&data_from=category&page=1",
+        "resource_type": "product",
+        "resource_id": 37,
+        "title": null,
+        "sub_title": null,
+        "button_text": null,
+        "background_color": null,
+        "photo_full_url": {
+            "key": "2025-12-22-6948f27baeebc.webp",
+            "path": "https:\/\/venu.jscorp.uz\/storage\/banner\/2025-12-22-6948f27baeebc.webp",
+            "status": 200
+        },
+        "storage": [
+            {
+                "id": 386,
+                "data_type": "App\\Models\\Banner",
+                "data_id": "2",
+                "key": "photo",
+                "value": "public",
+                "created_at": "2025-12-22T07:25:47.000000Z",
+                "updated_at": "2025-12-22T07:25:47.000000Z"
+            }
+        ]
+    }
+]
