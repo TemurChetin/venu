@@ -410,10 +410,6 @@ export default function DetailPage() {
                 className="space-y-4 text-muted-foreground leading-relaxed"
                 dangerouslySetInnerHTML={{ __html: product.details }}
               />
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Eaque
-              molestiae delectus amet neque dolorum, cum beatae consectetur ipsa
-              earum laboriosam natus repellat veniam corrupti eligendi impedit
-              aspernatur quam, nemo sapiente.
             </CardContent>
           </Card>
         )}
