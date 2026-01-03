@@ -17,6 +17,7 @@ import {
 } from "@/services/queries";
 
 import { Product } from "@/types/api";
+import Image from "next/image";
 
 interface ProductCardProps {
   product: Product;
@@ -160,7 +161,9 @@ export function ProductCard({ product }: ProductCardProps) {
             href={`/products/${product.slug}`}
             className="relative block overflow-hidden rounded-xl"
           >
-            <img
+            <Image
+              width={315}
+              height={250}
               src={thumbnailImage}
               alt={product.name}
               className="h-[250px] hover:scale-105 transition-all duration-300 md:h-[315px] w-full object-cover rounded-xl overflow-hidden"

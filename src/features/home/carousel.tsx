@@ -18,8 +18,7 @@ export function Carousel() {
 
   const slides =
     bannersData?.filter(
-      (banner) =>
-        banner.banner_type === "Main Banner" && banner.published === 1
+      (banner) => banner.banner_type === "Main Banner" && banner.published === 1
     ) || [];
 
   if (isLoading) {
@@ -47,7 +46,7 @@ export function Carousel() {
         rewind={true}
         grabCursor={true}
         speed={400}
-        initialSlide={2}
+        initialSlide={1}
         pagination={{
           clickable: true,
         }}

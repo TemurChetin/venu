@@ -47,6 +47,7 @@ export default function SettingsPage() {
       router.push(`/auth?returnUrl=${encodeURIComponent(currentPath)}`);
     }
   }, [status, router]);
+
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deletePassword, setDeletePassword] = useState("");

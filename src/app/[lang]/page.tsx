@@ -11,6 +11,7 @@ import {
   useFeaturedProducts,
   useBanners,
 } from "@/services/queries/products";
+import Image from "next/image";
 
 type Props = {};
 
@@ -64,7 +65,9 @@ function Page({}: Props) {
               href={mainSectionBanners[0].url}
               className="block overflow-hidden rounded-2xl hover:opacity-90 transition-opacity"
             >
-              <img
+              <Image
+                width={1200}
+                height={720}
                 src={
                   mainSectionBanners[0].photo_full_url?.path ||
                   "/placeholder.svg"
@@ -75,7 +78,9 @@ function Page({}: Props) {
             </Link>
           ) : (
             <div className="overflow-hidden rounded-2xl">
-              <img
+              <Image
+                width={1200}
+                height={720}
                 src={
                   mainSectionBanners[0].photo_full_url?.path ||
                   "/placeholder.svg"
@@ -126,7 +131,9 @@ function Page({}: Props) {
               href={mainSectionBanners[1].url}
               className="block overflow-hidden rounded-2xl hover:opacity-90 transition-opacity"
             >
-              <img
+              <Image
+                width={1200}
+                height={720}
                 src={
                   mainSectionBanners[1].photo_full_url?.path ||
                   "/placeholder.svg"
@@ -137,7 +144,9 @@ function Page({}: Props) {
             </Link>
           ) : (
             <div className="overflow-hidden rounded-2xl">
-              <img
+              <Image
+                width={1200}
+                height={720}
                 src={
                   mainSectionBanners[1].photo_full_url?.path ||
                   "/placeholder.svg"
@@ -186,7 +195,9 @@ function Page({}: Props) {
                 href={banner.url}
                 className="block overflow-hidden rounded-2xl hover:opacity-90 transition-opacity"
               >
-                <img
+                <Image
+                  width={1200}
+                  height={720}
                   src={banner.photo_full_url?.path || "/placeholder.svg"}
                   alt={banner.title || "Banner"}
                   className="w-full h-auto object-cover rounded-2xl"
@@ -194,7 +205,9 @@ function Page({}: Props) {
               </Link>
             ) : (
               <div className="overflow-hidden rounded-2xl">
-                <img
+                <Image
+                  width={1200}
+                  height={720}
                   src={banner.photo_full_url?.path || "/placeholder.svg"}
                   alt={banner.title || "Banner"}
                   className="w-full h-auto object-cover rounded-2xl"

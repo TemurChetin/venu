@@ -10,7 +10,7 @@ type Props = {};
 
 function MobileHeader({}: Props) {
   const t = useTranslations();
-  
+
   return (
     <header>
       <div className="container mt-4">

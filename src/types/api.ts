@@ -451,12 +451,115 @@ export interface UpdateCartRequest {
 }
 
 // Order Types
-export interface Order {
+export interface ShippingAddressData {
   id: number;
-  order_amount: number;
-  order_status: string;
+  customer_id: string;
+  is_guest: boolean;
+  contact_person_name: string;
+  email: string | null;
+  address_type: "home" | "office" | "other";
+  address: string;
+  city: string;
+  zip: string;
+  phone: string;
+  created_at: string | null;
+  updated_at: string | null;
+  state: string | null;
+  country: string;
+  latitude: string;
+  longitude: string;
+  is_billing: boolean;
+  region_id: number;
+  delivery_method: string;
+  district_id: number;
+}
+
+export interface OrderDetail {
+  id: number;
+  order_id: number;
+  product_id: number;
+  seller_id: number;
+  digital_file_after_sell: string | null;
+  product_details: string; // JSON string
+  qty: number;
+  price: number;
+  tax: number;
+  discount: number;
+  tax_model: string;
+  delivery_status: string;
   payment_status: string;
   created_at: string;
+  updated_at: string;
+  shipping_method_id: number | null;
+  variant: string;
+  variation: string; // JSON string
+  discount_type: string;
+  is_stock_decreased: number;
+  refund_request: number;
+  product: ProductFullInfo | null;
+  digital_file_after_sell_full_url: {
+    key: string | null;
+    path: string | null;
+    status: number;
+  };
+  storage: any[];
+}
+
+export interface Order {
+  id: number;
+  customer_id: number;
+  is_guest: boolean;
+  customer_type: string;
+  payment_status: string;
+  order_status: string;
+  payment_method: string;
+  transaction_ref: string | null;
+  payment_by: string | null;
+  payment_note: string | null;
+  order_amount: number;
+  paid_amount: number;
+  bring_change_amount: number | null;
+  bring_change_amount_currency: string | null;
+  admin_commission: string;
+  is_pause: boolean;
+  cause: string | null;
+  shipping_address: string | number;
+  created_at: string;
+  updated_at: string;
+  discount_amount: number;
+  discount_type: string | null;
+  coupon_code: string;
+  coupon_discount_bearer: string;
+  shipping_responsibility: string;
+  shipping_method_id: number;
+  shipping_cost: number;
+  is_shipping_free: boolean;
+  order_group_id: string;
+  verification_code: string;
+  verification_status: boolean;
+  seller_id: number;
+  seller_is: string;
+  shipping_address_data: ShippingAddressData;
+  delivery_man_id: number | null;
+  deliveryman_charge: number;
+  expected_delivery_date: string | null;
+  order_note: string | null;
+  billing_address: string | number;
+  billing_address_data: ShippingAddressData;
+  order_type: string;
+  extra_discount: number;
+  extra_discount_type: string | null;
+  free_delivery_bearer: string | null;
+  checked: boolean;
+  shipping_type: string;
+  delivery_type: string | null;
+  delivery_service_name: string | null;
+  third_party_delivery_tracking_id: string | null;
+  order_details_count: string;
+  details: OrderDetail[];
+  delivery_man: any | null;
+  seller: Seller;
+  // Legacy/computed fields for backward compatibility
   items?: OrderItem[];
   delivery_address?: string;
   recipient?: string;

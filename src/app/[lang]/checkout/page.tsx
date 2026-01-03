@@ -29,6 +29,7 @@ import { useGuestId } from "@/services/guest-id";
 import { toast } from "react-hot-toast";
 import { useCart } from "@/services";
 import { useConfigStore } from "@/stores";
+import Image from "next/image";
 
 export default function CheckoutNewPage() {
   const router = useRouter();
@@ -577,7 +578,13 @@ export default function CheckoutNewPage() {
                     id="payme"
                     className="sr-only"
                   />
-                  <img src="/payme.png" alt="Payme" className="h-8" />
+                  <Image
+                    width={400}
+                    height={90}
+                    src="/payme.png"
+                    alt="Payme"
+                    className="h-8"
+                  />
                 </Label>
 
                 <Label
@@ -594,7 +601,13 @@ export default function CheckoutNewPage() {
                     id="click"
                     className="sr-only"
                   />
-                  <img src="/click.png" alt="Click" className="h-8" />
+                  <Image
+                    width={400}
+                    height={90}
+                    src="/click.png"
+                    alt="Click"
+                    className="h-8"
+                  />
                 </Label>
               </RadioGroup>
             </div>
@@ -656,7 +669,9 @@ export default function CheckoutNewPage() {
                           {discountText}
                         </div>
                       )}
-                      <img
+                      <Image
+                        width={700}
+                        height={700}
                         src={thumbnailUrl}
                         alt={itemName}
                         className="h-20 w-20 rounded-lg object-cover"

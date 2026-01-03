@@ -11,7 +11,7 @@ export function Footer() {
   const session = useSession();
   const params = useParams();
   const lang = (params?.lang as string) || "uz";
-  
+
   // Fetch banners
   const { data: bannersData, isLoading: bannersLoading } = useBanners();
 
@@ -53,8 +53,12 @@ export function Footer() {
                         aria-label={banner.title || "Banner"}
                       >
                         <div className="relative w-full aspect-[16/9] overflow-hidden rounded-xl">
-                          <img
-                            src={banner.photo_full_url?.path || "/placeholder.svg"}
+                          <Image
+                            width={400}
+                            height={225}
+                            src={
+                              banner.photo_full_url?.path || "/placeholder.svg"
+                            }
                             alt={banner.title || "Banner"}
                             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                             loading="lazy"
@@ -64,8 +68,12 @@ export function Footer() {
                       </Link>
                     ) : (
                       <div className="relative w-full aspect-[16/9] overflow-hidden rounded-xl">
-                        <img
-                          src={banner.photo_full_url?.path || "/placeholder.svg"}
+                        <Image
+                          width={400}
+                          height={225}
+                          src={
+                            banner.photo_full_url?.path || "/placeholder.svg"
+                          }
                           alt={banner.title || "Banner"}
                           className="w-full h-full object-cover"
                           loading="lazy"

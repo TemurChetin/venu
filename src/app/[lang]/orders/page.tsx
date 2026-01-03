@@ -1,19 +1,40 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "@/i18n/routing";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Pagination } from "@/components/ui/pagination";
-import { Copy, Package, Clock, CheckCircle2, Truck } from "lucide-react";
+import {
+  Copy,
+  Package,
+  Clock,
+  CheckCircle2,
+  Truck,
+  Loader2,
+} from "lucide-react";
 import { formatCurrency } from "@/lib";
 import { useOrders } from "@/services/queries/orders";
-import { Order } from "@/types/api";
+import { Order, OrderDetail } from "@/types/api";
+import Image from "next/image";
 
 const ITEMS_PER_PAGE = 10;
 
 export default function OrdersPage() {
+  const router = useRouter();
+  const { status } = useSession();
+
+  // Redirect to auth page if not authenticated
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      const currentPath = window.location.pathname;
+      router.push(`/auth?returnUrl=${encodeURIComponent(currentPath)}`);
+    }
+  }, [status, router]);
+
   const [activeTab, setActiveTab] = useState<
     "all" | "delivered" | "out_for_delivery"
   >("all");
@@ -44,6 +65,46 @@ export default function OrdersPage() {
 
   const copyOrderId = (id: number) => {
     navigator.clipboard.writeText(id.toString());
+  };
+
+  // Helper function to parse product details from JSON string
+  const parseProductDetails = (productDetailsJson: string) => {
+    try {
+      return JSON.parse(productDetailsJson);
+    } catch {
+      return null;
+    }
+  };
+
+  // Helper function to get product name from order detail
+  const getProductName = (detail: OrderDetail) => {
+    if (detail.product?.name) {
+      return detail.product.name;
+    }
+    const parsed = parseProductDetails(detail.product_details);
+    return parsed?.name || `Mahsulot #${detail.product_id}`;
+  };
+
+  // Helper function to get product image from order detail
+  const getProductImage = (detail: OrderDetail) => {
+    // Try product object first
+    if (detail.product?.thumbnail_full_url?.path) {
+      return detail.product.thumbnail_full_url.path;
+    }
+    if (detail.product?.images_full_url?.[0]?.path) {
+      return detail.product.images_full_url[0].path;
+    }
+
+    // Try parsing product_details JSON
+    const parsed = parseProductDetails(detail.product_details);
+    if (parsed?.thumbnail_full_url?.path) {
+      return parsed.thumbnail_full_url.path;
+    }
+    if (parsed?.images_full_url?.[0]?.path) {
+      return parsed.images_full_url[0].path;
+    }
+
+    return null;
   };
 
   const getStatusInfo = (status: string) => {
@@ -96,6 +157,20 @@ export default function OrdersPage() {
     }
   };
 
+  // Show loading while checking authentication
+  if (status === "loading") {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // Don't render if not authenticated (will redirect)
+  if (status === "unauthenticated") {
+    return null;
+  }
+
   const orders = data?.orders || [];
   const totalSize = data?.total_size || 0;
   const totalPages = Math.ceil(totalSize / ITEMS_PER_PAGE);
@@ -105,23 +180,8 @@ export default function OrdersPage() {
       <Tabs
         value={activeTab}
         onValueChange={handleTabChange}
-        className="w-full"
+        className="w-full mt-6"
       >
-        <TabsList className="grid w-full max-w-md grid-cols-3 mt-6">
-          <TabsTrigger value="all" className="gap-2">
-            <Package className="h-4 w-4" />
-            Barchasi
-          </TabsTrigger>
-          <TabsTrigger value="delivered" className="gap-2">
-            <CheckCircle2 className="h-4 w-4" />
-            Topshirilganlar
-          </TabsTrigger>
-          <TabsTrigger value="out_for_delivery" className="gap-2">
-            <Truck className="h-4 w-4" />
-            Yetkazilmoqda
-          </TabsTrigger>
-        </TabsList>
-
         <TabsContent value={activeTab} className="mt-2 space-y-4">
           {isLoading ? (
             <Card>
@@ -204,77 +264,89 @@ export default function OrdersPage() {
                     <CardContent className="p-6">
                       <div className="space-y-6">
                         {/* Order Items - if available */}
-                        {order.items && order.items.length > 0 && (
+                        {order.details && order.details.length > 0 && (
                           <div>
                             <h4 className="mb-4 font-semibold text-sm text-muted-foreground uppercase tracking-wide">
                               Mahsulotlar:
                             </h4>
                             <div className="space-y-4">
-                              {order.items.map((item, idx) => (
-                                <div
-                                  key={idx}
-                                  className="flex items-start gap-4"
-                                >
-                                  {item.image && (
-                                    <div className="h-20 w-20 overflow-hidden rounded-lg border bg-muted">
-                                      <img
-                                        src={item.image || "/placeholder.svg"}
-                                        alt={item.product_name || "Mahsulot"}
-                                        className="h-full w-full object-cover"
-                                      />
-                                    </div>
-                                  )}
-                                  <div className="flex-1">
-                                    <h5 className="font-semibold">
-                                      {item.product_name ||
-                                        `Mahsulot #${item.product_id}`}
-                                    </h5>
-                                    <div className="mt-1 flex items-center gap-4 text-sm text-muted-foreground">
-                                      <span>{item.quantity} ta tovar</span>
-                                      <span>•</span>
-                                      <span className="font-semibold text-foreground">
-                                        {formatCurrency(item.price)}
-                                      </span>
+                              {order.details.map((detail) => {
+                                const productName = getProductName(detail);
+                                const productImage = getProductImage(detail);
+                                return (
+                                  <div
+                                    key={detail.id}
+                                    className="flex items-start gap-4"
+                                  >
+                                    {productImage && (
+                                      <div className="h-20 w-20 overflow-hidden rounded-lg border bg-muted">
+                                        <Image
+                                          width={80}
+                                          height={80}
+                                          src={productImage}
+                                          alt={productName}
+                                          className="h-full w-full object-cover"
+                                        />
+                                      </div>
+                                    )}
+                                    <div className="flex-1">
+                                      <h5 className="font-semibold">
+                                        {productName}
+                                      </h5>
+                                      <div className="mt-1 flex items-center gap-4 text-sm text-muted-foreground">
+                                        <span>{detail.qty} ta tovar</span>
+                                        <span>•</span>
+                                        <span className="font-semibold text-foreground">
+                                          {formatCurrency(detail.price)}
+                                        </span>
+                                      </div>
+                                      {detail.variant && (
+                                        <p className="mt-1 text-xs text-muted-foreground">
+                                          Variant: {detail.variant}
+                                        </p>
+                                      )}
                                     </div>
                                   </div>
-                                </div>
-                              ))}
+                                );
+                              })}
                             </div>
                           </div>
                         )}
 
                         {/* Delivery Info - if available */}
-                        {(order.delivery_address ||
-                          order.recipient ||
-                          order.phone) && (
+                        {order.shipping_address_data && (
                           <div className="grid gap-4 rounded-lg border bg-muted/30 p-4 md:grid-cols-2">
-                            {order.delivery_address && (
-                              <div>
-                                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
-                                  Yetkazib berish manzili:
+                            <div>
+                              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
+                                Yetkazib berish manzili:
+                              </p>
+                              <p className="text-sm">
+                                {order.shipping_address_data.address}
+                                {order.shipping_address_data.city &&
+                                  `, ${order.shipping_address_data.city}`}
+                                {order.shipping_address_data.district_id &&
+                                  ` (Tuman ID: ${order.shipping_address_data.district_id})`}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
+                                Buyurtmani qabul qiluvchi:
+                              </p>
+                              {order.shipping_address_data
+                                .contact_person_name && (
+                                <p className="text-sm font-medium">
+                                  {
+                                    order.shipping_address_data
+                                      .contact_person_name
+                                  }
                                 </p>
-                                <p className="text-sm">
-                                  {order.delivery_address}
+                              )}
+                              {order.shipping_address_data.phone && (
+                                <p className="text-sm text-muted-foreground">
+                                  {order.shipping_address_data.phone}
                                 </p>
-                              </div>
-                            )}
-                            {(order.recipient || order.phone) && (
-                              <div>
-                                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
-                                  Buyurtmani qabul qiluvchi:
-                                </p>
-                                {order.recipient && (
-                                  <p className="text-sm font-medium">
-                                    {order.recipient}
-                                  </p>
-                                )}
-                                {order.phone && (
-                                  <p className="text-sm text-muted-foreground">
-                                    {order.phone}
-                                  </p>
-                                )}
-                              </div>
-                            )}
+                              )}
+                            </div>
                           </div>
                         )}
 
@@ -291,13 +363,6 @@ export default function OrdersPage() {
                           <span className="text-2xl font-bold">
                             {formatCurrency(order.order_amount)}
                           </span>
-                        </div>
-
-                        {/* Action Button */}
-                        <div className="flex justify-end">
-                          <Button className="min-w-[200px]">
-                            Tovarlarni baholash
-                          </Button>
                         </div>
                       </div>
                     </CardContent>

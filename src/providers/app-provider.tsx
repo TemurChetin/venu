@@ -22,7 +22,11 @@ export function AppProvider({ children, locale, messages }: AppProviderProps) {
   return (
     <SessionProvider>
       <ReactQueryProvider>
-        <NextIntlClientProvider locale={locale} messages={messages}>
+        <NextIntlClientProvider
+          timeZone="Asia/Tashkent"
+          locale={locale}
+          messages={messages}
+        >
           <ConfigLoader />
           {children}
         </NextIntlClientProvider>
