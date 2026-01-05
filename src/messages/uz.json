@@ -75,5 +75,11 @@
   "toast": {
     "logoutSuccess": "Muvaffaqiyatli chiqildi",
     "logoutError": "Chiqishda xatolik yuz berdi"
+  },
+  "notFound": {
+    "title": "Sahifa topilmadi",
+    "description": "Kechirasiz, siz qidirayotgan sahifa mavjud emas yoki o'chirilgan.",
+    "goHome": "Bosh sahifaga qaytish",
+    "goSearch": "Qidiruv"
   }
 }

@@ -34,15 +34,15 @@ export function Carousel() {
   }
 
   return (
-    <div className="relative w-full px-4 py-8">
+    <div className="relative w-full px-0 md:px-4 py-8">
       <Swiper
         onSwiper={(swiper) => {
           swiperRef.current = swiper;
         }}
         modules={[Navigation, Pagination]}
-        spaceBetween={16}
-        slidesPerView={1.2}
-        centeredSlides={true}
+        spaceBetween={0}
+        slidesPerView={1}
+        centeredSlides={false}
         rewind={true}
         grabCursor={true}
         speed={400}
@@ -51,17 +51,15 @@ export function Carousel() {
           clickable: true,
         }}
         breakpoints={{
-          640: {
-            slidesPerView: 1.3,
-            spaceBetween: 20,
-          },
           768: {
             slidesPerView: 1.4,
             spaceBetween: 24,
+            centeredSlides: true,
           },
           1024: {
             slidesPerView: 1.5,
             spaceBetween: 32,
+            centeredSlides: true,
           },
         }}
         className="promo-swiper"
@@ -92,10 +90,10 @@ export function Carousel() {
         ))}
       </Swiper>
 
-      {/* Custom Navigation Buttons */}
+      {/* Custom Navigation Buttons - Hidden on mobile */}
       <button
         onClick={() => swiperRef.current?.slidePrev()}
-        className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white shadow-lg rounded-full p-2 md:p-3 transition-all duration-200 hover:scale-110"
+        className="hidden md:block absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white shadow-lg rounded-full p-2 md:p-3 transition-all duration-200 hover:scale-110"
         aria-label="Oldingi"
       >
         <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 text-gray-800" />
@@ -103,7 +101,7 @@ export function Carousel() {
 
       <button
         onClick={() => swiperRef.current?.slideNext()}
-        className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white shadow-lg rounded-full p-2 md:p-3 transition-all duration-200 hover:scale-110"
+        className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white shadow-lg rounded-full p-2 md:p-3 transition-all duration-200 hover:scale-110"
         aria-label="Keyingi"
       >
         <ChevronRight className="w-5 h-5 md:w-6 md:h-6 text-gray-800" />
@@ -128,12 +126,14 @@ export function Carousel() {
           border-radius: 4px;
         }
 
-        .promo-swiper .swiper-slide {
-          opacity: 0.5;
-        }
+        @media (min-width: 768px) {
+          .promo-swiper .swiper-slide {
+            opacity: 0.5;
+          }
 
-        .promo-swiper .swiper-slide-active {
-          opacity: 1;
+          .promo-swiper .swiper-slide-active {
+            opacity: 1;
+          }
         }
       `}</style>
     </div>
