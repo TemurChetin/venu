@@ -13,10 +13,17 @@ import {
 } from "@/services/queries/products";
 import Image from "next/image";
 import { BottomBanners } from "@/features/home/bottom-banners";
+import { useState, useEffect } from "react";
 
 type Props = {};
 
 function Page({}: Props) {
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Track mount state to prevent hydration mismatch
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
   // Fetch all product lists
   const { data: latestData, isLoading: latestLoading } = useLatestProducts(
     10,
@@ -41,6 +48,15 @@ function Page({}: Props) {
       (banner) =>
         banner.banner_type === "Main Section Banner" && banner.published === 1
     ) || [];
+
+  // Show loading state until mounted to prevent hydration mismatch
+  if (!isMounted) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <p className="text-muted-foreground">Yuklanmoqda...</p>
+      </div>
+    );
+  }
 
   return (
     <>

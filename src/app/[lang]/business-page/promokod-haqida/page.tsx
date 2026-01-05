@@ -1,5 +1,28 @@
+import type { Metadata } from "next";
+import { generateMetadata as generateSEOMetadata } from "@/lib/seo";
+
 interface Props {
   params: Promise<{ lang: string }>;
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+  const content =
+    promocodeContent[lang as keyof typeof promocodeContent] ||
+    promocodeContent.uz;
+
+  return generateSEOMetadata({
+    title: content.title,
+    description: content.whatIs.description,
+    url: `/${lang}/business-page/promokod-haqida`,
+    type: "website",
+    locale: lang,
+    keywords: ["venu", "promokod", "promo code", "chegirma", "discount"],
+  });
 }
 
 const promocodeContent = {

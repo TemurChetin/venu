@@ -25,10 +25,16 @@ import {
   useAddToWishlist,
   useRemoveFromWishlist,
 } from "@/services/queries";
+import {
+  StructuredData,
+  generateProductSchema,
+  generateBreadcrumbSchema,
+} from "@/components/seo/structured-data";
 
 export default function DetailPage() {
   const params = useParams();
   const productSlug = params?.id as string;
+  const lang = (params?.lang as string) || "uz";
 
   const { data: productData, isLoading: isLoadingProduct } =
     useProductDetail(productSlug);
@@ -53,6 +59,12 @@ export default function DetailPage() {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<number | null>(null);
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Track mount state to prevent hydration mismatch
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Calculate price with discount
   const priceInfo = useMemo(() => {
@@ -165,7 +177,8 @@ export default function DetailPage() {
     });
   };
 
-  if (isLoadingProduct) {
+  // Show loading state only after mount to prevent hydration mismatch
+  if (!isMounted || isLoadingProduct) {
     return (
       <main className="container mx-auto px-4 py-6 md:py-8">
         <div className="flex items-center justify-center min-h-[400px]">
@@ -183,8 +196,49 @@ export default function DetailPage() {
         </div>
       </main>
     );
-  } else
-    return (
+  }
+
+  // At this point, product is guaranteed to be defined
+  return (
+    <>
+      {/* Structured Data for SEO */}
+      <StructuredData
+        data={generateProductSchema({
+          name: product.name,
+          slug: product.slug,
+          details: product.details,
+          thumbnail: product.thumbnail,
+          thumbnail_full_url: product.thumbnail_full_url,
+          unit_price: product.unit_price,
+          discount: product.discount,
+          discount_type: product.discount_type,
+          category: product.category,
+          rating: product.rating,
+          review_count: product.review_count || product.reviews_count,
+          seller: product.seller
+            ? {
+                name:
+                  `${product.seller.f_name || ""} ${
+                    product.seller.l_name || ""
+                  }`.trim() || "Venu",
+              }
+            : undefined,
+        })}
+      />
+      <StructuredData
+        data={generateBreadcrumbSchema([
+          { name: "Bosh sahifa", url: `/${lang}` },
+          ...(product.category
+            ? [
+                {
+                  name: product.category.name,
+                  url: `/${lang}/search?category=${product.category.id}`,
+                },
+              ]
+            : []),
+          { name: product.name, url: `/${lang}/products/${product.slug}` },
+        ])}
+      />
       <main className="container mx-auto px-4 py-6 md:py-8">
         {/* Breadcrumb */}
         <nav className="mb-6 text-sm text-muted-foreground">
@@ -434,5 +488,6 @@ export default function DetailPage() {
           onOpenChange={setIsAuthModalOpen}
         />
       </main>
-    );
+    </>
+  );
 }

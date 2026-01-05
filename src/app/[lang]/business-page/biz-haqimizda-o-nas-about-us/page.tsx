@@ -1,5 +1,26 @@
+import type { Metadata } from "next";
+import { generateMetadata as generateSEOMetadata } from "@/lib/seo";
+
 interface Props {
   params: Promise<{ lang: string }>;
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+  const content = aboutUsContent[lang as keyof typeof aboutUsContent] || aboutUsContent.uz;
+
+  return generateSEOMetadata({
+    title: content.title,
+    description: content.description,
+    url: `/${lang}/business-page/biz-haqimizda-o-nas-about-us`,
+    type: "website",
+    locale: lang,
+    keywords: ["venu", "biz haqimizda", "about us", "onlayn do'kon", "marketplace"],
+  });
 }
 
 const aboutUsContent = {

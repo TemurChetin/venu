@@ -1,5 +1,30 @@
+import type { Metadata } from "next";
+import { generateMetadata as generateSEOMetadata } from "@/lib/seo";
+
 interface Props {
   params: Promise<{ lang: string }>;
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+  const content =
+    privacyPolicyContent[lang as keyof typeof privacyPolicyContent] ||
+    privacyPolicyContent.uz;
+
+  const description = `${content.section1.item1} ${content.section2.item1}`;
+
+  return generateSEOMetadata({
+    title: content.title,
+    description: description.substring(0, 160),
+    url: `/${lang}/business-page/maxfiylik-siyosati-politika-konfidencialnosti-privacy-policy`,
+    type: "website",
+    locale: lang,
+    keywords: ["venu", "maxfiylik siyosati", "privacy policy", "shaxsiy ma'lumotlar"],
+  });
 }
 
 const privacyPolicyContent = {
