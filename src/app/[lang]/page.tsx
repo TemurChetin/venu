@@ -12,6 +12,7 @@ import {
   useBanners,
 } from "@/services/queries/products";
 import Image from "next/image";
+import { BottomBanners } from "@/features/home/bottom-banners";
 
 type Props = {};
 
@@ -216,6 +217,8 @@ function Page({}: Props) {
             )}
           </div>
         ))}
+
+      <BottomBanners />
     </>
   );
 }

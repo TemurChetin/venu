@@ -162,12 +162,13 @@ export function CartDrawer({
                           size="icon"
                           variant="outline"
                           className="h-7 w-7 bg-transparent"
-                          onClick={() =>
-                            onUpdateQuantity(
-                              item.key,
-                              Math.max(1, item.quantity - 1)
-                            )
-                          }
+                          onClick={() => {
+                            if (item.quantity === 1) {
+                              onRemoveItem(item.key);
+                            } else {
+                              onUpdateQuantity(item.key, item.quantity - 1);
+                            }
+                          }}
                         >
                           <Minus className="h-3 w-3" />
                         </Button>
