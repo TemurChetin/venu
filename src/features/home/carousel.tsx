@@ -76,7 +76,7 @@ export function Carousel() {
                 <img
                   src={slide.photo_full_url?.path || "/placeholder.svg"}
                   alt={slide.title || ""}
-                  className="w-full h-auto object-cover aspect-[16/7]"
+                  className="w-full h-auto object-contain aspect-[8/3]"
                 />
               </Link>
             ) : (
@@ -84,7 +84,7 @@ export function Carousel() {
                 <img
                   src={slide.photo_full_url?.path || "/placeholder.svg"}
                   alt={slide.title || ""}
-                  className="w-full h-auto object-cover aspect-[16/7]"
+                  className="w-full h-auto object-contain aspect-[8/3]"
                 />
               </div>
             )}
