@@ -34,6 +34,24 @@ export const useLatestProducts = (limit = 10, offset = 0) => {
   });
 };
 
+// Seasonal Products
+export const useSeasonalProducts = (limit = 10, offset = 0) => {
+  return usePublicQuery<ProductListResponse>({
+    url: "/v1/products/seasonal",
+    query: { limit, offset },
+    enabled: true,
+  });
+};
+
+// Discounted Products
+export const useDiscountProducts = (limit = 10, offset = 0) => {
+  return usePublicQuery<ProductListResponse>({
+    url: "/v1/products/discount",
+    query: { limit, offset },
+    enabled: true,
+  });
+};
+
 // New Arrival Products
 export const useNewArrivalProducts = (limit = 10, offset = 0) => {
   return usePublicQuery<ProductListResponse>({
@@ -141,6 +159,11 @@ export interface Brand {
   id: number;
   name: string;
   image?: string;
+  image_full_url?: {
+    key: string;
+    path: string;
+    status?: number;
+  };
 }
 
 export interface BrandsResponse {

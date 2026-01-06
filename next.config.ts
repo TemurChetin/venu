@@ -18,7 +18,7 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "venu.jscorp.uz",
-        pathname: "/storage/**", // This ensures any path under /storage is allowed
+        pathname: "/**", // This ensures any path under /storage is allowed
       },
       {
         protocol: "https",

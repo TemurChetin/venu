@@ -10,26 +10,25 @@ import {
   useBestSellingProducts,
   useFeaturedProducts,
   useBanners,
+  useDiscountProducts,
+  useSeasonalProducts,
+  useBrands,
 } from "@/services/queries/products";
 import Image from "next/image";
 import { BottomBanners } from "@/features/home/bottom-banners";
-import { useState, useEffect } from "react";
 
 type Props = {};
 
 function Page({}: Props) {
-  const [isMounted, setIsMounted] = useState(false);
-
-  // Track mount state to prevent hydration mismatch
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
   // Fetch all product lists
   const { data: latestData, isLoading: latestLoading } = useLatestProducts(
     10,
     0
   );
-
+  const { data: discountData, isLoading: discountLoading } =
+    useDiscountProducts(10, 0);
+  const { data: seasonalData, isLoading: seasonalLoading } =
+    useSeasonalProducts(10, 0);
   const { data: newArrivalData, isLoading: newArrivalLoading } =
     useNewArrivalProducts(10, 0);
   const { data: topRatedData, isLoading: topRatedLoading } =
@@ -42,6 +41,9 @@ function Page({}: Props) {
   // Fetch banners
   const { data: bannersData, isLoading: bannersLoading } = useBanners();
 
+  // Fetch brands
+  const { data: brandsData, isLoading: brandsLoading } = useBrands();
+
   // Filter Main Section Banners (published only)
   const mainSectionBanners =
     bannersData?.filter(
@@ -49,18 +51,32 @@ function Page({}: Props) {
         banner.banner_type === "Main Section Banner" && banner.published === 1
     ) || [];
 
-  // Show loading state until mounted to prevent hydration mismatch
-  if (!isMounted) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <p className="text-muted-foreground">Yuklanmoqda...</p>
-      </div>
-    );
-  }
-
   return (
     <>
       <Carousel />
+      {/* Seasonal Products */}
+      {seasonalData?.products && seasonalData.products.length > 0 && (
+        <div className="px-4">
+          <h2 className="text-xl font-bold mb-4">Mavsumiy mahsulotlar</h2>
+          <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {seasonalData.products.map((product) => (
+              <ProductCard key={`seasonal-${product.slug}`} product={product} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Discount Products */}
+      {discountData?.products && discountData.products.length > 0 && (
+        <div className="px-4">
+          <h2 className="text-xl font-bold mb-4">Chegirmali mahsulotlar</h2>
+          <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {discountData.products.map((product) => (
+              <ProductCard key={`discount-${product.slug}`} product={product} />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Latest Products */}
       {latestData?.products && latestData.products.length > 0 && (
@@ -199,6 +215,52 @@ function Page({}: Props) {
             {featuredData.products.map((product) => (
               <ProductCard key={`featured-${product.slug}`} product={product} />
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Brands Section */}
+      {brandsData?.brands && brandsData.brands.length > 0 && (
+        <div className="px-4 py-6">
+          <h2 className="text-xl font-bold mb-4">Brendlar</h2>
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4">
+            {brandsData.brands.map((brand) => {
+              // Handle brand image URL - could be full URL or relative path
+              const brandImageUrl = brand.image_full_url?.path || null;
+
+              return (
+                <Link
+                  key={brand.id}
+                  href={`/search?brand=${encodeURIComponent(
+                    JSON.stringify([brand.id])
+                  )}`}
+                  className="group flex flex-col items-center justify-center p-4 bg-white rounded-xl border border-gray-200 hover:border-primary hover:shadow-md transition-all duration-300 hover:-translate-y-1"
+                >
+                  {brandImageUrl ? (
+                    <>
+                      <div className="relative w-full aspect-square mb-2">
+                        <Image
+                          src={brandImageUrl}
+                          alt={brand.name}
+                          fill
+                          className="object-contain rounded-lg"
+                          sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, (max-width: 1024px) 20vw, (max-width: 1280px) 16vw, 12vw"
+                        />
+                      </div>
+                      <span className="text-xs font-medium text-gray-700 text-center line-clamp-2 group-hover:text-primary transition-colors">
+                        {brand.name}
+                      </span>
+                    </>
+                  ) : (
+                    <div className="w-full aspect-square mb-2 flex items-center justify-center bg-gray-100 rounded-lg">
+                      <span className="text-xs font-medium text-gray-500 text-center px-2 line-clamp-2">
+                        {brand.name}
+                      </span>
+                    </div>
+                  )}
+                </Link>
+              );
+            })}
           </div>
         </div>
       )}

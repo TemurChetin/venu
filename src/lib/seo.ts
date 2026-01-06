@@ -126,8 +126,11 @@ export function generateMetadata({
 
   // Add product-specific metadata using other field
   if (isProduct && price) {
+    const existingOther = metadata.other as
+      | Record<string, string | number | (string | number)[]>
+      | undefined;
     metadata.other = {
-      ...metadata.other,
+      ...(existingOther || {}),
       "product:price:amount": price.amount.toString(),
       "product:price:currency": price.currency,
     };

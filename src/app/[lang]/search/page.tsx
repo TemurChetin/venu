@@ -12,6 +12,7 @@ function page({}: Props) {
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("query") || "";
   const categoryParam = searchParams.get("category");
+  const brandParam = searchParams.get("brand");
 
   // Helper function to encode search query
   const encodeSearchQuery = (query: string): string => {
@@ -30,10 +31,28 @@ function page({}: Props) {
     return isNaN(categoryId) ? null : categoryId;
   };
 
+  // Parse brand from URL
+  const parseBrand = (brandParam: string | null): string => {
+    if (!brandParam) return "[]";
+    try {
+      // Try to decode and parse as JSON
+      const decoded = decodeURIComponent(brandParam);
+      const parsed = JSON.parse(decoded);
+      // Ensure it's a valid array
+      if (Array.isArray(parsed)) {
+        return JSON.stringify(parsed);
+      }
+      return "[]";
+    } catch {
+      // If parsing fails, return empty array
+      return "[]";
+    }
+  };
+
   const [filters, setFilters] = useState<ProductFilterParams>({
     search: "",
     category: parseCategoryId(categoryParam),
-    brand: "[]",
+    brand: parseBrand(brandParam),
     product_authors: "[]",
     publishing_houses: "[]",
     sort_by: null,
@@ -63,6 +82,16 @@ function page({}: Props) {
       offset: 0, // Reset to first page when category changes
     }));
   }, [categoryParam]);
+
+  // Update brand filter when brandParam changes
+  useEffect(() => {
+    const brandValue = parseBrand(brandParam);
+    setFilters((prev) => ({
+      ...prev,
+      brand: brandValue,
+      offset: 0, // Reset to first page when brand changes
+    }));
+  }, [brandParam]);
 
   const handleFiltersChange = (newFilters: ProductFilterParams) => {
     setFilters((prev) => ({
