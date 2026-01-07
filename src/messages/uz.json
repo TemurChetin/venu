@@ -59,7 +59,10 @@
     "total": "Jami:",
     "checkout": "Rasmiylashtirish",
     "addToCart": "Savatga qo'shish",
-    "remove": "O'chirish"
+    "remove": "O'chirish",
+    "checkAll": "Barchasini tanlash",
+    "uncheckAll": "Barchasini bekor qilish",
+    "selectItemsToCheckout": "Checkout qilish uchun kamida bitta mahsulotni tanlang"
   },
   "wishlist": {
     "title": "Sevimlilar",

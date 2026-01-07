@@ -359,7 +359,7 @@ export function CatalogFilters({
                 Yuklanmoqda...
               </div>
             ) : brands.length > 0 ? (
-              brands.slice(0, 10).map((brand) => (
+              brands.map((brand) => (
                 <div key={brand.id} className="flex items-center space-x-2">
                   <Checkbox
                     id={`brand-${brand.id}`}

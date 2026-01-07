@@ -450,6 +450,11 @@ export interface UpdateCartRequest {
   quantity: number;
 }
 
+export interface SelectCartItemsRequest {
+  ids: number[];
+  action: "checked" | "unchecked";
+}
+
 // Order Types
 export interface ShippingAddressData {
   id: number;

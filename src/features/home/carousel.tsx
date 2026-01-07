@@ -34,7 +34,7 @@ export function Carousel() {
   }
 
   return (
-    <div className="relative w-full px-0 md:px-4 py-8">
+    <div className="relative w-full px-0 py-8">
       <Swiper
         onSwiper={(swiper) => {
           swiperRef.current = swiper;
@@ -42,25 +42,13 @@ export function Carousel() {
         modules={[Navigation, Pagination]}
         spaceBetween={0}
         slidesPerView={1}
-        centeredSlides={false}
+        centeredSlides={true}
         rewind={true}
         grabCursor={true}
         speed={400}
-        initialSlide={1}
+        initialSlide={0}
         pagination={{
           clickable: true,
-        }}
-        breakpoints={{
-          768: {
-            slidesPerView: 1.4,
-            spaceBetween: 24,
-            centeredSlides: true,
-          },
-          1024: {
-            slidesPerView: 1.5,
-            spaceBetween: 32,
-            centeredSlides: true,
-          },
         }}
         className="promo-swiper"
       >
@@ -124,16 +112,6 @@ export function Carousel() {
           background: #6366f1;
           width: 24px;
           border-radius: 4px;
-        }
-
-        @media (min-width: 768px) {
-          .promo-swiper .swiper-slide {
-            opacity: 0.5;
-          }
-
-          .promo-swiper .swiper-slide-active {
-            opacity: 1;
-          }
         }
       `}</style>
     </div>

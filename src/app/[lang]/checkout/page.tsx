@@ -75,8 +75,19 @@ export default function CheckoutNewPage() {
   const calculateDelivery = useCalculateDelivery();
   const createOrder = useCreateOrder();
 
-  // Calculate totals
-  const cartItems = cartData || [];
+  // Filter only checked items for checkout
+  const cartItems = useMemo(() => {
+    return (cartData || []).filter((item) => item.is_checked === 1);
+  }, [cartData]);
+
+  // Redirect if no checked items
+  useEffect(() => {
+    if (!isCartLoading && cartData && cartItems.length === 0) {
+      toast.error("Checkout qilish uchun kamida bitta mahsulotni tanlang");
+      router.push("/");
+    }
+  }, [cartItems.length, isCartLoading, cartData, router]);
+
   const subtotal = useMemo(() => {
     return cartItems.reduce((sum, item) => {
       const price = item.price || 0;

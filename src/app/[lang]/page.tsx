@@ -54,6 +54,7 @@ function Page({}: Props) {
   return (
     <>
       <Carousel />
+
       {/* Seasonal Products */}
       {seasonalData?.products && seasonalData.products.length > 0 && (
         <div className="px-4">

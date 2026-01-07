@@ -7,6 +7,7 @@ import {
   AddToCartRequest,
   RemoveFromCartRequest,
   UpdateCartRequest,
+  SelectCartItemsRequest,
 } from "@/types/api";
 import { toast } from "react-hot-toast";
 
@@ -102,6 +103,32 @@ export function useUpdateCart() {
       // Invalidate cart query to refetch
       queryClient.invalidateQueries({ queryKey: ["/v1/cart"] });
       toast.success("Savat yangilandi");
+    },
+    onError: (error: any) => {
+      const errorMessage =
+        error?.response?.data?.errors?.[0]?.message || "Xatolik yuz berdi";
+      toast.error(errorMessage);
+    },
+  });
+}
+
+/**
+ * Hook to select/unselect cart items
+ */
+export function useSelectCartItems() {
+  const queryClient = useQueryClient();
+
+  return useMutation<SuccessResponse, Error, SelectCartItemsRequest>({
+    mutationFn: async (payload: SelectCartItemsRequest) => {
+      const { data } = await instanceAuth.post<SuccessResponse>(
+        "/v1/cart/select-cart-items",
+        payload
+      );
+      return data;
+    },
+    onSuccess: () => {
+      // Invalidate cart query to refetch
+      queryClient.invalidateQueries({ queryKey: ["/v1/cart"] });
     },
     onError: (error: any) => {
       const errorMessage =
