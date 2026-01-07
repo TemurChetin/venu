@@ -55,18 +55,6 @@ function Page({}: Props) {
     <>
       <Carousel />
 
-      {/* Seasonal Products */}
-      {seasonalData?.products && seasonalData.products.length > 0 && (
-        <div className="px-4">
-          <h2 className="text-xl font-bold mb-4">Mavsumiy mahsulotlar</h2>
-          <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {seasonalData.products.map((product) => (
-              <ProductCard key={`seasonal-${product.slug}`} product={product} />
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Discount Products */}
       {discountData?.products && discountData.products.length > 0 && (
         <div className="px-4">
@@ -74,6 +62,18 @@ function Page({}: Props) {
           <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {discountData.products.map((product) => (
               <ProductCard key={`discount-${product.slug}`} product={product} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Seasonal Products */}
+      {seasonalData?.products && seasonalData.products.length > 0 && (
+        <div className="px-4">
+          <h2 className="text-xl font-bold mb-4">Mavsumiy mahsulotlar</h2>
+          <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {seasonalData.products.map((product) => (
+              <ProductCard key={`seasonal-${product.slug}`} product={product} />
             ))}
           </div>
         </div>

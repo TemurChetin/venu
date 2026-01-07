@@ -2,6 +2,7 @@
 
 import { Mail, Phone, MapPin, User } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -10,6 +11,7 @@ export function Footer() {
   const session = useSession();
   const params = useParams();
   const lang = (params?.lang as string) || "uz";
+  const t = useTranslations("footer");
 
   return (
     <footer className="border-t bg-background mt-12">
@@ -44,10 +46,10 @@ export function Footer() {
             </div>
           </div>
 
-          {/* For Customers (Uzbek) */}
+          {/* For Customers */}
           <div>
             <h3 className="mb-4 text-base font-semibold uppercase tracking-wide text-foreground">
-              Mijozlar Uchun
+              {t("forCustomers")}
             </h3>
             <ul className="space-y-3">
               <li>
@@ -55,7 +57,7 @@ export function Footer() {
                   href={`/${lang}/business-page/biz-haqimizda-o-nas-about-us`}
                   className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                 >
-                  Biz Haqimizda
+                  {t("aboutUs")}
                 </Link>
               </li>
               <li>
@@ -63,7 +65,7 @@ export function Footer() {
                   href={`/${lang}/business-page/maxfiylik-siyosati-politika-konfidencialnosti-privacy-policy`}
                   className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                 >
-                  Maxfiylik Siyosati
+                  {t("privacyPolicy")}
                 </Link>
               </li>
               <li>
@@ -71,17 +73,17 @@ export function Footer() {
                   href={`/${lang}/business-page/promokod-haqida`}
                   className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                 >
-                  Promokod Haqida
+                  {t("aboutPromocode")}
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* User Section (Uzbek) */}
+          {/* User Section */}
           {session.status === "unauthenticated" && (
             <div>
               <h3 className="mb-4 text-base font-semibold uppercase tracking-wide text-foreground">
-                Foydalanuvchi
+                {t("user")}
               </h3>
               <ul className="space-y-3">
                 <li>
@@ -89,7 +91,7 @@ export function Footer() {
                     href="/auth"
                     className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                   >
-                    Kirish
+                    {t("login")}
                   </Link>
                 </li>
                 <li>
@@ -97,7 +99,7 @@ export function Footer() {
                     href="/auth"
                     className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                   >
-                    Ro&apos;yxatdan O&apos;tish
+                    {t("register")}
                   </Link>
                 </li>
               </ul>
@@ -129,7 +131,7 @@ export function Footer() {
               className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
             >
               <User className="h-4 w-4" />
-              <span>Заявка в поддержку</span>
+              <span>{t("supportRequest")}</span>
             </Link>
           </div>
 
@@ -138,7 +140,7 @@ export function Footer() {
             className="flex items-center gap-2 text-sm text-muted-foreground"
           >
             <MapPin className="h-4 w-4 shrink-0" />
-            <span>Toshkent shahar Yunusobod tuman Yangishahar 3A</span>
+            <span>{t("address")}</span>
           </Link>
         </div>
       </div>

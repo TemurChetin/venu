@@ -15,8 +15,29 @@ export function ProductGallery({ images = [] }: ProductGalleryProps) {
   const displayImages = images.length > 0 ? images : ["/placeholder.svg"];
 
   return (
-    <div className="space-y-4">
-      <Card className="relative overflow-hidden bg-muted h-[350px] md:h-[650px] p-0">
+    <div className="flex gap-4">
+      {displayImages.length > 1 && (
+        <div className="flex flex-col gap-3">
+          {displayImages.map((img, idx) => (
+            <button
+              key={idx}
+              onClick={() => setCurrentImage(idx)}
+              className={`w-16 h-24 md:w-20 md:h-32 rounded-lg overflow-hidden border-2 transition-all shrink-0 ${
+                currentImage === idx
+                  ? "border-primary scale-105"
+                  : "border-border hover:border-primary/50"
+              }`}
+            >
+              <img
+                src={img || "/placeholder.svg"}
+                alt={`Thumbnail ${idx + 1}`}
+                className="w-full h-full object-cover"
+              />
+            </button>
+          ))}
+        </div>
+      )}
+      <Card className="relative overflow-hidden bg-muted flex-1 h-[350px] md:h-[650px] p-0">
         <img
           src={displayImages[currentImage] || "/placeholder.svg"}
           alt="Product"
@@ -51,27 +72,6 @@ export function ProductGallery({ images = [] }: ProductGalleryProps) {
           </div>
         )}
       </Card>
-      {displayImages.length > 1 && (
-        <div className="grid grid-cols-4 gap-3">
-          {displayImages.map((img, idx) => (
-            <button
-              key={idx}
-              onClick={() => setCurrentImage(idx)}
-              className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${
-                currentImage === idx
-                  ? "border-primary scale-105"
-                  : "border-border"
-              }`}
-            >
-              <img
-                src={img || "/placeholder.svg"}
-                alt={`Thumbnail ${idx + 1}`}
-                className="w-full h-full object-cover"
-              />
-            </button>
-          ))}
-        </div>
-      )}
     </div>
   );
 }

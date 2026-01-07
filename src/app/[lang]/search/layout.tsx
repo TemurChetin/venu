@@ -13,13 +13,13 @@ export async function generateMetadata({
   searchParams?: Promise<{ query?: string }>;
 }): Promise<Metadata> {
   const { lang } = await params;
-  
+
   // Safely handle searchParams
   let decodedQuery: string | undefined;
   if (searchParams) {
     const resolvedSearchParams = await searchParams;
     const query = resolvedSearchParams?.query;
-    
+
     // Decode base64 query if present (server-side compatible)
     if (query) {
       try {
@@ -43,4 +43,3 @@ export default function SearchLayout({
 }) {
   return <>{children}</>;
 }
-

@@ -84,5 +84,16 @@
     "description": "Kechirasiz, siz qidirayotgan sahifa mavjud emas yoki o'chirilgan.",
     "goHome": "Bosh sahifaga qaytish",
     "goSearch": "Qidiruv"
+  },
+  "footer": {
+    "forCustomers": "Mijozlar Uchun",
+    "aboutUs": "Biz Haqimizda",
+    "privacyPolicy": "Maxfiylik Siyosati",
+    "aboutPromocode": "Promokod Haqida",
+    "user": "Foydalanuvchi",
+    "login": "Kirish",
+    "register": "Ro'yxatdan O'tish",
+    "supportRequest": "Qo'llab-quvvatlashga murojaat",
+    "address": "Toshkent shahar Yunusobod tuman Yangishahar 3A"
   }
 }

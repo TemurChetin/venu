@@ -10,5 +10,16 @@
     "description": "申し訳ございませんが、お探しのページは存在しないか、削除された可能性があります。",
     "goHome": "ホームに戻る",
     "goSearch": "検索"
+  },
+  "footer": {
+    "forCustomers": "お客様向け",
+    "aboutUs": "私たちについて",
+    "privacyPolicy": "プライバシーポリシー",
+    "aboutPromocode": "プロモコードについて",
+    "user": "ユーザー",
+    "login": "ログイン",
+    "register": "登録",
+    "supportRequest": "サポートへのお問い合わせ",
+    "address": "タシュケント、ユヌサバード地区、ヤンギシャハル3A"
   }
 }
