@@ -17,7 +17,7 @@ export async function fetchProductDetail(
 ): Promise<ProductDetailResponse | null> {
   try {
     const response = await axios.get<ProductDetailResponse>(
-      `${API_BASE_URL}/api/v1/products/details/${slug}`,
+      `${API_BASE_URL}/api/v1/products/details/${slug}?guest_id=872103`,
       {
         headers: {
           lang: locale,
