@@ -21,5 +21,17 @@
     "register": "登録",
     "supportRequest": "サポートへのお問い合わせ",
     "address": "タシュケント、ユヌサバード地区、ヤンギシャハル3A"
+  },
+  "home": {
+    "discountProducts": "割引商品",
+    "seasonalProducts": "季節の商品",
+    "latestProducts": "最新商品",
+    "newArrivalProducts": "新着商品",
+    "topRatedProducts": "高評価商品",
+    "bestSellingProducts": "ベストセラー",
+    "featuredProducts": "おすすめ商品",
+    "brands": "ブランド",
+    "previousBrands": "前のブランド",
+    "nextBrands": "次のブランド"
   }
 }

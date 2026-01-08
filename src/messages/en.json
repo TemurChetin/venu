@@ -21,5 +21,17 @@
     "register": "Register",
     "supportRequest": "Support Request",
     "address": "Tashkent, Yunusabad district, Yangishahar 3A"
+  },
+  "home": {
+    "discountProducts": "Discount Products",
+    "seasonalProducts": "Seasonal Products",
+    "latestProducts": "Latest Products",
+    "newArrivalProducts": "New Arrivals",
+    "topRatedProducts": "Top Rated",
+    "bestSellingProducts": "Best Selling",
+    "featuredProducts": "Featured Products",
+    "brands": "Brands",
+    "previousBrands": "Previous Brands",
+    "nextBrands": "Next Brands"
   }
 }

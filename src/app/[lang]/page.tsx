@@ -3,6 +3,7 @@
 import { ProductCard } from "@/components/common/product-card";
 import { Carousel } from "@/features/home/carousel";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import {
   useLatestProducts,
   useNewArrivalProducts,
@@ -16,10 +17,23 @@ import {
 } from "@/services/queries/products";
 import Image from "next/image";
 import { BottomBanners } from "@/features/home/bottom-banners";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation } from "swiper/modules";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useRef } from "react";
+import type { Swiper as SwiperType } from "swiper";
+
+import "swiper/css";
+import "swiper/css/navigation";
 
 type Props = {};
 
 function Page({}: Props) {
+  const t = useTranslations("home");
+
+  // Swiper ref for brands carousel
+  const brandsSwiperRef = useRef<SwiperType | null>(null);
+
   // Fetch all product lists
   const { data: latestData, isLoading: latestLoading } = useLatestProducts(
     10,
@@ -58,7 +72,7 @@ function Page({}: Props) {
       {/* Discount Products */}
       {discountData?.products && discountData.products.length > 0 && (
         <div className="px-4">
-          <h2 className="text-xl font-bold mb-4">Chegirmali mahsulotlar</h2>
+          <h2 className="text-xl font-bold mb-4">{t("discountProducts")}</h2>
           <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {discountData.products.map((product) => (
               <ProductCard key={`discount-${product.slug}`} product={product} />
@@ -70,7 +84,7 @@ function Page({}: Props) {
       {/* Seasonal Products */}
       {seasonalData?.products && seasonalData.products.length > 0 && (
         <div className="px-4">
-          <h2 className="text-xl font-bold mb-4">Mavsumiy mahsulotlar</h2>
+          <h2 className="text-xl font-bold mb-4">{t("seasonalProducts")}</h2>
           <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {seasonalData.products.map((product) => (
               <ProductCard key={`seasonal-${product.slug}`} product={product} />
@@ -82,7 +96,7 @@ function Page({}: Props) {
       {/* Latest Products */}
       {latestData?.products && latestData.products.length > 0 && (
         <div className="px-4">
-          <h2 className="text-xl font-bold mb-4">Eng so'nggi mahsulotlar</h2>
+          <h2 className="text-xl font-bold mb-4">{t("latestProducts")}</h2>
           <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {latestData.products.map((product) => (
               <ProductCard key={`latest-${product.slug}`} product={product} />
@@ -130,7 +144,7 @@ function Page({}: Props) {
       {/* New Arrival Products */}
       {newArrivalData?.products && newArrivalData.products.length > 0 && (
         <div className="px-4">
-          <h2 className="text-xl font-bold mb-4">Yangi kelgan mahsulotlar</h2>
+          <h2 className="text-xl font-bold mb-4">{t("newArrivalProducts")}</h2>
           <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {newArrivalData.products.map((product) => (
               <ProductCard
@@ -145,7 +159,7 @@ function Page({}: Props) {
       {/* Top Rated Products */}
       {topRatedData?.products && topRatedData.products.length > 0 && (
         <div className="px-4">
-          <h2 className="text-xl font-bold mb-4">Eng yuqori reytingli</h2>
+          <h2 className="text-xl font-bold mb-4">{t("topRatedProducts")}</h2>
           <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {topRatedData.products.map((product) => (
               <ProductCard
@@ -196,7 +210,7 @@ function Page({}: Props) {
       {/* Best Selling Products */}
       {bestSellingData?.products && bestSellingData.products.length > 0 && (
         <div className="px-4">
-          <h2 className="text-xl font-bold mb-4">Eng ko'p sotilgan</h2>
+          <h2 className="text-xl font-bold mb-4">{t("bestSellingProducts")}</h2>
           <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {bestSellingData.products.map((product) => (
               <ProductCard
@@ -211,7 +225,7 @@ function Page({}: Props) {
       {/* Featured Products */}
       {featuredData?.products && featuredData.products.length > 0 && (
         <div className="px-4">
-          <h2 className="text-xl font-bold mb-4">Taniqli mahsulotlar</h2>
+          <h2 className="text-xl font-bold mb-4">{t("featuredProducts")}</h2>
           <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {featuredData.products.map((product) => (
               <ProductCard key={`featured-${product.slug}`} product={product} />
@@ -222,46 +236,93 @@ function Page({}: Props) {
 
       {/* Brands Section */}
       {brandsData?.brands && brandsData.brands.length > 0 && (
-        <div className="px-4 py-6">
-          <h2 className="text-xl font-bold mb-4">Brendlar</h2>
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4">
-            {brandsData.brands.map((brand) => {
-              // Handle brand image URL - could be full URL or relative path
-              const brandImageUrl = brand.image_full_url?.path || null;
+        <div className="px-4 py-6 relative">
+          <h2 className="text-xl font-bold mb-4">{t("brands")}</h2>
+          <div className="relative">
+            <Swiper
+              onSwiper={(swiper) => {
+                brandsSwiperRef.current = swiper;
+              }}
+              modules={[Navigation]}
+              spaceBetween={16}
+              slidesPerView={3}
+              breakpoints={{
+                640: {
+                  slidesPerView: 4,
+                },
+                768: {
+                  slidesPerView: 5,
+                },
+                1024: {
+                  slidesPerView: 6,
+                },
+                1280: {
+                  slidesPerView: 8,
+                },
+              }}
+              grabCursor={true}
+              className="brands-swiper !py-2"
+            >
+              {brandsData.brands.map((brand) => {
+                // Handle brand image URL - could be full URL or relative path
+                const brandImageUrl = brand.image_full_url?.path || null;
 
-              return (
-                <Link
-                  key={brand.id}
-                  href={`/search?brand=${encodeURIComponent(
-                    JSON.stringify([brand.id])
-                  )}`}
-                  className="group flex flex-col items-center justify-center p-4 bg-white rounded-xl border border-gray-200 hover:border-primary hover:shadow-md transition-all duration-300 hover:-translate-y-1"
+                return (
+                  <SwiperSlide key={brand.id}>
+                    <Link
+                      href={`/search?brand=${encodeURIComponent(
+                        JSON.stringify([brand.id])
+                      )}`}
+                      className="group flex flex-col items-center justify-center p-4 bg-white rounded-xl border border-gray-200 hover:border-primary hover:shadow-md transition-all duration-300 hover:-translate-y-1"
+                    >
+                      {brandImageUrl ? (
+                        <>
+                          <div className="relative w-full aspect-square mb-2">
+                            <Image
+                              src={brandImageUrl}
+                              alt={brand.name}
+                              fill
+                              className="object-contain rounded-lg"
+                              sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, (max-width: 1024px) 20vw, (max-width: 1280px) 16vw, 12vw"
+                            />
+                          </div>
+                          <span className="text-xs font-medium text-gray-700 text-center line-clamp-2 group-hover:text-primary transition-colors">
+                            {brand.name}
+                          </span>
+                        </>
+                      ) : (
+                        <div className="w-full aspect-square mb-2 flex items-center justify-center bg-gray-100 rounded-lg">
+                          <span className="text-xs font-medium text-gray-500 text-center px-2 line-clamp-2">
+                            {brand.name}
+                          </span>
+                        </div>
+                      )}
+                    </Link>
+                  </SwiperSlide>
+                );
+              })}
+            </Swiper>
+
+            {/* Navigation Buttons */}
+            {brandsData.brands.length > 8 && (
+              <>
+                <button
+                  onClick={() => brandsSwiperRef.current?.slidePrev()}
+                  className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white shadow-lg rounded-full p-2 transition-all duration-200 hover:scale-110 -ml-4"
+                  aria-label={t("previousBrands")}
                 >
-                  {brandImageUrl ? (
-                    <>
-                      <div className="relative w-full aspect-square mb-2">
-                        <Image
-                          src={brandImageUrl}
-                          alt={brand.name}
-                          fill
-                          className="object-contain rounded-lg"
-                          sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, (max-width: 1024px) 20vw, (max-width: 1280px) 16vw, 12vw"
-                        />
-                      </div>
-                      <span className="text-xs font-medium text-gray-700 text-center line-clamp-2 group-hover:text-primary transition-colors">
-                        {brand.name}
-                      </span>
-                    </>
-                  ) : (
-                    <div className="w-full aspect-square mb-2 flex items-center justify-center bg-gray-100 rounded-lg">
-                      <span className="text-xs font-medium text-gray-500 text-center px-2 line-clamp-2">
-                        {brand.name}
-                      </span>
-                    </div>
-                  )}
-                </Link>
-              );
-            })}
+                  <ChevronLeft className="w-5 h-5 text-gray-800" />
+                </button>
+
+                <button
+                  onClick={() => brandsSwiperRef.current?.slideNext()}
+                  className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white shadow-lg rounded-full p-2 transition-all duration-200 hover:scale-110 -mr-4"
+                  aria-label={t("nextBrands")}
+                >
+                  <ChevronRight className="w-5 h-5 text-gray-800" />
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}

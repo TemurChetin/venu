@@ -95,5 +95,17 @@
     "register": "Регистрация",
     "supportRequest": "Заявка в поддержку",
     "address": "Ташкент, Юнусабадский район, Янгишахар 3А"
+  },
+  "home": {
+    "discountProducts": "Товары со скидкой",
+    "seasonalProducts": "Сезонные товары",
+    "latestProducts": "Последние товары",
+    "newArrivalProducts": "Новые поступления",
+    "topRatedProducts": "Топ рейтинговые",
+    "bestSellingProducts": "Популярные товары",
+    "featuredProducts": "Рекомендуемые товары",
+    "brands": "Бренды",
+    "previousBrands": "Предыдущие бренды",
+    "nextBrands": "Следующие бренды"
   }
 }

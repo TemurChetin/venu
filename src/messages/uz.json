@@ -95,5 +95,17 @@
     "register": "Ro'yxatdan O'tish",
     "supportRequest": "Qo'llab-quvvatlashga murojaat",
     "address": "Toshkent shahar Yunusobod tuman Yangishahar 3A"
+  },
+  "home": {
+    "discountProducts": "Chegirmali mahsulotlar",
+    "seasonalProducts": "Mavsumiy mahsulotlar",
+    "latestProducts": "Eng so'nggi mahsulotlar",
+    "newArrivalProducts": "Yangi kelgan mahsulotlar",
+    "topRatedProducts": "Eng yuqori reytingli",
+    "bestSellingProducts": "Eng ko'p sotilgan",
+    "featuredProducts": "Taniqli mahsulotlar",
+    "brands": "Brendlar",
+    "previousBrands": "Oldingi brendlar",
+    "nextBrands": "Keyingi brendlar"
   }
 }

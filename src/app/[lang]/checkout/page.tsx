@@ -594,7 +594,7 @@ export default function CheckoutNewPage() {
                     height={90}
                     src="/payme.png"
                     alt="Payme"
-                    className="h-8"
+                    className="h-8 object-contain"
                   />
                 </Label>
 
@@ -617,7 +617,7 @@ export default function CheckoutNewPage() {
                     height={90}
                     src="/click.png"
                     alt="Click"
-                    className="h-8"
+                    className="h-8 object-contain"
                   />
                 </Label>
               </RadioGroup>
