@@ -18,13 +18,14 @@ import {
 import Image from "next/image";
 import { BottomBanners } from "@/features/home/bottom-banners";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation } from "swiper/modules";
+import { Navigation, Autoplay } from "swiper/modules";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRef } from "react";
 import type { Swiper as SwiperType } from "swiper";
 
 import "swiper/css";
 import "swiper/css/navigation";
+import "swiper/css/autoplay";
 
 type Props = {};
 
@@ -36,21 +37,21 @@ function Page({}: Props) {
 
   // Fetch all product lists
   const { data: latestData, isLoading: latestLoading } = useLatestProducts(
-    10,
+    12,
     0
   );
   const { data: discountData, isLoading: discountLoading } =
-    useDiscountProducts(10, 0);
+    useDiscountProducts(12, 0);
   const { data: seasonalData, isLoading: seasonalLoading } =
-    useSeasonalProducts(10, 0);
+    useSeasonalProducts(12, 0);
   const { data: newArrivalData, isLoading: newArrivalLoading } =
-    useNewArrivalProducts(10, 0);
+    useNewArrivalProducts(12, 0);
   const { data: topRatedData, isLoading: topRatedLoading } =
-    useTopRatedProducts(10, 0);
+    useTopRatedProducts(12, 0);
   const { data: bestSellingData, isLoading: bestSellingLoading } =
-    useBestSellingProducts(10, 0);
+    useBestSellingProducts(12, 0);
   const { data: featuredData, isLoading: featuredLoading } =
-    useFeaturedProducts(10, 0);
+    useFeaturedProducts(12, 0);
 
   // Fetch banners
   const { data: bannersData, isLoading: bannersLoading } = useBanners();
@@ -243,7 +244,7 @@ function Page({}: Props) {
               onSwiper={(swiper) => {
                 brandsSwiperRef.current = swiper;
               }}
-              modules={[Navigation]}
+              modules={[Navigation, Autoplay]}
               spaceBetween={16}
               slidesPerView={3}
               breakpoints={{
@@ -259,6 +260,11 @@ function Page({}: Props) {
                 1280: {
                   slidesPerView: 8,
                 },
+              }}
+              autoplay={{
+                delay: 5000,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true,
               }}
               grabCursor={true}
               className="brands-swiper !py-2"

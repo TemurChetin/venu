@@ -9,6 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@amplitude/analytics-browser": "^2.33.1",
+    "@amplitude/plugin-session-replay-browser": "^1.25.5",
     "@hookform/resolvers": "^5.2.2",
     "@pbe/react-yandex-maps": "^1.2.5",
     "@radix-ui/react-avatar": "^1.1.11",

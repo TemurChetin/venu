@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/routing";
 import {
   Card,
@@ -37,6 +38,7 @@ import { instanceAuth } from "@/services/api";
 import { signOut } from "next-auth/react";
 
 export default function SettingsPage() {
+  const t = useTranslations("settings");
   const router = useRouter();
   const { data: session, status } = useSession();
 
@@ -66,7 +68,7 @@ export default function SettingsPage() {
       return data;
     },
     onSuccess: () => {
-      toast.success("Hisobingiz muvaffaqiyatli o'chirildi");
+      toast.success(t("deleteAccountSuccess"));
       setIsDeleteDialogOpen(false);
       setDeletePassword("");
       signOut({ callbackUrl: "/" });
@@ -75,20 +77,20 @@ export default function SettingsPage() {
       const errorMessage =
         error?.response?.data?.errors?.[0]?.message ||
         error?.response?.data?.message ||
-        "Hisobni o'chirishda xatolik yuz berdi";
+        t("deleteAccountError");
       toast.error(errorMessage);
     },
   });
 
   const handleSave = () => {
     // Bu yerda API ga so'rov yuboriladi
-    toast.success("Ma'lumotlaringiz muvaffaqiyatli yangilandi");
+    toast.success(t("updateSuccess"));
     setIsEditing(false);
   };
 
   const handleLogout = async () => {
     await signOut({ callbackUrl: "/" });
-    toast.success("Siz tizimdan muvaffaqiyatli chiqdingiz");
+    toast.success(t("logoutSuccess"));
   };
 
   // Show loading while checking authentication
@@ -107,7 +109,7 @@ export default function SettingsPage() {
 
   const handleDeleteAccount = () => {
     if (!deletePassword) {
-      toast.error("Parolni kiriting");
+      toast.error(t("enterPassword"));
       return;
     }
     deleteAccountMutation.mutate(deletePassword);
@@ -120,11 +122,9 @@ export default function SettingsPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <User className="h-5 w-5" />
-            Shaxsiy ma'lumotlar
+            {t("personalInfo")}
           </CardTitle>
-          <CardDescription>
-            Ismingiz, familiyangiz va boshqa ma'lumotlarni tahrirlang
-          </CardDescription>
+          <CardDescription>{t("personalInfoDescription")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid gap-6 md:grid-cols-2">
@@ -132,7 +132,7 @@ export default function SettingsPage() {
             <div className="space-y-2">
               <Label htmlFor="firstName" className="flex items-center gap-2">
                 <User className="h-4 w-4 text-muted-foreground" />
-                Ism
+                {t("firstName")}
               </Label>
               <Input
                 id="firstName"
@@ -149,7 +149,7 @@ export default function SettingsPage() {
             <div className="space-y-2">
               <Label htmlFor="lastName" className="flex items-center gap-2">
                 <User className="h-4 w-4 text-muted-foreground" />
-                Familiya
+                {t("lastName")}
               </Label>
               <Input
                 id="lastName"
@@ -166,7 +166,7 @@ export default function SettingsPage() {
             <div className="space-y-2">
               <Label htmlFor="birthDate" className="flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
-                Tug'ilgan sana
+                {t("birthDate")}
               </Label>
               <Input
                 id="birthDate"
@@ -184,7 +184,7 @@ export default function SettingsPage() {
             <div className="space-y-2">
               <Label htmlFor="phone" className="flex items-center gap-2">
                 <Phone className="h-4 w-4 text-muted-foreground" />
-                Telefon raqami
+                {t("phone")}
               </Label>
               <Input
                 id="phone"
@@ -207,20 +207,20 @@ export default function SettingsPage() {
                 className="sm:min-w-[160px]"
               >
                 <User className="mr-2 h-4 w-4" />
-                Tahrirlash
+                {t("edit")}
               </Button>
             ) : (
               <div className="flex gap-3">
                 <Button onClick={handleSave} className="min-w-[120px]">
                   <Save className="mr-2 h-4 w-4" />
-                  Saqlash
+                  {t("save")}
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => setIsEditing(false)}
                   className="min-w-[120px]"
                 >
-                  Bekor qilish
+                  {t("cancel")}
                 </Button>
               </div>
             )}
@@ -231,7 +231,7 @@ export default function SettingsPage() {
               className="min-w-[160px]"
             >
               <LogOut className="mr-2 h-4 w-4" />
-              Tizimdan chiqish
+              {t("logout")}
             </Button>
           </div>
 
@@ -241,11 +241,10 @@ export default function SettingsPage() {
           <div className="pt-4">
             <div className="space-y-2">
               <h3 className="text-lg font-semibold text-destructive">
-                Xavfli sozlamalar
+                {t("dangerZone")}
               </h3>
               <p className="text-sm text-muted-foreground">
-                Hisobingizni o'chirish orqali barcha ma'lumotlaringiz butunlay
-                yo'qoladi. Bu amalni qaytarib bo'lmaydi.
+                {t("dangerZoneDescription")}
               </p>
               <Button
                 variant="destructive"
@@ -253,7 +252,7 @@ export default function SettingsPage() {
                 className="mt-4"
               >
                 <Trash2 className="mr-2 h-4 w-4" />
-                Hisobni o'chirish
+                {t("deleteAccount")}
               </Button>
             </div>
           </div>
@@ -265,20 +264,19 @@ export default function SettingsPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="text-destructive">
-              Hisobni o'chirishni tasdiqlash
+              {t("deleteAccountConfirm")}
             </DialogTitle>
             <DialogDescription>
-              Hisobingizni o'chirish uchun parolingizni kiriting. Bu amalni
-              qaytarib bo'lmaydi va barcha ma'lumotlaringiz yo'qoladi.
+              {t("deleteAccountDescription")}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="deletePassword">Parol</Label>
+              <Label htmlFor="deletePassword">{t("password")}</Label>
               <Input
                 id="deletePassword"
                 type="password"
-                placeholder="Parolingizni kiriting"
+                placeholder={t("passwordPlaceholder")}
                 value={deletePassword}
                 onChange={(e) => setDeletePassword(e.target.value)}
                 onKeyDown={(e) => {
@@ -298,7 +296,7 @@ export default function SettingsPage() {
               }}
               disabled={deleteAccountMutation.isPending}
             >
-              Bekor qilish
+              {t("cancel")}
             </Button>
             <Button
               variant="destructive"
@@ -306,8 +304,8 @@ export default function SettingsPage() {
               disabled={deleteAccountMutation.isPending || !deletePassword}
             >
               {deleteAccountMutation.isPending
-                ? "O'chirilmoqda..."
-                : "Hisobni o'chirish"}
+                ? t("deleting")
+                : t("deleteAccountButton")}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { signIn } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,6 +19,7 @@ import { checkPhone, verifyOtp } from "@/services/requests/auth";
 import { useRouter } from "next/navigation";
 
 export default function AuthPage() {
+  const t = useTranslations("auth");
   const router = useRouter();
   const { data: session, status } = useSession();
   const [phone, setPhone] = useState("");
@@ -63,7 +65,7 @@ export default function AuthPage() {
     const formattedPhone = formatPhone(phone);
 
     if (!validatePhone(formattedPhone)) {
-      toast.error("To'g'ri telefon raqam kiriting (masalan: +998901234567)");
+      toast.error(t("invalidPhone"));
       return;
     }
 
@@ -73,7 +75,7 @@ export default function AuthPage() {
       const response = await checkPhone(formattedPhone);
 
       if (response.errors) {
-        const errorMessage = response.errors[0]?.message || "Xatolik yuz berdi";
+        const errorMessage = response.errors[0]?.message || t("error");
         toast.error(errorMessage);
 
         // Handle rate limiting - start countdown
@@ -96,15 +98,14 @@ export default function AuthPage() {
           }
         }
       } else {
-        toast.success("SMS kod yuborildi");
+        toast.success(t("smsSent"));
         setPhone(formattedPhone);
         setStep("otp");
       }
     } catch (error: any) {
       console.error("Send code error:", error);
       toast.error(
-        error?.response?.data?.errors?.[0]?.message ||
-          "Kod yuborishda xatolik yuz berdi"
+        error?.response?.data?.errors?.[0]?.message || t("sendCodeError")
       );
     } finally {
       setSendingCode(false);
@@ -115,7 +116,7 @@ export default function AuthPage() {
     e.preventDefault();
 
     if (!otpCode || otpCode.length !== 6) {
-      toast.error("OTP kod 6 xonali bo'lishi kerak");
+      toast.error(t("invalidOtp"));
       return;
     }
 
@@ -136,22 +137,21 @@ export default function AuthPage() {
         });
 
         if (result?.error) {
-          toast.error("Kirishda xatolik yuz berdi");
+          toast.error(t("loginError"));
         } else {
-          toast.success("Muvaffaqiyatli kirildi");
+          toast.success(t("loginSuccess"));
           // Get return URL from query params or default to home
           const params = new URLSearchParams(window.location.search);
           const returnUrl = params.get("returnUrl") || "/";
           router.push(returnUrl);
         }
       } else {
-        toast.error("Noto'g'ri OTP kod");
+        toast.error(t("wrongOtp"));
       }
     } catch (error: any) {
       console.error("Verify OTP error:", error);
       toast.error(
-        error?.response?.data?.errors?.[0]?.message ||
-          "OTP kodni tasdiqlashda xatolik yuz berdi"
+        error?.response?.data?.errors?.[0]?.message || t("verifyError")
       );
     } finally {
       setLoading(false);
@@ -169,7 +169,7 @@ export default function AuthPage() {
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
           <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto"></div>
-          <p className="text-muted-foreground">Yuklanmoqda...</p>
+          <p className="text-muted-foreground">{t("waiting")}</p>
         </div>
       </div>
     );
@@ -185,23 +185,23 @@ export default function AuthPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">
-            Kirish / Ro'yxatdan o'tish
+            {t("title")}
           </CardTitle>
           <CardDescription className="text-center">
             {step === "phone"
-              ? "Telefon raqamingizga SMS kod yuboramiz"
-              : `${phone} raqamiga yuborilgan kodni kiriting`}
+              ? t("phoneDescription")
+              : t("otpDescription", { phone })}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {step === "phone" ? (
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="phone">Telefon raqam</Label>
+                <Label htmlFor="phone">{t("phoneLabel")}</Label>
                 <Input
                   id="phone"
                   type="tel"
-                  placeholder="+998901234567"
+                  placeholder={t("phonePlaceholder")}
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   disabled={sendingCode}
@@ -221,17 +221,17 @@ export default function AuthPage() {
                 disabled={sendingCode || !phone}
                 className="w-full"
               >
-                {sendingCode ? "Kutilmoqda..." : "Kod yuborish"}
+                {sendingCode ? t("waiting") : t("sendCode")}
               </Button>
             </div>
           ) : (
             <form onSubmit={handleVerifyOtp} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="otp">SMS kod</Label>
+                <Label htmlFor="otp">{t("otpLabel")}</Label>
                 <Input
                   id="otp"
                   type="text"
-                  placeholder="123456"
+                  placeholder={t("otpPlaceholder")}
                   value={otpCode}
                   onChange={(e) =>
                     setOtpCode(e.target.value.replace(/\D/g, ""))
@@ -243,13 +243,13 @@ export default function AuthPage() {
                   className="text-center text-2xl tracking-widest"
                 />
                 <p className="text-xs text-muted-foreground">
-                  {phone} raqamiga yuborilgan 6 xonali kodni kiriting
+                  {t("otpHint", { phone })}
                 </p>
               </div>
 
               <div className="flex flex-col gap-2">
                 <Button type="submit" disabled={loading} className="w-full">
-                  {loading ? "Tekshirilmoqda..." : "Tasdiqlash"}
+                  {loading ? t("verifying") : t("verify")}
                 </Button>
 
                 <div className="flex items-center justify-between text-sm">
@@ -263,7 +263,7 @@ export default function AuthPage() {
                     disabled={loading}
                     className="text-xs"
                   >
-                    Telefon raqamni o'zgartirish
+                    {t("changePhone")}
                   </Button>
 
                   {canResend ? (
@@ -274,7 +274,7 @@ export default function AuthPage() {
                       disabled={loading}
                       className="text-xs"
                     >
-                      Kodni qayta yuborish
+                      {t("resendCode")}
                     </Button>
                   ) : (
                     <span className="text-xs text-muted-foreground">

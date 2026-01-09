@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "react-hot-toast";
 import { checkPhone, verifyOtp } from "@/services/requests/auth";
 import { useTranslations } from "next-intl";
+import amplitude from "@/amplitude";
 
 interface PhoneAuthModalProps {
   open: boolean;
@@ -96,8 +97,7 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
     } catch (error: any) {
       console.error("Send code error:", error);
       toast.error(
-        error?.response?.data?.errors?.[0]?.message ||
-          t("auth.sendCodeError")
+        error?.response?.data?.errors?.[0]?.message || t("auth.sendCodeError")
       );
     } finally {
       setSendingCode(false);
@@ -141,8 +141,7 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
     } catch (error: any) {
       console.error("Verify OTP error:", error);
       toast.error(
-        error?.response?.data?.errors?.[0]?.message ||
-          t("auth.verifyError")
+        error?.response?.data?.errors?.[0]?.message || t("auth.verifyError")
       );
     } finally {
       setLoading(false);

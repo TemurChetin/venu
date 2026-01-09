@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -32,6 +33,7 @@ import { useConfigStore } from "@/stores";
 import Image from "next/image";
 
 export default function CheckoutNewPage() {
+  const t = useTranslations("checkout");
   const router = useRouter();
   const { data: session, status } = useSession();
   const { guestId } = useGuestId();
@@ -83,10 +85,10 @@ export default function CheckoutNewPage() {
   // Redirect if no checked items
   useEffect(() => {
     if (!isCartLoading && cartData && cartItems.length === 0) {
-      toast.error("Checkout qilish uchun kamida bitta mahsulotni tanlang");
+      toast.error(t("selectItemsToCheckout"));
       router.push("/");
     }
-  }, [cartItems.length, isCartLoading, cartData, router]);
+  }, [cartItems.length, isCartLoading, cartData, router, t]);
 
   const subtotal = useMemo(() => {
     return cartItems.reduce((sum, item) => {
@@ -238,7 +240,7 @@ export default function CheckoutNewPage() {
   // Handle order submission
   const handleSubmit = async () => {
     if (!selectedAddressId || !selectedDeliveryMethod || !guestId) {
-      toast.error("Iltimos, barcha kerakli ma'lumotlarni to'ldiring");
+      toast.error(t("fillAllFields"));
       return;
     }
 
@@ -404,14 +406,14 @@ export default function CheckoutNewPage() {
     return (
       <div className="w-full mt-4">
         <h1 className="mb-8 text-3xl font-bold text-foreground">
-          Buyurtmani rasmiylashtirish
+          {t("title")}
         </h1>
         <div className="rounded-2xl bg-white p-12 text-center shadow-sm">
           <p className="text-lg text-muted-foreground">
-            Savatingiz bo'sh. Buyurtma berish uchun mahsulot qo'shing.
+            {t("emptyCart")}
           </p>
           <Button onClick={() => router.push("/")} className="mt-6">
-            Bosh sahifaga qaytish
+            {t("goHome")}
           </Button>
         </div>
       </div>
@@ -421,7 +423,7 @@ export default function CheckoutNewPage() {
   return (
     <div className="w-full mt-4">
       <h1 className="mb-8 text-3xl font-bold text-foreground">
-        Buyurtmani rasmiylashtirish
+        {t("title")}
       </h1>
 
       <div className="grid grid-cols-12 gap-6">
@@ -433,7 +435,7 @@ export default function CheckoutNewPage() {
               <div className="mb-6 flex items-center justify-between">
                 <h2 className="flex items-center gap-2 text-xl font-semibold">
                   <User className="h-5 w-5 text-primary" />
-                  Yetkazib berish manzili
+                  {t("deliveryAddress")}
                 </h2>
                 <Button
                   type="button"
@@ -442,7 +444,7 @@ export default function CheckoutNewPage() {
                   onClick={() => setIsAddAddressModalOpen(true)}
                 >
                   <Plus className="mr-2 h-4 w-4" />
-                  Yangi manzil
+                  {t("addNewAddress")}
                 </Button>
               </div>
 
@@ -485,10 +487,10 @@ export default function CheckoutNewPage() {
               ) : (
                 <div className="rounded-lg border border-dashed border-border p-8 text-center">
                   <p className="text-muted-foreground mb-4">
-                    Hech qanday manzil qo'shilmagan
+                    {t("noAddresses")}
                   </p>
                   <Button onClick={() => setIsAddAddressModalOpen(true)}>
-                    Yangi manzil qo'shish
+                    {t("addAddress")}
                   </Button>
                 </div>
               )}
@@ -499,7 +501,7 @@ export default function CheckoutNewPage() {
               <div className="rounded-2xl bg-white p-6 shadow-sm">
                 <h2 className="mb-6 flex items-center gap-2 text-xl font-semibold">
                   <Truck className="h-5 w-5 text-primary" />
-                  Yetkazib berish turi
+                  {t("deliveryMethod")}
                 </h2>
 
                 <RadioGroup
@@ -541,15 +543,15 @@ export default function CheckoutNewPage() {
                             {isFree && (
                               <div className="text-sm text-muted-foreground">
                                 {isFreeDeliveryEligible
-                                  ? "1 000 000 so'mdan yuqori buyurtmalar uchun"
-                                  : "Faqat 1 000 000 so'mdan yuqori buyurtmalar uchun"}
+                                  ? t("freeDeliveryEligible")
+                                  : t("freeDeliveryOnly")}
                               </div>
                             )}
                           </Label>
                         </div>
                         <span className="font-semibold">
                           {cost === null ? null : cost === 0 ? (
-                            <span className="text-green-600">Bepul</span>
+                            <span className="text-green-600">{t("free")}</span>
                           ) : (
                             formatUZS(cost)
                           )}
@@ -565,7 +567,7 @@ export default function CheckoutNewPage() {
             <div className="rounded-2xl bg-white p-6 shadow-sm">
               <h2 className="mb-6 flex items-center gap-2 text-xl font-semibold">
                 <CreditCard className="h-5 w-5 text-primary" />
-                To'lov turi
+                {t("paymentMethod")}
               </h2>
 
               <RadioGroup
@@ -629,7 +631,7 @@ export default function CheckoutNewPage() {
         <div className="col-span-12 lg:col-span-4">
           <div className="sticky top-4 space-y-4">
             <div className="rounded-2xl bg-white p-6 shadow-sm">
-              <h2 className="mb-4 text-xl font-semibold">Buyurtma</h2>
+              <h2 className="mb-4 text-xl font-semibold">{t("orderSummary")}</h2>
 
               <div className="space-y-4 max-h-[400px] overflow-y-auto">
                 {cartItems.map((item) => {
@@ -637,7 +639,7 @@ export default function CheckoutNewPage() {
                     item.name ||
                     item.product?.name ||
                     item.product_full_info?.name ||
-                    "Mahsulot";
+                    "Product";
                   const thumbnailUrl = item.thumbnail
                     ? `https://venu.uz/storage/product/thumbnail/${item.thumbnail}`
                     : item.product?.thumbnail_full_url?.path ||
@@ -711,7 +713,7 @@ export default function CheckoutNewPage() {
                 <div className="flex justify-between">
                   <span className="flex items-center gap-1 text-muted-foreground">
                     <ShoppingCart className="h-4 w-4" />
-                    Mahsulotlar ({cartItems.length})
+                    {t("products")} ({cartItems.length})
                   </span>
                   <span className="font-medium">
                     {formatCurrency(subtotal)}
@@ -721,11 +723,11 @@ export default function CheckoutNewPage() {
                 <div className="flex justify-between">
                   <span className="flex items-center gap-1 text-muted-foreground">
                     <Truck className="h-4 w-4" />
-                    Yetkazish
+                    {t("delivery")}
                   </span>
                   <span className="font-medium">
                     {finalDeliveryCost === 0 ? (
-                      <span className="text-green-600">Bepul</span>
+                      <span className="text-green-600">{t("free")}</span>
                     ) : deliveryCost === null ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
@@ -737,7 +739,7 @@ export default function CheckoutNewPage() {
                 {totalDiscount > 0 && (
                   <div className="flex justify-between">
                     <span className="flex items-center gap-1 text-muted-foreground">
-                      Chegirma
+                      {t("discount")}
                     </span>
                     <span className="font-medium text-green-600">
                       -{formatCurrency(totalDiscount)}
@@ -748,8 +750,7 @@ export default function CheckoutNewPage() {
                 {!isFreeDeliveryEligible &&
                   config?.uzsCurrency?.exchange_rate && (
                     <p className="rounded-lg bg-primary/10 p-3 text-xs text-primary">
-                      Yana {howMuchToAdd} qo'shing va bepul yetkazishdan
-                      foydalaning!
+                      {t("addMoreForFreeDelivery", { amount: formatUZS(howMuchToAdd) })}
                     </p>
                   )}
               </div>
@@ -760,28 +761,29 @@ export default function CheckoutNewPage() {
                   !selectedAddressId ||
                   !selectedDeliveryMethod ||
                   createOrder.isPending ||
+                  chooseShippingMethod.isPending ||
                   (deliveryCost === null &&
                     selectedDeliveryMethod !== "free" &&
                     !isFreeDeliveryEligible)
                 }
                 className="mt-6 w-full bg-primary py-6 text-base font-semibold hover:bg-primary/90"
               >
-                {createOrder.isPending ? (
+                {createOrder.isPending || chooseShippingMethod.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Buyurtma yaratilmoqda...
+                    {t("creatingOrder")}
                   </>
                 ) : (
-                  "Buyurtmani tasdiqlash"
+                  t("confirmOrder")
                 )}
               </Button>
 
               <p className="mt-4 text-center text-xs text-muted-foreground">
-                Buyurtmani tasdiqlash orqali siz{" "}
+                {t("termsAgreement")}{" "}
                 <a href="#" className="text-primary hover:underline">
-                  foydalanish shartlari
+                  {t("termsLink")}
                 </a>
-                ga rozilik bildirasiz
+                {" "}{t("termsAgreementEnd")}
               </p>
             </div>
           </div>

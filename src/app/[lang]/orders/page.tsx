@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/routing";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +25,7 @@ import Image from "next/image";
 const ITEMS_PER_PAGE = 10;
 
 export default function OrdersPage() {
+  const t = useTranslations("orders");
   const router = useRouter();
   const { status } = useSession();
 
@@ -111,25 +113,25 @@ export default function OrdersPage() {
     switch (status) {
       case "delivered":
         return {
-          label: "XARIDORGA BERILGAN",
+          label: t("statusDelivered"),
           color: "bg-green-500/10 text-green-600 border-green-500/20",
           icon: CheckCircle2,
         };
       case "out_for_delivery":
         return {
-          label: "YETKAZILMOQDA",
+          label: t("statusOutForDelivery"),
           color: "bg-blue-500/10 text-blue-600 border-blue-500/20",
           icon: Truck,
         };
       case "returned":
         return {
-          label: "QAYTARILDI",
+          label: t("statusReturned"),
           color: "bg-gray-500/10 text-gray-600 border-gray-500/20",
           icon: Package,
         };
       case "pending":
         return {
-          label: "KUTILMOQDA",
+          label: t("statusPending"),
           color: "bg-yellow-500/10 text-yellow-600 border-yellow-500/20",
           icon: Clock,
         };
@@ -137,14 +139,14 @@ export default function OrdersPage() {
       case "processing":
       case "processed":
         return {
-          label: "JARAYONDA",
+          label: t("statusProcessing"),
           color: "bg-blue-500/10 text-blue-600 border-blue-500/20",
           icon: Clock,
         };
       case "failed":
       case "canceled":
         return {
-          label: "BEKOR QILINGAN",
+          label: t("statusCanceled"),
           color: "bg-red-500/10 text-red-600 border-red-500/20",
           icon: Package,
         };
@@ -187,7 +189,7 @@ export default function OrdersPage() {
             <Card>
               <CardContent className="flex min-h-[400px] flex-col items-center justify-center gap-4 py-12">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-                <p className="text-muted-foreground">Yuklanmoqda...</p>
+                <p className="text-muted-foreground">{t("loading")}</p>
               </CardContent>
             </Card>
           ) : error ? (
@@ -195,9 +197,9 @@ export default function OrdersPage() {
               <CardContent className="flex min-h-[400px] flex-col items-center justify-center gap-4 py-12">
                 <Package className="h-16 w-16 text-muted-foreground" />
                 <div className="text-center">
-                  <h3 className="font-semibold text-lg">Xatolik yuz berdi</h3>
+                  <h3 className="font-semibold text-lg">{t("error")}</h3>
                   <p className="text-muted-foreground mt-1">
-                    Buyurtmalarni yuklashda muammo bo'ldi
+                    {t("errorDescription")}
                   </p>
                 </div>
               </CardContent>
@@ -207,9 +209,9 @@ export default function OrdersPage() {
               <CardContent className="flex min-h-[400px] flex-col items-center justify-center gap-4 py-12">
                 <Package className="h-16 w-16 text-muted-foreground" />
                 <div className="text-center">
-                  <h3 className="font-semibold text-lg">Buyurtma topilmadi</h3>
+                  <h3 className="font-semibold text-lg">{t("noOrders")}</h3>
                   <p className="text-muted-foreground mt-1">
-                    Bu bo'limda hech qanday buyurtma yo'q
+                    {t("noOrdersDescription")}
                   </p>
                 </div>
               </CardContent>
@@ -236,7 +238,7 @@ export default function OrdersPage() {
                           </Badge>
                           <div className="flex items-center gap-2">
                             <span className="font-semibold">
-                              Buyurtma №{order.id}
+                              {t("orderNumber", { id: order.id })}
                             </span>
                             <Button
                               variant="ghost"
@@ -267,7 +269,7 @@ export default function OrdersPage() {
                         {order.details && order.details.length > 0 && (
                           <div>
                             <h4 className="mb-4 font-semibold text-sm text-muted-foreground uppercase tracking-wide">
-                              Mahsulotlar:
+                              {t("products")}
                             </h4>
                             <div className="space-y-4">
                               {order.details.map((detail) => {
@@ -294,7 +296,7 @@ export default function OrdersPage() {
                                         {productName}
                                       </h5>
                                       <div className="mt-1 flex items-center gap-4 text-sm text-muted-foreground">
-                                        <span>{detail.qty} ta tovar</span>
+                                        <span>{t("items", { qty: detail.qty })}</span>
                                         <span>•</span>
                                         <span className="font-semibold text-foreground">
                                           {formatCurrency(detail.price)}
@@ -302,7 +304,7 @@ export default function OrdersPage() {
                                       </div>
                                       {detail.variant && (
                                         <p className="mt-1 text-xs text-muted-foreground">
-                                          Variant: {detail.variant}
+                                          {t("variant", { variant: detail.variant })}
                                         </p>
                                       )}
                                     </div>
@@ -318,7 +320,7 @@ export default function OrdersPage() {
                           <div className="grid gap-4 rounded-lg border bg-muted/30 p-4 md:grid-cols-2">
                             <div>
                               <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
-                                Yetkazib berish manzili:
+                                {t("deliveryAddress")}
                               </p>
                               <p className="text-sm">
                                 {order.shipping_address_data.address}
@@ -330,7 +332,7 @@ export default function OrdersPage() {
                             </div>
                             <div>
                               <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
-                                Buyurtmani qabul qiluvchi:
+                                {t("recipient")}
                               </p>
                               {order.shipping_address_data
                                 .contact_person_name && (
@@ -353,10 +355,10 @@ export default function OrdersPage() {
                         {/* Total */}
                         <div className="flex items-center justify-between border-t pt-4">
                           <div className="flex items-center gap-2">
-                            <span className="font-semibold">Jami:</span>
+                            <span className="font-semibold">{t("total")}</span>
                             {order.payment_status !== "paid" && (
                               <Badge variant="destructive" className="text-xs">
-                                To'lov qilinmagan
+                                {t("notPaid")}
                               </Badge>
                             )}
                           </div>

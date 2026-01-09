@@ -14,6 +14,7 @@ import {
   generateWebsiteSchema,
 } from "@/components/seo/structured-data";
 import "./globals.css";
+import Amplitude from "@/amplitude";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -65,6 +66,7 @@ export default async function RootLayout({
 
   return (
     <html lang={lang} suppressHydrationWarning>
+      <Amplitude />
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

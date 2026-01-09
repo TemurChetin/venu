@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Star, Heart, ShoppingCart, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -32,6 +33,7 @@ import {
 } from "@/components/seo/structured-data";
 
 export default function DetailPage() {
+  const t = useTranslations("product");
   const params = useParams();
   const productSlug = params?.id as string;
   const lang = (params?.lang as string) || "uz";
@@ -182,7 +184,7 @@ export default function DetailPage() {
     return (
       <main className="container mx-auto px-4 py-6 md:py-8">
         <div className="flex items-center justify-center min-h-[400px]">
-          <p className="text-muted-foreground">Yuklanmoqda...</p>
+          <p className="text-muted-foreground">{t("loading")}</p>
         </div>
       </main>
     );
@@ -192,7 +194,7 @@ export default function DetailPage() {
     return (
       <main className="container mx-auto px-4 py-6 md:py-8">
         <div className="flex items-center justify-center min-h-[400px]">
-          <p className="text-muted-foreground">Mahsulot topilmadi</p>
+          <p className="text-muted-foreground">{t("notFound")}</p>
         </div>
       </main>
     );
@@ -227,7 +229,7 @@ export default function DetailPage() {
       />
       <StructuredData
         data={generateBreadcrumbSchema([
-          { name: "Bosh sahifa", url: `/${lang}` },
+          { name: t("home"), url: `/${lang}` },
           ...(product.category
             ? [
                 {
@@ -243,7 +245,7 @@ export default function DetailPage() {
         {/* Breadcrumb */}
         <nav className="mb-6 text-sm text-muted-foreground">
           <ol className="flex items-center gap-2 flex-wrap">
-            <li>Главная</li>
+            <li>{t("home")}</li>
             <li>/</li>
             {product.category && (
               <>
@@ -292,7 +294,7 @@ export default function DetailPage() {
                   </span>
                   <span className="text-sm text-muted-foreground">
                     ({product.review_count || product.reviews_count || 0}{" "}
-                    sharhlar)
+                    {t("reviews")})
                   </span>
                 </div>
                 {product.product_type && (
@@ -320,7 +322,7 @@ export default function DetailPage() {
                   )}
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  {product.current_stock} dona xarid qilish mumkin
+                  {t("available", { stock: product.current_stock })}
                 </p>
               </div>
             )}
@@ -330,7 +332,7 @@ export default function DetailPage() {
             {/* Color Selection */}
             {product.colors && product.colors.length > 0 && (
               <div className="space-y-3">
-                <label className="text-sm font-medium">Rangi:</label>
+                <label className="text-sm font-medium">{t("color")}</label>
                 <div className="flex items-center gap-3 flex-wrap">
                   {product.colors.map(
                     (color: { id: number; name: string; code: string }) => (
@@ -356,7 +358,7 @@ export default function DetailPage() {
             {/* Size Selection */}
             {product.sizes && product.sizes.length > 0 && (
               <div className="space-y-3">
-                <label className="text-sm font-medium">Hajmi:</label>
+                <label className="text-sm font-medium">{t("size")}</label>
                 <div className="flex items-center gap-3 flex-wrap">
                   {product.sizes.map(
                     (size: { id: number; name: string; value: string }) => (
@@ -388,8 +390,7 @@ export default function DetailPage() {
                       {product.shipping_methods[0].name}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {product.shipping_methods[0].estimated_days} kun ichida
-                      yetkazib beramiz
+                      {product.shipping_methods[0].estimated_days} {t("deliveryDays")}
                     </p>
                   </div>
                 </div>
@@ -404,7 +405,7 @@ export default function DetailPage() {
                 disabled={addToCart.isPending}
               >
                 <ShoppingCart className="mr-2 h-5 w-5" />
-                {addToCart.isPending ? "Qo'shilmoqda..." : "Savatga qo'shish"}
+                {addToCart.isPending ? t("adding") : t("addToCart")}
               </Button>
               <Button
                 size="lg"
@@ -437,19 +438,19 @@ export default function DetailPage() {
             <div className="grid grid-cols-3 gap-4 pt-4">
               <div className="text-center">
                 <p className="text-2xl font-bold text-primary">0</p>
-                <p className="text-xs text-muted-foreground">Заказы</p>
+                <p className="text-xs text-muted-foreground">{t("orders")}</p>
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold text-primary">
                   {product.review_count || product.reviews_count || 0}
                 </p>
-                <p className="text-xs text-muted-foreground">Отзывы</p>
+                <p className="text-xs text-muted-foreground">{t("reviewsCount")}</p>
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold text-primary">
                   {product.wish_list || product.wish_list_count || 0}
                 </p>
-                <p className="text-xs text-muted-foreground">В избранном</p>
+                <p className="text-xs text-muted-foreground">{t("inWishlist")}</p>
               </div>
             </div>
           </div>
@@ -459,7 +460,7 @@ export default function DetailPage() {
         {product.details && (
           <Card className="mb-12">
             <CardContent>
-              <h2 className="text-xl font-bold mb-4">Mahsulot haqida</h2>
+              <h2 className="text-xl font-bold mb-4">{t("about")}</h2>
               <div
                 className="space-y-4 text-muted-foreground leading-relaxed"
                 dangerouslySetInnerHTML={{ __html: product.details }}
