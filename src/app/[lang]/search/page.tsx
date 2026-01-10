@@ -2,10 +2,12 @@
 
 import { CatalogFilters } from "@/features/search/catalog-filter";
 import { ProductGrid } from "@/features/search/product-grid";
+import { MobileCategorySelector } from "@/features/search/mobile-category-selector";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import type { ProductFilterParams } from "@/services/queries/products";
 import { encodeSearchQuery } from "@/lib";
+import useDeviceDetect from "@/hooks/use-device";
 
 type Props = {};
 
@@ -14,6 +16,7 @@ function page({}: Props) {
   const searchQuery = searchParams.get("query") || "";
   const categoryParam = searchParams.get("category");
   const brandParam = searchParams.get("brand");
+  const { isMobile } = useDeviceDetect();
 
   // Parse category from URL (can be ID number or slug)
   const parseCategoryId = (categoryParam: string | null): number | null => {
@@ -92,21 +95,33 @@ function page({}: Props) {
     }));
   };
 
+  // On mobile, show category selector when no category is selected
+  const showCategorySelector = isMobile && !categoryParam && !searchQuery;
+
   return (
     <div className="flex flex-col gap-6 lg:flex-row mt-4">
-      {/* Sidebar Filters - Hidden on mobile by default */}
-      <aside className="hidden lg:block lg:w-64 xl:w-72">
-        <CatalogFilters
-          searchQuery={searchQuery}
-          filters={filters}
-          onFiltersChange={handleFiltersChange}
-        />
-      </aside>
+      {/* Mobile Category Selector - Only shown on mobile when no category/search is selected */}
+      {showCategorySelector ? (
+        <div className="w-full">
+          <MobileCategorySelector />
+        </div>
+      ) : (
+        <>
+          {/* Sidebar Filters - Hidden on mobile by default */}
+          <aside className="hidden lg:block lg:w-64 xl:w-72">
+            <CatalogFilters
+              searchQuery={searchQuery}
+              filters={filters}
+              onFiltersChange={handleFiltersChange}
+            />
+          </aside>
 
-      {/* Main Content */}
-      <div className="flex-1">
-        <ProductGrid searchQuery={searchQuery} filters={filters} />
-      </div>
+          {/* Main Content */}
+          <div className="flex-1">
+            <ProductGrid searchQuery={searchQuery} filters={filters} />
+          </div>
+        </>
+      )}
     </div>
   );
 }

@@ -77,14 +77,10 @@ export default async function RootLayout({
           <main>
             <NextTopLoader
               color="#ff0042"
-              initialPosition={0.08}
-              crawlSpeed={200}
               height={3}
-              crawl
-              showSpinner
-              easing="ease"
               speed={600}
               shadow="0 0 10px #ff0042, 0 0 5px #ff0042"
+              showSpinner={false}
             />
             <Header />
             <div className="container pb-20 md:pb-0">{children}</div>
