@@ -65,9 +65,26 @@ export function usePublicQuery<T>({
     ? useDebounces(finalUrl, debounceTime)
     : finalUrl;
 
-  // Include data in query key for POST requests to ensure refetch when data changes
+  // Debounce data for POST requests if debounceTime is specified
+  const dataString = method === "POST" && data ? JSON.stringify(data) : "";
+  const debouncedDataString = debounceTime && dataString
+    ? useDebounces(dataString, debounceTime)
+    : dataString;
+  
+  // Parse debounced data safely
+  let debouncedData = data;
+  if (debouncedDataString && method === "POST") {
+    try {
+      debouncedData = JSON.parse(debouncedDataString);
+    } catch {
+      // If parsing fails, use original data as fallback
+      debouncedData = data;
+    }
+  }
+
+  // Include debounced data in query key for POST requests
   const queryKey =
-    method === "POST" && data ? [debouncedUrl, data] : [debouncedUrl];
+    method === "POST" && debouncedData ? [debouncedUrl, debouncedData] : [debouncedUrl];
 
   return useQuery<T>({
     queryKey,
@@ -80,7 +97,7 @@ export function usePublicQuery<T>({
         const { data: responseData } = await instance.request<T>({
           method,
           url: apiUrl,
-          data: data || undefined,
+          data: debouncedData || undefined,
         });
 
         return responseData;
@@ -96,7 +113,9 @@ export function usePublicQuery<T>({
     },
     enabled:
       enabled &&
-      (!debounceTime || debouncedUrl === finalUrl) &&
+      (!debounceTime || 
+        (debouncedUrl === finalUrl && 
+          (method !== "POST" || !data || debouncedDataString === dataString))) &&
       (!requiresGuestId || !isLoadingGuestId),
     retry: (failureCount, error) => {
       // Don't retry on client errors

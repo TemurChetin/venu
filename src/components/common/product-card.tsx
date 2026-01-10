@@ -163,10 +163,10 @@ export function ProductCard({ product }: ProductCardProps) {
           >
             <Image
               width={315}
-              height={250}
+              height={560}
               src={thumbnailImage}
               alt={product.name}
-              className="h-[250px] hover:scale-105 transition-all duration-300 md:h-[315px] w-full object-cover rounded-xl overflow-hidden"
+              className="aspect-[3/4] hover:scale-105 transition-all duration-300 w-full object-cover rounded-xl overflow-hidden"
             />
           </Link>
         </div>

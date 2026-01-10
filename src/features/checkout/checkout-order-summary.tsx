@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ShoppingBag, Truck, Minus, Plus, Trash2 } from "lucide-react";
 import { useFormatCurrency, formatUZS } from "@/lib/format-currency";
+import Image from "next/image";
 
 interface OrderItem {
   id: string;
@@ -74,7 +75,9 @@ export function CheckoutOrderSummary({
         <div className="space-y-4">
           {items.map((item) => (
             <div key={item.id} className="flex gap-3">
-              <img
+              <Image
+                width={80}
+                height={80}
                 src={item.image || "/placeholder.svg"}
                 alt={item.title}
                 className="h-20 w-20 rounded-lg object-cover"

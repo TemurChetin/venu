@@ -5,9 +5,9 @@ import type React from "react";
 import { useState, useRef, useEffect, useMemo } from "react";
 import { Search, Package, Tag, Clock, X, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { cn, encodeSearchQuery } from "@/lib/utils";
 import { Link, useRouter } from "@/i18n/routing";
-import { useProductSuggestion } from "@/services/queries/products";
+import { useProductSearch } from "@/services/queries/products";
 import { useCategories } from "@/services/queries/products";
 import type { Category } from "@/types/api";
 import { useTranslations } from "next-intl";
@@ -61,7 +61,8 @@ export default function IntelisceneSearchInput() {
 
   // API hooks
   const { data: productSuggestions, isLoading: isLoadingProducts } =
-    useProductSuggestion(query, query.length > 0);
+    useProductSearch(encodeSearchQuery(query));
+
   const { data: categoriesData, isLoading: isLoadingCategories } =
     useCategories();
 
@@ -144,38 +145,57 @@ export default function IntelisceneSearchInput() {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!isOpen) return;
 
-    const allItems = [
-      ...(showRecentSearches ? recentSearches : []),
-      ...filteredCategories,
-      ...filteredProducts,
-    ];
+    const recentSearchesStart = 0;
+    const recentSearchesEnd = showRecentSearches ? recentSearches.length : 0;
+    const categoriesStart = recentSearchesEnd;
+    const categoriesEnd = categoriesStart + filteredCategories.length;
+    const productsStart = categoriesEnd;
+    const productsEnd = productsStart + filteredProducts.length;
+
+    const allItemsLength = productsEnd;
 
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setSelectedIndex((prev) =>
-        prev < allItems.length - 1 ? prev + 1 : prev
-      );
+      setSelectedIndex((prev) => (prev < allItemsLength - 1 ? prev + 1 : prev));
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       setSelectedIndex((prev) => (prev > 0 ? prev - 1 : -1));
     } else if (e.key === "Enter") {
       e.preventDefault();
-      if (selectedIndex >= 0 && selectedIndex < allItems.length) {
-        const selectedItem = allItems[selectedIndex];
-        if (typeof selectedItem === "string") {
-          // Recent search
-          handleSearch(selectedItem);
-        } else if ("slug" in selectedItem) {
-          // Category
-          router.push(`/search?category=${selectedItem.slug}`);
-          setIsOpen(false);
-        } else if ("id" in selectedItem && selectedItem.id) {
-          // Product
-          router.push(`/products/${selectedItem.id}`);
+      if (selectedIndex >= 0 && selectedIndex < allItemsLength) {
+        // Recent search
+        if (
+          selectedIndex >= recentSearchesStart &&
+          selectedIndex < recentSearchesEnd
+        ) {
+          const searchQuery =
+            recentSearches[selectedIndex - recentSearchesStart];
+          handleSearch(searchQuery);
+        }
+        // Category
+        else if (
+          selectedIndex >= categoriesStart &&
+          selectedIndex < categoriesEnd
+        ) {
+          const category = filteredCategories[selectedIndex - categoriesStart];
+          router.push(`/search?category=${category.slug}`);
           setIsOpen(false);
         }
+        // Product
+        else if (
+          selectedIndex >= productsStart &&
+          selectedIndex < productsEnd
+        ) {
+          const product = filteredProducts[selectedIndex - productsStart];
+          if (product.name) {
+            saveRecentSearch(product.name);
+            setRecentSearches(getRecentSearches());
+            router.push(`/products/${product.slug}`);
+            setIsOpen(false);
+          }
+        }
       } else {
-        // No selection, search with query
+        // No selection, search with current query
         handleSearch(query);
       }
     } else if (e.key === "Escape") {
@@ -323,7 +343,7 @@ export default function IntelisceneSearchInput() {
                     idx;
                   return (
                     <Link
-                      href={`/search?query=${encodeURIComponent(product.name)}`}
+                      href={`/products/${product.slug}`}
                       key={product.id || idx}
                       className={cn(
                         "w-full flex items-center gap-3 px-3 py-2.5 rounded-md transition-colors text-sm group",

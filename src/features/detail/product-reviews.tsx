@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Star } from "lucide-react";
 import { Review } from "@/types/api";
 import { formatDate } from "@/lib/formatDate";
+import Image from "next/image";
 
 interface ProductReviewsProps {
   reviews: Review[];
@@ -29,7 +30,9 @@ export function ProductReviews({ reviews, totalCount }: ProductReviewsProps) {
             <div key={review.id} className="flex gap-4">
               <Avatar className="h-10 w-10 flex-shrink-0">
                 {review.user_avatar ? (
-                  <img
+                  <Image
+                    width={80}
+                    height={80}
                     src={review.user_avatar}
                     alt={review.user_name}
                     className="w-full h-full object-cover"
@@ -67,7 +70,9 @@ export function ProductReviews({ reviews, totalCount }: ProductReviewsProps) {
                 {review.images && review.images.length > 0 && (
                   <div className="flex gap-2 mt-2 flex-wrap">
                     {review.images.map((img, idx) => (
-                      <img
+                      <Image
+                        width={80}
+                        height={80}
                         key={idx}
                         src={img}
                         alt={`Review image ${idx + 1}`}

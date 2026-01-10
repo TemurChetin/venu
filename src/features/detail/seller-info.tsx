@@ -2,13 +2,10 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Store,
-  Clock,
-  Star,
-} from "lucide-react";
+import { Store, Clock, Star } from "lucide-react";
 import { ProductDetailResponse } from "@/types/api";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Image from "next/image";
 
 export function SellerInfo({
   seller,
@@ -45,7 +42,9 @@ export function SellerInfo({
           <div className="shrink-0">
             {shop.image_full_url?.path ? (
               <div className="relative">
-                <img
+                <Image
+                  width={80}
+                  height={80}
                   src={shop.image_full_url.path}
                   alt={shop.name}
                   className="h-20 w-20 sm:h-24 sm:w-24 rounded-lg object-cover border-2 border-border"
@@ -124,7 +123,6 @@ export function SellerInfo({
                 </p>
               </div>
             )}
-
           </div>
         </div>
       </CardContent>

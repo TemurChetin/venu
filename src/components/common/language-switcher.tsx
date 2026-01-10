@@ -10,14 +10,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { ChevronDown } from "lucide-react";
 
 export function LanguageSwitcher() {
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
 
-  const currentLanguage = LANGUAGES.find((lang) => lang.code === locale) || LANGUAGES[0];
+  const currentLanguage =
+    LANGUAGES.find((lang) => lang.code === locale) || LANGUAGES[0];
 
   const handleLanguageChange = (newLocale: string) => {
     router.replace(pathname, { locale: newLocale });
@@ -28,11 +28,10 @@ export function LanguageSwitcher() {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors h-auto p-0"
+          size="icon"
+          className="h-8 w-8 p-0 hover:bg-accent"
         >
-          <span className="text-base">{currentLanguage.flag}</span>
-          <span className="text-sm">{currentLanguage.name}</span>
-          <ChevronDown className="h-3 w-3 ml-1" />
+          <span className="text-lg">{currentLanguage.flag}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -52,4 +51,3 @@ export function LanguageSwitcher() {
     </DropdownMenu>
   );
 }
-

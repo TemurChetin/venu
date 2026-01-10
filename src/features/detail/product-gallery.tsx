@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 interface ProductGalleryProps {
   images?: string[];
@@ -28,7 +29,9 @@ export function ProductGallery({ images = [] }: ProductGalleryProps) {
                   : "border-border hover:border-primary/50"
               }`}
             >
-              <img
+              <Image
+                width={80}
+                height={80}
                 src={img || "/placeholder.svg"}
                 alt={`Thumbnail ${idx + 1}`}
                 className="w-full h-full object-cover"
@@ -38,7 +41,9 @@ export function ProductGallery({ images = [] }: ProductGalleryProps) {
         </div>
       )}
       <Card className="relative overflow-hidden bg-muted flex-1 h-[350px] md:h-[650px] p-0">
-        <img
+        <Image
+          width={800}
+          height={800}
           src={displayImages[currentImage] || "/placeholder.svg"}
           alt="Product"
           className="w-full h-full object-cover"

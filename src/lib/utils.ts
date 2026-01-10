@@ -8,3 +8,13 @@ import { twMerge } from "tailwind-merge";
 export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs));
 }
+
+// Helper function to encode search query
+export const encodeSearchQuery = (query: string): string => {
+  if (!query) return "";
+  try {
+    return btoa(unescape(encodeURIComponent(query)));
+  } catch {
+    return "";
+  }
+};

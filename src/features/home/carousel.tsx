@@ -11,6 +11,7 @@ import { useBanners } from "@/services/queries/products";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import Image from "next/image";
 
 export function Carousel() {
   const swiperRef = useRef<SwiperType | null>(null);
@@ -59,7 +60,9 @@ export function Carousel() {
                 href={slide.url}
                 className="block overflow-hidden rounded-2xl hover:opacity-90 transition-opacity"
               >
-                <img
+                <Image
+                  width={800}
+                  height={800}
                   src={slide.photo_full_url?.path || "/placeholder.svg"}
                   alt={slide.title || ""}
                   className="w-full h-auto object-contain aspect-[8/3]"
@@ -67,7 +70,9 @@ export function Carousel() {
               </Link>
             ) : (
               <div className="overflow-hidden rounded-2xl">
-                <img
+                <Image
+                  width={800}
+                  height={800}
                   src={slide.photo_full_url?.path || "/placeholder.svg"}
                   alt={slide.title || ""}
                   className="w-full h-auto object-contain aspect-[8/3]"

@@ -242,15 +242,26 @@ export interface ProductSuggestionResponse {
   products: ProductSuggestion[];
 }
 
-export const useProductSuggestion = (name: string, enabled = true) => {
-  return usePublicQuery<ProductSuggestionResponse>({
-    url: "/v1/products/suggestion-product",
-    query: {
-      name,
-      limit: 10,
-      offset: 0,
-    },
-    enabled: enabled && name.length > 0,
+export const useProductSearch = (name: string) => {
+  // Build filter payload according to ProductFilterParams interface
+  const filterPayload: ProductFilterParams = {
+    search: name || "",
+    category: "[]" as any,
+    brand: "[]",
+    product_authors: "[]",
+    publishing_houses: "[]",
+    sort_by: null,
+    price_min: null,
+    price_max: null,
+    limit: "20",
+    offset: 0,
+    product_type: "all",
+  };
+
+  return usePublicQuery<ProductListResponse>({
+    url: "/v1/products/filter",
+    method: "POST",
+    data: filterPayload,
     debounceTime: 300,
   });
 };

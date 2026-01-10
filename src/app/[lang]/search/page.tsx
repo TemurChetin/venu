@@ -5,6 +5,7 @@ import { ProductGrid } from "@/features/search/product-grid";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import type { ProductFilterParams } from "@/services/queries/products";
+import { encodeSearchQuery } from "@/lib";
 
 type Props = {};
 
@@ -13,16 +14,6 @@ function page({}: Props) {
   const searchQuery = searchParams.get("query") || "";
   const categoryParam = searchParams.get("category");
   const brandParam = searchParams.get("brand");
-
-  // Helper function to encode search query
-  const encodeSearchQuery = (query: string): string => {
-    if (!query) return "";
-    try {
-      return btoa(unescape(encodeURIComponent(query)));
-    } catch {
-      return "";
-    }
-  };
 
   // Parse category from URL (can be ID number or slug)
   const parseCategoryId = (categoryParam: string | null): number | null => {
