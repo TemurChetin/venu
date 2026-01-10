@@ -25,7 +25,7 @@ export function Carousel() {
   if (isLoading) {
     return (
       <div className="relative w-full px-4 py-8">
-        <div className="w-full h-[200px] md:h-[300px] bg-gray-200 animate-pulse rounded-2xl" />
+        <div className="w-full lg:h-[600px] h-[200px] md:h-[300px] bg-gray-200 animate-pulse rounded-2xl" />
       </div>
     );
   }
@@ -61,8 +61,8 @@ export function Carousel() {
                 className="block overflow-hidden rounded-2xl hover:opacity-90 transition-opacity"
               >
                 <Image
-                  width={800}
-                  height={800}
+                  width={1920}
+                  height={720}
                   src={slide.photo_full_url?.path || "/placeholder.svg"}
                   alt={slide.title || ""}
                   className="w-full h-auto object-contain aspect-[8/3]"

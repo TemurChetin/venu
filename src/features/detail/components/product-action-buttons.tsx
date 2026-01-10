@@ -9,6 +9,7 @@ interface ProductActionButtonsProps {
   isWishlistPending: boolean;
   isAddToCartPending: boolean;
   onOneClickBuy?: () => void;
+  isOneClickBuyPending?: boolean;
 }
 
 export function ProductActionButtons({
@@ -18,6 +19,7 @@ export function ProductActionButtons({
   isWishlistPending,
   isAddToCartPending,
   onOneClickBuy,
+  isOneClickBuyPending = false,
 }: ProductActionButtonsProps) {
   const t = useTranslations("product");
 
@@ -29,8 +31,9 @@ export function ProductActionButtons({
           variant="secondary"
           className="w-full h-12 text-base font-medium"
           onClick={onOneClickBuy}
+          disabled={isOneClickBuyPending || isAddToCartPending}
         >
-          {t("oneClickBuy")}
+          {isOneClickBuyPending ? t("processing") : t("oneClickBuy")}
         </Button>
       )}
       <div className="flex gap-3 w-full">

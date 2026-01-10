@@ -17,7 +17,7 @@ type Props = {
 
 function BottomNavigation({ cartItemsCount: propCartItemsCount }: Props) {
   const t = useTranslations();
-  
+
   const Navigation = [
     {
       name: t("navigation.home"),
@@ -26,7 +26,7 @@ function BottomNavigation({ cartItemsCount: propCartItemsCount }: Props) {
       id: "home",
     },
     {
-      name: t("navigation.search"),
+      name: t("common.catalog"),
       href: "/search",
       icon: Search,
       id: "search",

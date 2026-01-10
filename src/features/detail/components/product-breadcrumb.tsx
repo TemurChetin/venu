@@ -9,7 +9,7 @@ export function ProductBreadcrumb({ product }: ProductBreadcrumbProps) {
   const t = useTranslations("product");
 
   return (
-    <nav className="mb-6 text-sm text-muted-foreground">
+    <nav className="mb-6 mt-2 text-sm text-muted-foreground">
       <ol className="flex items-center gap-2 flex-wrap">
         <li>{t("home")}</li>
         <li>/</li>
@@ -24,5 +24,3 @@ export function ProductBreadcrumb({ product }: ProductBreadcrumbProps) {
     </nav>
   );
 }
-
-

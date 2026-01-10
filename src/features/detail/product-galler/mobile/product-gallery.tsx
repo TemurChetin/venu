@@ -72,31 +72,6 @@ export default function ProductGalleryMobile({
             </SwiperSlide>
           ))}
         </Swiper>
-
-        {/* {displayImages.length > 1 && (
-          <>
-            <Button
-              variant="secondary"
-              size="icon"
-              className="absolute left-2 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full shadow-lg z-10 bg-white/95 hover:bg-white active:scale-95 touch-manipulation"
-              onClick={() => swiperRef.current?.slidePrev()}
-              aria-label="Previous image"
-              style={{ touchAction: "manipulation" }}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="secondary"
-              size="icon"
-              className="absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full shadow-lg z-10 bg-white/95 hover:bg-white active:scale-95 touch-manipulation"
-              onClick={() => swiperRef.current?.slideNext()}
-              aria-label="Next image"
-              style={{ touchAction: "manipulation" }}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </>
-        )} */}
       </div>
 
       {displayImages.length > 1 && (

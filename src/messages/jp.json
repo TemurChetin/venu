@@ -1,5 +1,15 @@
 {
   "hello": "こんにちは",
+  "common": {
+    "city": "タシュケント",
+    "becomeSeller": "販売者になる",
+    "faq": "よくある質問",
+    "myOrders": "注文履歴",
+    "catalog": "カタログ",
+    "more": "もっと見る",
+    "search": "検索",
+    "searchPlaceholder": "商品とカテゴリーを検索"
+  },
   "cart": {
     "checkAll": "すべて選択",
     "uncheckAll": "すべての選択を解除",
@@ -126,6 +136,7 @@
     "reviewsCount": "レビュー",
     "inWishlist": "お気に入り",
     "oneClickBuy": "ワンクリック購入",
+    "processing": "処理中...",
     "deliveryBannerTitle": "お届け先まで！",
     "deliveryBannerSubtitle": "明日お届けします！",
     "shareSuccess": "リンクが正常に共有されました",

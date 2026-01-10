@@ -23,5 +23,3 @@ export function ProductDescription({ product }: ProductDescriptionProps) {
     </Card>
   );
 }
-
-

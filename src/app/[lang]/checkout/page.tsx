@@ -409,9 +409,7 @@ export default function CheckoutNewPage() {
           {t("title")}
         </h1>
         <div className="rounded-2xl bg-white p-12 text-center shadow-sm">
-          <p className="text-lg text-muted-foreground">
-            {t("emptyCart")}
-          </p>
+          <p className="text-lg text-muted-foreground">{t("emptyCart")}</p>
           <Button onClick={() => router.push("/")} className="mt-6">
             {t("goHome")}
           </Button>
@@ -422,9 +420,7 @@ export default function CheckoutNewPage() {
 
   return (
     <div className="w-full mt-4">
-      <h1 className="mb-8 text-3xl font-bold text-foreground">
-        {t("title")}
-      </h1>
+      <h1 className="mb-8 text-3xl font-bold text-foreground">{t("title")}</h1>
 
       <div className="grid grid-cols-12 gap-6">
         {/* Left Side - Form */}
@@ -631,7 +627,9 @@ export default function CheckoutNewPage() {
         <div className="col-span-12 lg:col-span-4">
           <div className="sticky top-4 space-y-4">
             <div className="rounded-2xl bg-white p-6 shadow-sm">
-              <h2 className="mb-4 text-xl font-semibold">{t("orderSummary")}</h2>
+              <h2 className="mb-4 text-xl font-semibold">
+                {t("orderSummary")}
+              </h2>
 
               <div className="space-y-4 max-h-[400px] overflow-y-auto">
                 {cartItems.map((item) => {
@@ -640,11 +638,11 @@ export default function CheckoutNewPage() {
                     item.product?.name ||
                     item.product_full_info?.name ||
                     "Product";
-                  const thumbnailUrl = item.thumbnail
-                    ? `https://venu.uz/storage/product/thumbnail/${item.thumbnail}`
-                    : item.product?.thumbnail_full_url?.path ||
-                      item.product_full_info?.thumbnail_full_url?.path ||
-                      "/placeholder.svg";
+
+                  // Get thumbnail image
+                  const thumbnailUrl =
+                    item.product?.thumbnail_full_url?.path ||
+                    "/placeholder.svg";
 
                   // Get product info for discount calculation
                   const product = item.product_full_info || item.product;
@@ -750,7 +748,9 @@ export default function CheckoutNewPage() {
                 {!isFreeDeliveryEligible &&
                   config?.uzsCurrency?.exchange_rate && (
                     <p className="rounded-lg bg-primary/10 p-3 text-xs text-primary">
-                      {t("addMoreForFreeDelivery", { amount: formatUZS(howMuchToAdd) })}
+                      {t("addMoreForFreeDelivery", {
+                        amount: formatUZS(howMuchToAdd),
+                      })}
                     </p>
                   )}
               </div>
@@ -782,8 +782,8 @@ export default function CheckoutNewPage() {
                 {t("termsAgreement")}{" "}
                 <a href="#" className="text-primary hover:underline">
                   {t("termsLink")}
-                </a>
-                {" "}{t("termsAgreementEnd")}
+                </a>{" "}
+                {t("termsAgreementEnd")}
               </p>
             </div>
           </div>

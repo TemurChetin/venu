@@ -20,7 +20,9 @@ export async function shareProduct({
   const shareData = {
     title: product.name,
     text: product.details
-      ? `${product.name} - ${product.details.replace(/<[^>]*>/g, "").substring(0, 100)}...`
+      ? `${product.name} - ${product.details
+          .replace(/<[^>]*>/g, "")
+          .substring(0, 100)}...`
       : product.name,
     url: productUrl,
   };
@@ -28,8 +30,10 @@ export async function shareProduct({
   // Check if Web Share API is available
   const canUseWebShare =
     typeof navigator !== "undefined" &&
-    navigator.share &&
-    (typeof navigator.canShare === "function" ? navigator.canShare(shareData) : true);
+    typeof navigator.share !== "undefined" &&
+    (typeof navigator.canShare === "function"
+      ? navigator.canShare(shareData)
+      : true);
 
   if (canUseWebShare) {
     try {
@@ -37,7 +41,12 @@ export async function shareProduct({
       toast.success(translations.shareSuccess);
     } catch (error: unknown) {
       // User cancelled or error occurred
-      if (error && typeof error === "object" && "name" in error && error.name !== "AbortError") {
+      if (
+        error &&
+        typeof error === "object" &&
+        "name" in error &&
+        error.name !== "AbortError"
+      ) {
         // Fallback to clipboard if share fails
         await copyToClipboard(productUrl, translations);
       }
@@ -74,5 +83,3 @@ async function copyToClipboard(
     document.body.removeChild(textArea);
   }
 }
-
-

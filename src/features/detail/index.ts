@@ -1,4 +1,3 @@
-export { ProductGallery } from "./product-galler/desktop/product-gallery";
 export { RelatedProducts } from "./related-products";
 export { SellerInfo } from "./seller-info";
 export { ProductReviews } from "./product-reviews";

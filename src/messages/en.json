@@ -1,5 +1,15 @@
 {
   "hello": "Hello",
+  "common": {
+    "city": "Tashkent",
+    "becomeSeller": "Become a Seller",
+    "faq": "FAQ",
+    "myOrders": "My Orders",
+    "catalog": "Catalog",
+    "more": "More",
+    "search": "Search",
+    "searchPlaceholder": "Search products and categories"
+  },
   "cart": {
     "checkAll": "Select All",
     "uncheckAll": "Unselect All",
@@ -126,6 +136,7 @@
     "reviewsCount": "Reviews",
     "inWishlist": "In Wishlist",
     "oneClickBuy": "Buy with One Click",
+    "processing": "Processing...",
     "deliveryBannerTitle": "To Your Home!",
     "deliveryBannerSubtitle": "We deliver tomorrow!",
     "shareSuccess": "Link shared successfully",
