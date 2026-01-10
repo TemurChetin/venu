@@ -19,6 +19,7 @@
     "user": "ユーザー",
     "login": "ログイン",
     "register": "登録",
+    "socialMedia": "ソーシャルメディアでフォロー",
     "supportRequest": "サポートへのお問い合わせ",
     "address": "タシュケント、ユヌサバード地区、ヤンギシャハル3A"
   },
@@ -123,6 +124,12 @@
     "about": "商品について",
     "orders": "注文",
     "reviewsCount": "レビュー",
-    "inWishlist": "お気に入り"
+    "inWishlist": "お気に入り",
+    "oneClickBuy": "ワンクリック購入",
+    "deliveryBannerTitle": "お届け先まで！",
+    "deliveryBannerSubtitle": "明日お届けします！",
+    "shareSuccess": "リンクが正常に共有されました",
+    "copySuccess": "リンクがクリップボードにコピーされました",
+    "copyError": "リンクのコピー中にエラーが発生しました"
   }
 }

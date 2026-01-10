@@ -1,6 +1,7 @@
 "use client";
 
 import { Mail, Phone, MapPin, User } from "lucide-react";
+import { FaTelegram, FaInstagram, FaYoutube } from "react-icons/fa";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
@@ -105,6 +106,47 @@ export function Footer() {
               </ul>
             </div>
           )}
+
+          {/* Social Media Links */}
+          <div>
+            <h3 className="mb-4 text-base font-semibold uppercase tracking-wide text-foreground">
+              {t("socialMedia")}
+            </h3>
+            <div className="flex items-center gap-4">
+              <Link
+                href="https://t.me/venu_market"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground transition-colors hover:text-foreground"
+                aria-label="Telegram"
+              >
+                <Image src={"/tg.png"} alt="Telegram" width={50} height={50} />
+              </Link>
+              <Link
+                href="https://www.instagram.com/venu_market/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground transition-colors hover:text-foreground"
+                aria-label="Instagram"
+              >
+                <Image
+                  src={"/insta.png"}
+                  alt="Instagram"
+                  width={50}
+                  height={50}
+                />
+              </Link>
+              <Link
+                href="https://www.youtube.com/@VENUMarket"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground transition-colors hover:text-foreground"
+                aria-label="YouTube"
+              >
+                <Image src={"/yt.png"} alt="YouTube" width={50} height={50} />
+              </Link>
+            </div>
+          </div>
         </div>
 
         {/* Bottom Contact Section */}

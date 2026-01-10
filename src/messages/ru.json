@@ -93,6 +93,7 @@
     "user": "Пользователь",
     "login": "Вход",
     "register": "Регистрация",
+    "socialMedia": "Мы в социальных сетях",
     "supportRequest": "Заявка в поддержку",
     "address": "Ташкент, Юнусабадский район, Янгишахар 3А"
   },
@@ -197,6 +198,12 @@
     "about": "О товаре",
     "orders": "Заказы",
     "reviewsCount": "Отзывы",
-    "inWishlist": "В избранном"
+    "inWishlist": "В избранном",
+    "oneClickBuy": "Купить в один клик",
+    "deliveryBannerTitle": "До вашего дома!",
+    "deliveryBannerSubtitle": "Доставим завтра!",
+    "shareSuccess": "Ссылка успешно поделена",
+    "copySuccess": "Ссылка скопирована в буфер обмена",
+    "copyError": "Ошибка копирования ссылки"
   }
 }

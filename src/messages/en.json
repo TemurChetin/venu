@@ -19,6 +19,7 @@
     "user": "User",
     "login": "Login",
     "register": "Register",
+    "socialMedia": "Follow us on social media",
     "supportRequest": "Support Request",
     "address": "Tashkent, Yunusabad district, Yangishahar 3A"
   },
@@ -123,6 +124,12 @@
     "about": "About Product",
     "orders": "Orders",
     "reviewsCount": "Reviews",
-    "inWishlist": "In Wishlist"
+    "inWishlist": "In Wishlist",
+    "oneClickBuy": "Buy with One Click",
+    "deliveryBannerTitle": "To Your Home!",
+    "deliveryBannerSubtitle": "We deliver tomorrow!",
+    "shareSuccess": "Link shared successfully",
+    "copySuccess": "Link copied to clipboard",
+    "copyError": "Error copying link"
   }
 }

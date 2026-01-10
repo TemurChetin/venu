@@ -93,6 +93,7 @@
     "user": "Foydalanuvchi",
     "login": "Kirish",
     "register": "Ro'yxatdan O'tish",
+    "socialMedia": "Biz ijtimoiy tarmoqlarda",
     "supportRequest": "Qo'llab-quvvatlashga murojaat",
     "address": "Toshkent shahar Yunusobod tuman Yangishahar 3A"
   },
@@ -195,8 +196,14 @@
     "available": "{stock} dona xarid qilish mumkin",
     "deliveryDays": "kun ichida yetkazib beramiz",
     "about": "Mahsulot haqida",
-    "orders": "Заказы",
-    "reviewsCount": "Отзывы",
-    "inWishlist": "В избранном"
+    "orders": "Buyurtmalar",
+    "reviewsCount": "Sharhlar",
+    "inWishlist": "Sevimlilarda",
+    "oneClickBuy": "1 bosishda xarid qiling",
+    "deliveryBannerTitle": "Uyingizgacha!",
+    "deliveryBannerSubtitle": "Ertaga yetkazib beramiz!",
+    "shareSuccess": "Link muvaffaqiyatli baham ko'rildi",
+    "copySuccess": "Link panjara (clipboard)ga ko'chirildi",
+    "copyError": "Linkni ko'chirishda xatolik yuz berdi"
   }
 }
