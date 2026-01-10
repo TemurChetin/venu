@@ -72,7 +72,7 @@ function Page({}: Props) {
 
       {/* Discount Products */}
       {discountData?.products && discountData.products.length > 0 && (
-        <div className="px-4">
+        <div className="">
           <h2 className="text-xl font-bold mb-4">{t("discountProducts")}</h2>
           <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {discountData.products.map((product) => (
@@ -84,7 +84,7 @@ function Page({}: Props) {
 
       {/* Seasonal Products */}
       {seasonalData?.products && seasonalData.products.length > 0 && (
-        <div className="px-4">
+        <div className="">
           <h2 className="text-xl font-bold mb-4">{t("seasonalProducts")}</h2>
           <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {seasonalData.products.map((product) => (
@@ -96,7 +96,7 @@ function Page({}: Props) {
 
       {/* Latest Products */}
       {latestData?.products && latestData.products.length > 0 && (
-        <div className="px-4">
+        <div className="">
           <h2 className="text-xl font-bold mb-4">{t("latestProducts")}</h2>
           <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {latestData.products.map((product) => (
@@ -108,7 +108,7 @@ function Page({}: Props) {
 
       {/* Main Section Banner 1 */}
       {mainSectionBanners.length > 0 && mainSectionBanners[0] && (
-        <div className="px-4 py-6">
+        <div className=" py-6">
           {mainSectionBanners[0].url ? (
             <Link
               href={mainSectionBanners[0].url}
@@ -144,7 +144,7 @@ function Page({}: Props) {
 
       {/* New Arrival Products */}
       {newArrivalData?.products && newArrivalData.products.length > 0 && (
-        <div className="px-4">
+        <div className="">
           <h2 className="text-xl font-bold mb-4">{t("newArrivalProducts")}</h2>
           <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {newArrivalData.products.map((product) => (
@@ -159,7 +159,7 @@ function Page({}: Props) {
 
       {/* Top Rated Products */}
       {topRatedData?.products && topRatedData.products.length > 0 && (
-        <div className="px-4">
+        <div className="">
           <h2 className="text-xl font-bold mb-4">{t("topRatedProducts")}</h2>
           <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {topRatedData.products.map((product) => (
@@ -174,7 +174,7 @@ function Page({}: Props) {
 
       {/* Main Section Banner 2 */}
       {mainSectionBanners.length > 1 && mainSectionBanners[1] && (
-        <div className="px-4 py-6">
+        <div className=" py-6">
           {mainSectionBanners[1].url ? (
             <Link
               href={mainSectionBanners[1].url}
@@ -210,7 +210,7 @@ function Page({}: Props) {
 
       {/* Best Selling Products */}
       {bestSellingData?.products && bestSellingData.products.length > 0 && (
-        <div className="px-4">
+        <div className="">
           <h2 className="text-xl font-bold mb-4">{t("bestSellingProducts")}</h2>
           <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {bestSellingData.products.map((product) => (
@@ -225,7 +225,7 @@ function Page({}: Props) {
 
       {/* Featured Products */}
       {featuredData?.products && featuredData.products.length > 0 && (
-        <div className="px-4">
+        <div className="">
           <h2 className="text-xl font-bold mb-4">{t("featuredProducts")}</h2>
           <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {featuredData.products.map((product) => (
@@ -237,7 +237,7 @@ function Page({}: Props) {
 
       {/* Brands Section */}
       {brandsData?.brands && brandsData.brands.length > 0 && (
-        <div className="px-4 py-6 relative">
+        <div className=" py-6 relative">
           <h2 className="text-xl font-bold mb-4">{t("brands")}</h2>
           <div className="relative">
             <Swiper
@@ -336,7 +336,7 @@ function Page({}: Props) {
       {/* Additional Main Section Banners */}
       {mainSectionBanners.length > 2 &&
         mainSectionBanners.slice(2).map((banner, index) => (
-          <div key={banner.id} className="px-4 py-6">
+          <div key={banner.id} className=" py-6">
             {banner.url ? (
               <Link
                 href={banner.url}

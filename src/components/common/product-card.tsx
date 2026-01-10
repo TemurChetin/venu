@@ -138,7 +138,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className="relative">
           {/* Discount Badge */}
           {discountDisplayText && (
-            <div className="absolute left-3 top-3 z-10 flex items-center justify-center rounded-md bg-red-500 px-2.5 py-1 text-xs font-bold text-white shadow-md">
+            <div className="absolute left-1 top-1 z-10 flex items-center justify-center rounded-md bg-red-500 px-2.5 py-1 text-xs font-bold text-white shadow-md">
               {discountDisplayText}
             </div>
           )}
@@ -146,11 +146,11 @@ export function ProductCard({ product }: ProductCardProps) {
           <button
             onClick={handleWishlistToggle}
             disabled={isLoading}
-            className="cursor-pointer absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="cursor-pointer absolute right-1 top-1 z-10 flex lg:h-9 lg:w-9 h-7 w-7 items-center justify-center rounded-full bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Heart
               className={cn(
-                "h-5 w-5 transition-colors",
+                "lg:h-5 lg:w-5 h-4 w-4 transition-colors",
                 isWishlisted ? "fill-red-500 text-red-500" : "text-gray-400"
               )}
             />

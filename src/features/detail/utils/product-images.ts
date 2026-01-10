@@ -11,3 +11,4 @@ export function getProductImages(product: ProductDetailResponse | undefined): st
   return thumbnailPath ? [thumbnailPath] : [];
 }
 
+

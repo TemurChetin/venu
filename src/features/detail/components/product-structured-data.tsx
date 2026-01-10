@@ -54,3 +54,4 @@ export function ProductStructuredData({ product, lang }: ProductStructuredDataPr
   );
 }
 
+

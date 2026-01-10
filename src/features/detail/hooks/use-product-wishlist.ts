@@ -56,4 +56,3 @@ export function useProductWishlist(
     isPending: addToWishlist.isPending || removeFromWishlist.isPending,
   };
 }
-

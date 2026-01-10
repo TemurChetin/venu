@@ -1,9 +1,8 @@
 import { useTranslations } from "next-intl";
-import { Heart, ShoppingCart, Share2 } from "lucide-react";
+import { Heart, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ProductActionButtonsProps {
-  onShare: () => void;
   onWishlistToggle: () => void;
   onAddToCart: () => void;
   isWishlisted: boolean;
@@ -13,7 +12,6 @@ interface ProductActionButtonsProps {
 }
 
 export function ProductActionButtons({
-  onShare,
   onWishlistToggle,
   onAddToCart,
   isWishlisted,
@@ -35,19 +33,10 @@ export function ProductActionButtons({
           {t("oneClickBuy")}
         </Button>
       )}
-      <div className="flex gap-3 flex-col sm:flex-row">
+      <div className="flex gap-3 w-full">
         <Button
-          size="lg"
           variant="outline"
-          className="sm:w-auto h-12 bg-transparent"
-          onClick={onShare}
-        >
-          <Share2 />
-        </Button>
-        <Button
-          size="lg"
-          variant="outline"
-          className="sm:w-auto h-12 bg-transparent"
+          className="bg-transparent"
           onClick={onWishlistToggle}
           disabled={isWishlistPending}
         >
@@ -60,8 +49,7 @@ export function ProductActionButtons({
           />
         </Button>
         <Button
-          size="lg"
-          className="md:flex-1 h-10 md:h-12 text-base font-medium"
+          className="flex-1 text-base font-medium"
           onClick={onAddToCart}
           disabled={isAddToCartPending}
         >
@@ -72,4 +60,3 @@ export function ProductActionButtons({
     </>
   );
 }
-

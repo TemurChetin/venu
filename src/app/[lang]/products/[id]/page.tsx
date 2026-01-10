@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
 import { Card, CardContent } from "@/components/ui/card";
-import { ProductGallery } from "@/features/detail/product-gallery";
+import ProductGallery from "@/features/detail/product-galler";
 import { SellerInfo } from "@/features/detail/seller-info";
 import { ProductReviews } from "@/features/detail/product-reviews";
 import { RelatedProducts } from "@/features/detail/related-products";
@@ -33,6 +33,7 @@ import {
   ProductDeliveryBanner,
   ProductStructuredData,
 } from "@/features/detail/components";
+import { Share2 } from "lucide-react";
 
 export default function DetailPage() {
   const t = useTranslations("product");
@@ -132,12 +133,18 @@ export default function DetailPage() {
         <ProductBreadcrumb product={product} />
 
         {/* Product Section */}
-        <div className="grid gap-6 lg:grid-cols-12 lg:gap-12 mb-12">
-          <ProductGallery images={getProductImages(product)} />
+        <div className="grid gap-6 grid-cols-1 lg:grid-cols-12 lg:gap-12 mb-12">
+          <div className="lg:col-span-8">
+            <ProductGallery images={getProductImages(product)} />
+          </div>
 
           {/* Product Info */}
-          <div className="col-span-4 space-y-6">
-            <Card className="space-y-6">
+          <div className="lg:col-span-4 space-y-6">
+            <Card className="space-y-6 relative">
+              <button onClick={handleShare} className="absolute top-3 right-3">
+                <Share2 className="w-4 h-4" />
+              </button>
+
               <CardContent className="space-y-4">
                 <ProductPriceDisplay product={product} />
                 <ProductColorSelector
@@ -153,7 +160,6 @@ export default function DetailPage() {
                 <ProductDeliveryInfo product={product} />
                 <ProductStats product={product} />
                 <ProductActionButtons
-                  onShare={handleShare}
                   onWishlistToggle={handleWishlistToggle}
                   onAddToCart={handleAddToCart}
                   isWishlisted={isWishlisted}

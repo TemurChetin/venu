@@ -38,4 +38,3 @@ export function ProductPriceDisplay({ product }: ProductPriceDisplayProps) {
     </div>
   );
 }
-

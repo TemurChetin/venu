@@ -18,7 +18,9 @@ interface ProductGalleryProps {
   images?: string[];
 }
 
-export function ProductGallery({ images = [] }: ProductGalleryProps) {
+export default function ProductGalleryDesktop({
+  images = [],
+}: ProductGalleryProps) {
   const [currentImage, setCurrentImage] = useState(0);
   const swiperRef = useRef<SwiperType | null>(null);
 
@@ -32,7 +34,7 @@ export function ProductGallery({ images = [] }: ProductGalleryProps) {
   }, [currentImage]);
 
   return (
-    <div className="flex flex-col gap-4 col-span-8">
+    <div className="flex flex-col gap-4 w-full">
       <div className="relative h-[350px] md:h-[650px]">
         <Swiper
           onSwiper={(swiper) => {

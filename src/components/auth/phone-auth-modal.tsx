@@ -170,7 +170,7 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] w-[80%] rounded-4xl">
         <DialogHeader>
           <DialogTitle>{t("auth.title")}</DialogTitle>
           <DialogDescription>
