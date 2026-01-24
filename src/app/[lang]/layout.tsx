@@ -66,13 +66,15 @@ export default async function RootLayout({
 
   return (
     <html lang={lang} suppressHydrationWarning>
-      <Amplitude />
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <head>
+        <Amplitude />
         {/* Structured Data for SEO */}
         <StructuredData data={generateOrganizationSchema()} />
         <StructuredData data={generateWebsiteSchema()} />
+      </head>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
         <AppProvider locale={lang} messages={messages}>
           <main>
             <NextTopLoader

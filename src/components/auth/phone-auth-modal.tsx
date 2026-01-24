@@ -179,7 +179,6 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
               : t("auth.otpDescription", { phone })}
           </DialogDescription>
         </DialogHeader>
-
         {step === "phone" ? (
           <div className="space-y-4">
             <div className="space-y-2">
@@ -231,19 +230,18 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
                 {loading ? t("auth.verifying") : t("auth.verify")}
               </Button>
 
-              <div className="flex items-center justify-between text-sm">
-                <Button
+              <div className="flex flex-col gap-2">
+                <button
                   type="button"
-                  variant="ghost"
                   onClick={() => {
                     setStep("phone");
                     setOtpCode("");
                   }}
                   disabled={loading}
-                  className="text-xs"
+                  className="text-xs w-full"
                 >
                   {t("auth.changePhone")}
-                </Button>
+                </button>
 
                 {canResend ? (
                   <Button

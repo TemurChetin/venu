@@ -141,6 +141,14 @@
     "deliveryBannerSubtitle": "We deliver tomorrow!",
     "shareSuccess": "Link shared successfully",
     "copySuccess": "Link copied to clipboard",
-    "copyError": "Error copying link"
+    "copyError": "Error copying link",
+    "guarantees": {
+      "originalProduct": "Original Product",
+      "securePayment": "Secure Payment — Click, Payme",
+      "returnPolicy": "10-Day Return Policy",
+      "returnPolicyDescription": "We accept returns within 10 days and refund immediately",
+      "fastDelivery": "Fast and Reliable Delivery",
+      "originalGuaranteed": "Original and Guaranteed Product"
+    }
   }
 }

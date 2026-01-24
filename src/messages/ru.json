@@ -205,6 +205,14 @@
     "deliveryBannerSubtitle": "Доставим завтра!",
     "shareSuccess": "Ссылка успешно поделена",
     "copySuccess": "Ссылка скопирована в буфер обмена",
-    "copyError": "Ошибка копирования ссылки"
+    "copyError": "Ошибка копирования ссылки",
+    "guarantees": {
+      "originalProduct": "Оригинальный товар",
+      "securePayment": "Безопасная оплата — Click, Payme",
+      "returnPolicy": "Возврат в течение 10 дней",
+      "returnPolicyDescription": "Принимаем товары в течение 10 дней и немедленно возвращаем деньги",
+      "fastDelivery": "Быстрая и надежная доставка",
+      "originalGuaranteed": "Оригинальный и гарантированный товар"
+    }
   }
 }

@@ -28,7 +28,7 @@ export function SellerInfo({
   const reviewCount = 0; // You may need to get this from seller data
 
   return (
-    <Card className="mb-12">
+    <Card className="">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Store className="h-5 w-5 text-primary" />

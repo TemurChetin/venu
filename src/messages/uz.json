@@ -205,6 +205,14 @@
     "deliveryBannerSubtitle": "Ertaga yetkazib beramiz!",
     "shareSuccess": "Link muvaffaqiyatli baham ko'rildi",
     "copySuccess": "Link panjara (clipboard)ga ko'chirildi",
-    "copyError": "Linkni ko'chirishda xatolik yuz berdi"
+    "copyError": "Linkni ko'chirishda xatolik yuz berdi",
+    "guarantees": {
+      "originalProduct": "Original mahsulot",
+      "securePayment": "Xavfsiz to'lov — Click, Payme",
+      "returnPolicy": "10 kun ichida qaytarish",
+      "returnPolicyDescription": "Tovarlarni 10 kun ichida qabul qilamiz va darhol pulini qaytaramiz",
+      "fastDelivery": "Tez va ishonchli yetkazib berish",
+      "originalGuaranteed": "Original va kafolatli mahsulot"
+    }
   }
 }

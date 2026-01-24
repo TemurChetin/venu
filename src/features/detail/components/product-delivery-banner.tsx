@@ -5,7 +5,7 @@ export function ProductDeliveryBanner() {
   const t = useTranslations("product");
 
   return (
-    <Card>
+    <Card className="mb-12">
       <CardContent className="">
         <p className="text-primary font-bold">{t("deliveryBannerTitle")}</p>
         <h1 className="text-2xl font-bold">{t("deliveryBannerSubtitle")}</h1>

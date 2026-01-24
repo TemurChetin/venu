@@ -8,5 +8,6 @@ export { ProductBreadcrumb } from "./product-breadcrumb";
 export { ProductDescription } from "./product-description";
 export { ProductDeliveryBanner } from "./product-delivery-banner";
 export { ProductStructuredData } from "./product-structured-data";
+export { ProductGuarantees } from "./product-guarantees";
 
 

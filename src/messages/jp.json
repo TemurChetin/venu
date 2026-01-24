@@ -141,6 +141,14 @@
     "deliveryBannerSubtitle": "明日お届けします！",
     "shareSuccess": "リンクが正常に共有されました",
     "copySuccess": "リンクがクリップボードにコピーされました",
-    "copyError": "リンクのコピー中にエラーが発生しました"
+    "copyError": "リンクのコピー中にエラーが発生しました",
+    "guarantees": {
+      "originalProduct": "オリジナル商品",
+      "securePayment": "安全な支払い — Click, Payme",
+      "returnPolicy": "10日間返品保証",
+      "returnPolicyDescription": "10日以内に返品を受け付け、即座に返金いたします",
+      "fastDelivery": "迅速で信頼性の高い配送",
+      "originalGuaranteed": "オリジナルで保証付き商品"
+    }
   }
 }

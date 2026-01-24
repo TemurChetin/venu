@@ -35,6 +35,7 @@ import {
   ProductDescription,
   ProductDeliveryBanner,
   ProductStructuredData,
+  ProductGuarantees,
 } from "@/features/detail/components";
 import { Share2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -395,7 +396,6 @@ export default function DetailPage() {
 
   return (
     <>
-      <ProductStructuredData product={product} lang={lang} />
       <ProductBreadcrumb product={product} />
 
       {/* Product Section */}
@@ -412,6 +412,7 @@ export default function DetailPage() {
             </button>
 
             <CardContent className="space-y-4">
+              <h1 className="text-2xl md:text-3xl font-bold mb-2">{product.name}</h1>
               <ProductPriceDisplay product={product} />
               <ProductColorSelector
                 product={product}
@@ -436,8 +437,9 @@ export default function DetailPage() {
               />
             </CardContent>
           </Card>
-          <ProductDeliveryBanner />
+          <ProductGuarantees />
           {product.seller && <SellerInfo seller={product.seller} />}
+          <ProductDeliveryBanner />
         </div>
       </div>
 
