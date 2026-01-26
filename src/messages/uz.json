@@ -214,5 +214,23 @@
       "fastDelivery": "Tez va ishonchli yetkazib berish",
       "originalGuaranteed": "Original va kafolatli mahsulot"
     }
+  },
+  "seller": {
+    "notFound": "Sotuvchi topilmadi",
+    "products": "Mahsulotlar",
+    "loading": "Yuklanmoqda...",
+    "totalProducts": "Jami {count} ta mahsulot",
+    "noProducts": "Mahsulotlar topilmadi",
+    "open": "Ochiq",
+    "closed": "Yopiq",
+    "onVacation": "Ta'tilda",
+    "temporarilyClosed": "Vaqtinchalik yopilgan",
+    "statistics": "Statistika",
+    "totalProductsStat": "Jami mahsulotlar",
+    "memberSince": "A'zo bo'lgan sana",
+    "minimumOrder": "Minimal buyurtma",
+    "freeDelivery": "Bepul yetkazib berish",
+    "freeDeliveryOver": "{amount} dan ortiq buyurtmalar uchun bepul",
+    "freeDeliveryNotAvailable": "Mavjud emas"
   }
 }

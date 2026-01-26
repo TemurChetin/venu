@@ -2,16 +2,22 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Store, Clock, Star } from "lucide-react";
+import { Store, Clock, Star, Package, Calendar } from "lucide-react";
 import { ProductDetailResponse } from "@/types/api";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
+import { Link } from "@/i18n/routing";
+import { useParams } from "next/navigation";
+import { useSellerProducts } from "@/services/queries/sellers";
 
 export function SellerInfo({
   seller,
 }: {
   seller: ProductDetailResponse["seller"];
 }) {
+  const params = useParams();
+  const lang = (params?.lang as string) || "uz";
+
   if (!seller || !seller.shop) return null;
 
   const shop = seller.shop;
@@ -22,6 +28,25 @@ export function SellerInfo({
     ? "Vaqtinchalik yopilgan"
     : "Ochiq";
 
+  // Fetch seller products to get total count
+  const { data: productsData } = useSellerProducts(seller.id, 1, 0);
+  const totalProducts = productsData?.total_size || 0;
+
+  // Calculate years active from shop creation date
+  const getYearsActive = () => {
+    if (!shop.created_at) return null;
+    const createdDate = new Date(shop.created_at);
+    const now = new Date();
+    const yearsDiff = now.getFullYear() - createdDate.getFullYear();
+    const monthDiff = now.getMonth() - createdDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < createdDate.getDate())) {
+      return Math.max(0, yearsDiff - 1);
+    }
+    return yearsDiff;
+  };
+
+  const yearsActive = getYearsActive();
+
   // Calculate average rating if available (assuming seller has rating)
   // This is a placeholder - adjust based on actual API response
   const sellerRating = 4.5; // You may need to get this from seller data
@@ -30,14 +55,17 @@ export function SellerInfo({
   return (
     <Card className="">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Store className="h-5 w-5 text-primary" />
-          Sotuvchi ma'lumotlari
+        <CardTitle className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Store className="h-5 w-5 text-primary" />
+            Sotuvchi ma'lumotlari
+          </div>
+         
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Shop Info Section */}
-        <div className="flex flex-col sm:flex-row gap-6">
+        <Link href={`/seller/${seller.id}`} className="flex flex-col sm:flex-row gap-6">
           {/* Shop/Seller Avatar */}
           <div className="shrink-0">
             {shop.image_full_url?.path ? (
@@ -121,6 +149,56 @@ export function SellerInfo({
                 <p className="text-sm text-muted-foreground">
                   {shop.vacation_note}
                 </p>
+              </div>
+            )}
+          </div>
+        </Link>
+
+        {/* Shop Statistics Section */}
+        <div className="pt-4 border-t border-border">
+          <h4 className="text-sm font-semibold text-foreground mb-4">
+            Do'kon statistikasi
+          </h4>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            {/* Total Products */}
+            <div className="flex flex-col items-start gap-1">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Package className="h-4 w-4" />
+                <span className="text-xs">Mahsulotlar</span>
+              </div>
+              <span className="text-lg font-semibold text-foreground">
+                {totalProducts.toLocaleString()}
+              </span>
+            </div>
+
+            {/* Years Active */}
+            {yearsActive !== null && (
+              <div className="flex flex-col items-start gap-1">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Calendar className="h-4 w-4" />
+                  <span className="text-xs">Faol yillar</span>
+                </div>
+                <span className="text-lg font-semibold text-foreground">
+                  {yearsActive} {yearsActive === 1 ? "yil" : "yil"}
+                </span>
+              </div>
+            )}
+
+            {/* Rating (if available) */}
+            {reviewCount > 0 && (
+              <div className="flex flex-col items-start gap-1">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Star className="h-4 w-4 fill-primary text-primary" />
+                  <span className="text-xs">Reyting</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-lg font-semibold text-foreground">
+                    {sellerRating.toFixed(1)}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    ({reviewCount})
+                  </span>
+                </div>
               </div>
             )}
           </div>

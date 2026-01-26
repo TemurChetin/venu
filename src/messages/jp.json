@@ -150,5 +150,23 @@
       "fastDelivery": "迅速で信頼性の高い配送",
       "originalGuaranteed": "オリジナルで保証付き商品"
     }
+  },
+  "seller": {
+    "notFound": "販売者が見つかりません",
+    "products": "商品",
+    "loading": "読み込み中...",
+    "totalProducts": "合計 {count} 商品",
+    "noProducts": "商品が見つかりません",
+    "open": "営業中",
+    "closed": "閉店",
+    "onVacation": "休暇中",
+    "temporarilyClosed": "一時的に閉店",
+    "statistics": "統計",
+    "totalProductsStat": "総商品数",
+    "memberSince": "メンバー登録日",
+    "minimumOrder": "最低注文額",
+    "freeDelivery": "無料配送",
+    "freeDeliveryOver": "{amount}以上の注文で無料",
+    "freeDeliveryNotAvailable": "利用不可"
   }
 }

@@ -150,5 +150,23 @@
       "fastDelivery": "Fast and Reliable Delivery",
       "originalGuaranteed": "Original and Guaranteed Product"
     }
+  },
+  "seller": {
+    "notFound": "Seller not found",
+    "products": "Products",
+    "loading": "Loading...",
+    "totalProducts": "Total {count} products",
+    "noProducts": "No products found",
+    "open": "Open",
+    "closed": "Closed",
+    "onVacation": "On Vacation",
+    "temporarilyClosed": "Temporarily Closed",
+    "statistics": "Statistics",
+    "totalProductsStat": "Total Products",
+    "memberSince": "Member Since",
+    "minimumOrder": "Minimum Order",
+    "freeDelivery": "Free Delivery",
+    "freeDeliveryOver": "Free for orders over {amount}",
+    "freeDeliveryNotAvailable": "Not Available"
   }
 }

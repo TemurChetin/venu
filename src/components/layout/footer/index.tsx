@@ -27,7 +27,11 @@ export function Footer() {
 
             {/* App Store Buttons */}
             <div className="flex flex-col gap-3 sm:flex-row">
-              <Link href="#">
+              <Link
+                href="https://play.google.com/store/apps/details?id=uz.felix.venu&pcampaignid=web_share"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <Image
                   width={200}
                   height={90}
@@ -36,7 +40,11 @@ export function Footer() {
                 />
               </Link>
 
-              <Link href="#">
+              <Link
+                href="https://apps.apple.com/us/app/venu/id6749202720"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <Image
                   src={"/appstore.png"}
                   alt="App store"

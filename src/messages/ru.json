@@ -214,5 +214,23 @@
       "fastDelivery": "Быстрая и надежная доставка",
       "originalGuaranteed": "Оригинальный и гарантированный товар"
     }
+  },
+  "seller": {
+    "notFound": "Продавец не найден",
+    "products": "Товары",
+    "loading": "Загрузка...",
+    "totalProducts": "Всего {count} товаров",
+    "noProducts": "Товары не найдены",
+    "open": "Открыт",
+    "closed": "Закрыт",
+    "onVacation": "В отпуске",
+    "temporarilyClosed": "Временно закрыт",
+    "statistics": "Статистика",
+    "totalProductsStat": "Всего товаров",
+    "memberSince": "Участник с",
+    "minimumOrder": "Минимальный заказ",
+    "freeDelivery": "Бесплатная доставка",
+    "freeDeliveryOver": "Бесплатно при заказе от {amount}",
+    "freeDeliveryNotAvailable": "Недоступна"
   }
 }
