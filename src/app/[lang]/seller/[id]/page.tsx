@@ -7,10 +7,12 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Pagination } from "@/components/ui/pagination";
-import { Store, Clock, Package, Calendar, ShoppingCart } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Store, Clock, Package, Calendar, ShoppingCart, Search, X } from "lucide-react";
 import { useSeller, useSellerProducts } from "@/services/queries/sellers";
+import { useAllCategories, useBrands } from "@/services/queries/products";
 import { ProductCard } from "@/components/common/product-card";
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { useFormatCurrency } from "@/lib/format-currency";
 import { formatDate } from "@/lib/formatDate";
@@ -23,14 +25,95 @@ export default function SellerPage() {
   const formatCurrency = useFormatCurrency();
 
   const { data: sellerData, isLoading: isLoadingSeller } = useSeller(sellerId);
+  
+  // Search and filter states
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const [selectedBrand, setSelectedBrand] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  
   const limit = 20;
   const offset = (currentPage - 1) * limit;
+
+  // Fetch categories and brands for filters
+  const { data: categoriesData, isLoading: isLoadingCategories } = useAllCategories();
+  const { data: brandsData, isLoading: isLoadingBrands } = useBrands();
+
+  // Flatten categories to include all subcategories and sub-subcategories
+  const flattenedCategories = useMemo(() => {
+    if (!categoriesData) return [];
+    const flat: Array<{ id: number; name: string; level: number }> = [];
+    
+    categoriesData.forEach((category) => {
+      // Add parent category
+      flat.push({ id: category.id, name: category.name, level: 0 });
+      
+      // Add subcategories
+      category.childes?.forEach((subCategory) => {
+        flat.push({ 
+          id: subCategory.id, 
+          name: `  ${subCategory.name}`, 
+          level: 1 
+        });
+        
+        // Add sub-subcategories
+        subCategory.childes?.forEach((subSubCategory) => {
+          flat.push({ 
+            id: subSubCategory.id, 
+            name: `    ${subSubCategory.name}`, 
+            level: 2 
+          });
+        });
+      });
+    });
+    
+    return flat;
+  }, [categoriesData]);
+
+  const brands = brandsData?.brands || [];
+
+  // Debounce search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+      setCurrentPage(1); // Reset to first page when search changes
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, selectedBrand]);
+
+  // Build filter options for API
+  const filterOptions = useMemo(() => {
+    const options: {
+      search?: string;
+      category?: string;
+      brand_ids?: string;
+    } = {};
+
+    if (debouncedSearch.trim()) {
+      options.search = debouncedSearch.trim();
+    }
+    if (selectedCategory) {
+      options.category = selectedCategory.toString();
+    }
+    if (selectedBrand) {
+      options.brand_ids = selectedBrand.toString();
+    }
+
+    return options;
+  }, [debouncedSearch, selectedCategory, selectedBrand]);
 
   const { data: productsData, isLoading: isLoadingProducts } = useSellerProducts(
     sellerId,
     limit,
-    offset
+    offset,
+    filterOptions
   );
 
   const seller = sellerData?.seller;
@@ -42,6 +125,15 @@ export default function SellerPage() {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  const handleClearFilters = () => {
+    setSearchQuery("");
+    setSelectedCategory(null);
+    setSelectedBrand(null);
+    setCurrentPage(1);
+  };
+
+  const hasActiveFilters = searchQuery || selectedCategory || selectedBrand;
 
   if (isLoadingSeller) {
     return (
@@ -190,20 +282,113 @@ export default function SellerPage() {
 
       {/* Products Section */}
       <div className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold text-foreground mb-2">
-            {t("products")}
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            {isLoadingProducts ? (
-              t("loading")
-            ) : (
-              <>
-                {t("totalProducts", { count: totalSize })}
-              </>
-            )}
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-bold text-foreground mb-2">
+              {t("products")}
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              {isLoadingProducts ? (
+                t("loading")
+              ) : (
+                <>
+                  {t("totalProducts", { count: totalSize })}
+                </>
+              )}
+            </p>
+          </div>
         </div>
+
+        {/* Search and Filter Section */}
+        <Card>
+          <CardContent className="pt-6">
+            <div className="space-y-4">
+              {/* Search Input */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Mahsulotlarni qidirish..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 pr-10"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+
+              {/* Filter Dropdowns */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                {/* Category Filter */}
+                <div className="flex-1">
+                  <label className="text-sm font-medium text-foreground mb-2 block">
+                    Kategoriya
+                  </label>
+                  <select
+                    value={selectedCategory || ""}
+                    onChange={(e) =>
+                      setSelectedCategory(
+                        e.target.value ? parseInt(e.target.value) : null
+                      )
+                    }
+                    disabled={isLoadingCategories}
+                    className="w-full h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <option value="">Barcha kategoriyalar</option>
+                    {flattenedCategories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Brand Filter */}
+                <div className="flex-1">
+                  <label className="text-sm font-medium text-foreground mb-2 block">
+                    Brend
+                  </label>
+                  <select
+                    value={selectedBrand || ""}
+                    onChange={(e) =>
+                      setSelectedBrand(
+                        e.target.value ? parseInt(e.target.value) : null
+                      )
+                    }
+                    disabled={isLoadingBrands}
+                    className="w-full h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <option value="">Barcha brendlar</option>
+                    {brands.map((brand) => (
+                      <option key={brand.id} value={brand.id}>
+                        {brand.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Clear Filters Button */}
+                {hasActiveFilters && (
+                  <div className="flex items-end">
+                    <button
+                      onClick={handleClearFilters}
+                      className="h-9 px-4 rounded-md border border-input bg-transparent text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors flex items-center gap-2"
+                    >
+                      <X className="h-4 w-4" />
+                      Tozalash
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Products Grid */}
         {isLoadingProducts && products.length === 0 ? (
