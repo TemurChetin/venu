@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { generateMetadata as generateSEOMetadata } from "@/lib/seo";
+import { generateMetadata as generateSEOMetadata, generateHreflangAlternates } from "@/lib/seo";
 
 interface Props {
   params: Promise<{ lang: string }>;
@@ -17,7 +17,7 @@ export async function generateMetadata({
 
   const description = `${content.section1.item1} ${content.section2.item1}`;
 
-  return generateSEOMetadata({
+  const metadata = generateSEOMetadata({
     title: content.title,
     description: description.substring(0, 160),
     url: `/${lang}/business-page/maxfiylik-siyosati-politika-konfidencialnosti-privacy-policy`,
@@ -25,6 +25,20 @@ export async function generateMetadata({
     locale: lang,
     keywords: ["venu", "maxfiylik siyosati", "privacy policy", "shaxsiy ma'lumotlar"],
   });
+
+  // Add hreflang alternates
+  const alternateLocales = generateHreflangAlternates("/business-page/maxfiylik-siyosati-politika-konfidencialnosti-privacy-policy");
+
+  return {
+    ...metadata,
+    alternates: {
+      ...metadata.alternates,
+      languages: alternateLocales.reduce((acc, alt) => {
+        acc[alt.locale] = alt.url;
+        return acc;
+      }, {} as Record<string, string>),
+    },
+  };
 }
 
 const privacyPolicyContent = {

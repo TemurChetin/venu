@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { generateMetadata as generateSEOMetadata } from "@/lib/seo";
+import { generateMetadata as generateSEOMetadata, generateHreflangAlternates } from "@/lib/seo";
 
 interface Props {
   params: Promise<{ lang: string }>;
@@ -13,7 +13,7 @@ export async function generateMetadata({
   const { lang } = await params;
   const content = aboutUsContent[lang as keyof typeof aboutUsContent] || aboutUsContent.uz;
 
-  return generateSEOMetadata({
+  const metadata = generateSEOMetadata({
     title: content.title,
     description: content.description,
     url: `/${lang}/business-page/biz-haqimizda-o-nas-about-us`,
@@ -21,6 +21,20 @@ export async function generateMetadata({
     locale: lang,
     keywords: ["venu", "biz haqimizda", "about us", "onlayn do'kon", "marketplace"],
   });
+
+  // Add hreflang alternates
+  const alternateLocales = generateHreflangAlternates("/business-page/biz-haqimizda-o-nas-about-us");
+
+  return {
+    ...metadata,
+    alternates: {
+      ...metadata.alternates,
+      languages: alternateLocales.reduce((acc, alt) => {
+        acc[alt.locale] = alt.url;
+        return acc;
+      }, {} as Record<string, string>),
+    },
+  };
 }
 
 const aboutUsContent = {

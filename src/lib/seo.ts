@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { LANGUAGES } from "@/lib/constants";
 
 /**
  * SEO Metadata Utility
@@ -7,6 +8,23 @@ import type { Metadata } from "next";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://venu.uz";
 const SITE_NAME = "Venu";
+
+/**
+ * Generate hreflang alternates for a given path
+ * @param path - The path without language prefix (e.g., "/products/123" or "/search")
+ * @returns Array of alternate locale objects
+ */
+export function generateHreflangAlternates(
+  path: string
+): Array<{ locale: string; url: string }> {
+  // Remove leading slash if present and ensure path starts with /
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  
+  return LANGUAGES.map((lang) => ({
+    locale: lang.code,
+    url: `/${lang.code}${cleanPath}`,
+  }));
+}
 const DEFAULT_DESCRIPTION = {
   uz: "Venu - O'zbekistondagi eng yirik onlayn do'kon. Turli xil mahsulotlar, tez yetkazib berish va xavfsiz to'lov.",
   ru: "Venu - крупнейший интернет-магазин в Узбекистане. Разнообразные товары, быстрая доставка и безопасная оплата.",

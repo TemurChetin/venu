@@ -6,8 +6,7 @@ import { Footer } from "@/components/layout/footer";
 import { AppProvider } from "@/providers";
 import NextTopLoader from "nextjs-toploader";
 import { getMessages } from "next-intl/server";
-import { generateHomeMetadata } from "@/lib/seo";
-import { LANGUAGES } from "@/lib/constants";
+import { generateHomeMetadata, generateHreflangAlternates } from "@/lib/seo";
 import {
   StructuredData,
   generateOrganizationSchema,
@@ -34,11 +33,8 @@ export async function generateMetadata({
   const { lang } = await params;
   const metadata = generateHomeMetadata(lang);
 
-  // Add alternate language links
-  const alternateLocales = LANGUAGES.map((l) => ({
-    locale: l.code,
-    url: `/${l.code}`,
-  }));
+  // Add alternate language links (hreflang)
+  const alternateLocales = generateHreflangAlternates("");
 
   return {
     ...metadata,

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { generateSearchMetadata } from "@/lib/seo";
+import { generateSearchMetadata, generateHreflangAlternates } from "@/lib/seo";
 
 /**
  * Layout for search page
@@ -33,7 +33,24 @@ export async function generateMetadata({
     }
   }
 
-  return generateSearchMetadata(decodedQuery, lang);
+  const metadata = generateSearchMetadata(decodedQuery, lang);
+  
+  // Add hreflang alternates
+  const searchPath = decodedQuery
+    ? `/search?q=${encodeURIComponent(decodedQuery)}`
+    : "/search";
+  const alternateLocales = generateHreflangAlternates(searchPath);
+
+  return {
+    ...metadata,
+    alternates: {
+      ...metadata.alternates,
+      languages: alternateLocales.reduce((acc, alt) => {
+        acc[alt.locale] = alt.url;
+        return acc;
+      }, {} as Record<string, string>),
+    },
+  };
 }
 
 export default function SearchLayout({

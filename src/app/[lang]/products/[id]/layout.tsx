@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { generateProductMetadata } from "@/lib/seo";
+import { generateProductMetadata, generateHreflangAlternates } from "@/lib/seo";
 import { fetchProductDetail } from "@/lib/api-server";
 import {
   StructuredData,
@@ -34,15 +34,7 @@ export async function generateMetadata({
   const metadata = generateProductMetadata(product, lang);
   
   // Add proper hreflang alternates
-  const LANGUAGES = [
-    { code: "uz", name: "O'zbekcha" },
-    { code: "ru", name: "Русский" },
-  ];
-  
-  const alternateLocales = LANGUAGES.map((l) => ({
-    locale: l.code,
-    url: `/${l.code}/products/${id}`,
-  }));
+  const alternateLocales = generateHreflangAlternates(`/products/${id}`);
 
   return {
     ...metadata,

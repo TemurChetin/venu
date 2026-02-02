@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { generateMetadata as generateSEOMetadata } from "@/lib/seo";
+import { generateMetadata as generateSEOMetadata, generateHreflangAlternates } from "@/lib/seo";
 
 interface Props {
   params: Promise<{ lang: string }>;
@@ -15,7 +15,7 @@ export async function generateMetadata({
     promocodeContent[lang as keyof typeof promocodeContent] ||
     promocodeContent.uz;
 
-  return generateSEOMetadata({
+  const metadata = generateSEOMetadata({
     title: content.title,
     description: content.whatIs.description,
     url: `/${lang}/business-page/promokod-haqida`,
@@ -23,6 +23,20 @@ export async function generateMetadata({
     locale: lang,
     keywords: ["venu", "promokod", "promo code", "chegirma", "discount"],
   });
+
+  // Add hreflang alternates
+  const alternateLocales = generateHreflangAlternates("/business-page/promokod-haqida");
+
+  return {
+    ...metadata,
+    alternates: {
+      ...metadata.alternates,
+      languages: alternateLocales.reduce((acc, alt) => {
+        acc[alt.locale] = alt.url;
+        return acc;
+      }, {} as Record<string, string>),
+    },
+  };
 }
 
 const promocodeContent = {
