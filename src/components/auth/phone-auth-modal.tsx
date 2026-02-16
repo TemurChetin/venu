@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,6 +31,34 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
   const [sendingCode, setSendingCode] = useState(false);
   const [canResend, setCanResend] = useState(true);
   const [countdown, setCountdown] = useState(0);
+  const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Countdown effect to handle resend timeout
+  useEffect(() => {
+    if (countdown > 0) {
+      countdownIntervalRef.current = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            setCanResend(true);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } else {
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
+        countdownIntervalRef.current = null;
+      }
+    }
+
+    return () => {
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
+        countdownIntervalRef.current = null;
+      }
+    };
+  }, [countdown]);
 
   const formatPhone = (value: string) => {
     // Remove all non-digit characters except +
@@ -115,24 +143,17 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
           const match = errorMessage.match(/(\d+)\s*Seconds?/i);
           if (match) {
             const seconds = parseInt(match[1]);
-            setCountdown(seconds);
             setCanResend(false);
-            const interval = setInterval(() => {
-              setCountdown((prev) => {
-                if (prev <= 1) {
-                  clearInterval(interval);
-                  setCanResend(true);
-                  return 0;
-                }
-                return prev - 1;
-              });
-            }, 1000);
+            setCountdown(seconds);
           }
         }
       } else {
         toast.success(t("auth.smsSent"));
         setPhone(formattedPhone);
         setStep("otp");
+        // Set 60 second countdown before allowing resend
+        setCanResend(false);
+        setCountdown(60);
       }
     } catch (error: any) {
       console.error("Send code error:", error);
@@ -289,15 +310,20 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
                     type="button"
                     variant="ghost"
                     onClick={handleResendCode}
-                    disabled={loading}
+                    disabled={loading || !canResend}
                     className="text-xs"
                   >
                     {t("auth.resendCode")}
                   </Button>
                 ) : (
-                  <span className="text-xs text-muted-foreground">
-                    {countdown > 0 && `${countdown}s`}
-                  </span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    disabled
+                    className="text-xs text-muted-foreground"
+                  >
+                    {t("auth.resendCode")} ({countdown}s)
+                  </Button>
                 )}
               </div>
             </div>
