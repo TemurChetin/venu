@@ -43,7 +43,13 @@ export default function OrdersPage() {
   const [currentPage, setCurrentPage] = useState(1);
 
   // Calculate offset based on current page
-  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+  const offset = currentPage;
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Scroll to top of orders list when page changes
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   // Determine status filter based on active tab
   const statusFilter = useMemo(() => {
@@ -378,7 +384,7 @@ export default function OrdersPage() {
                   <Pagination
                     currentPage={currentPage}
                     totalPages={totalPages}
-                    onPageChange={setCurrentPage}
+                    onPageChange={handlePageChange}
                   />
                 </div>
               )}

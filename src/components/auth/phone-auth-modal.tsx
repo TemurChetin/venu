@@ -24,7 +24,7 @@ interface PhoneAuthModalProps {
 
 export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
   const t = useTranslations();
-  const [phone, setPhone] = useState("");
+  const [phone, setPhone] = useState("+998");
   const [otpCode, setOtpCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<"phone" | "otp">("phone");
@@ -46,6 +46,46 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
       return `+998${cleaned}`;
     }
     return cleaned;
+  };
+
+  const formatPhoneDisplay = (value: string): string => {
+    // Remove all non-digit characters except +
+    const cleaned = value.replace(/[^\d+]/g, "");
+    
+    // If empty, return empty
+    if (!cleaned) return "";
+    
+    // Ensure it starts with +998
+    let phone = cleaned;
+    if (phone.startsWith("998")) {
+      phone = `+${phone}`;
+    } else if (phone.startsWith("0")) {
+      phone = `+998${phone.slice(1)}`;
+    } else if (!phone.startsWith("+")) {
+      phone = `+998${phone}`;
+    }
+    
+    // Extract digits after +998
+    const digits = phone.replace(/^\+998/, "");
+    
+    // Format: +998 XX XXX-XX-XX
+    if (digits.length === 0) return "+998";
+    if (digits.length <= 2) return `+998 ${digits}`;
+    if (digits.length <= 5) return `+998 ${digits.slice(0, 2)} ${digits.slice(2)}`;
+    if (digits.length <= 7) return `+998 ${digits.slice(0, 2)} ${digits.slice(2, 5)}-${digits.slice(5)}`;
+    return `+998 ${digits.slice(0, 2)} ${digits.slice(2, 5)}-${digits.slice(5, 7)}-${digits.slice(7, 9)}`;
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    // Store the raw phone value (cleaned) for validation
+    const cleaned = formatPhone(inputValue);
+    // Ensure +998 is always present
+    if (!cleaned.startsWith("+998")) {
+      setPhone("+998");
+    } else {
+      setPhone(cleaned);
+    }
   };
 
   const validatePhone = (phoneNumber: string): boolean => {
@@ -154,7 +194,7 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
   };
 
   const resetForm = () => {
-    setPhone("");
+    setPhone("+998");
     setOtpCode("");
     setStep("phone");
     setCanResend(true);
@@ -176,7 +216,7 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
           <DialogDescription>
             {step === "phone"
               ? t("auth.phoneDescription")
-              : t("auth.otpDescription", { phone })}
+              : t("auth.otpDescription", { phone: formatPhoneDisplay(phone) })}
           </DialogDescription>
         </DialogHeader>
         {step === "phone" ? (
@@ -187,18 +227,19 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
                 id="phone"
                 type="tel"
                 placeholder={t("auth.phonePlaceholder")}
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                value={formatPhoneDisplay(phone)}
+                onChange={handlePhoneChange}
                 disabled={sendingCode}
                 required
                 autoFocus
+                className="text-lg"
               />
             </div>
 
             <Button
               type="button"
               onClick={handleSendCode}
-              disabled={sendingCode || !phone}
+              disabled={sendingCode || phone === "+998" || !validatePhone(phone)}
               className="w-full"
             >
               {sendingCode ? t("auth.waiting") : t("auth.sendCode")}
@@ -221,7 +262,7 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
                 className="text-center text-2xl tracking-widest"
               />
               <p className="text-xs text-muted-foreground">
-                {t("auth.otpHint", { phone })}
+                {t("auth.otpHint", { phone: formatPhoneDisplay(phone) })}
               </p>
             </div>
 

@@ -53,7 +53,7 @@ function page({}: Props) {
     price_min: null,
     price_max: null,
     limit: "20",
-    offset: 0,
+    offset: 1,
     product_type: "all",
   });
 
@@ -63,7 +63,7 @@ function page({}: Props) {
     setFilters((prev) => ({
       ...prev,
       search: encodedSearch,
-      offset: 0, // Reset to first page when search changes
+      offset: 1, // Reset to first page when search changes
     }));
   }, [searchQuery]);
 
@@ -73,7 +73,7 @@ function page({}: Props) {
     setFilters((prev) => ({
       ...prev,
       category: categoryId,
-      offset: 0, // Reset to first page when category changes
+      offset: 1, // Reset to first page when category changes
     }));
   }, [categoryParam]);
 
@@ -83,7 +83,7 @@ function page({}: Props) {
     setFilters((prev) => ({
       ...prev,
       brand: brandValue,
-      offset: 0, // Reset to first page when brand changes
+      offset: 1, // Reset to first page when brand changes
     }));
   }, [brandParam]);
 
@@ -91,7 +91,7 @@ function page({}: Props) {
     setFilters((prev) => ({
       ...prev,
       ...newFilters,
-      offset: 0, // Reset offset when filters change
+      offset: 1, // Reset offset when filters change
     }));
   };
 

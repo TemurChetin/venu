@@ -41,7 +41,7 @@ async function getAllProducts(): Promise<Product[]> {
 
       if (data.products && data.products.length > 0) {
         allProducts = [...allProducts, ...data.products];
-        offset += limit;
+        offset += 1;
 
         // Agar olingan mahsulotlar soni jami sondan ko'p yoki teng bo'lsa to'xtatamiz
         if (allProducts.length >= data.total_size) {

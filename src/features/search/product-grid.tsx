@@ -33,16 +33,16 @@ export function ProductGrid({ searchQuery, filters }: ProductGridProps) {
 
   // Calculate pagination values
   const currentPage = useMemo(() => {
-    const offset = currentFilters.offset || 0;
-    return Math.floor(offset / limit) + 1;
-  }, [currentFilters.offset, limit]);
+    const offset = currentFilters.offset || 1;
+    return offset;
+  }, [currentFilters.offset]);
 
   const totalPages = useMemo(() => {
     return Math.ceil(totalSize / limit);
   }, [totalSize, limit]);
 
   const handlePageChange = (page: number) => {
-    const newOffset = (page - 1) * limit;
+    const newOffset = page;
     setCurrentFilters((prev) => ({
       ...prev,
       offset: newOffset,
@@ -55,7 +55,7 @@ export function ProductGrid({ searchQuery, filters }: ProductGridProps) {
     setCurrentFilters((prev) => ({
       ...prev,
       ...newFilters,
-      offset: 0,
+      offset: 1,
     }));
   };
 

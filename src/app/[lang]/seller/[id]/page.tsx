@@ -34,7 +34,7 @@ export default function SellerPage() {
   const [currentPage, setCurrentPage] = useState(1);
   
   const limit = 20;
-  const offset = (currentPage - 1) * limit;
+  const offset = currentPage;
 
   // Fetch categories and brands for filters
   const { data: categoriesData, isLoading: isLoadingCategories } = useAllCategories();
@@ -123,6 +123,7 @@ export default function SellerPage() {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+    // Scroll to top of product grid when page changes
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
