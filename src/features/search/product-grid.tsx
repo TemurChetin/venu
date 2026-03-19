@@ -10,7 +10,7 @@ import {
   useProductFilter,
   type ProductFilterParams,
 } from "@/services/queries/products";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 
 interface ProductGridProps {
   searchQuery?: string;
@@ -27,9 +27,15 @@ export function ProductGrid({ searchQuery, filters }: ProductGridProps) {
     setCurrentFilters(filters);
   }, [filters]);
 
-  const products = data?.products || [];
+  const products = data || [];
   const totalSize = data?.total_size || 0;
   const limit = parseInt(currentFilters.limit || "20", 10);
+
+
+  // just test remove me pls
+  useEffect(() => {
+    console.log(data)
+  }, [data])
 
   // Calculate pagination values
   const currentPage = useMemo(() => {

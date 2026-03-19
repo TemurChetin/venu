@@ -44,7 +44,7 @@ export const useSeasonalProducts = (limit = 10, offset = 0) => {
 };
 
 // Discounted Products
-export const useDiscountProducts = (limit = 10, offset = 0) => {
+export const useDiscountProducts = (limit = 15, offset = 0) => {
   return usePublicQuery<ProductListResponse>({
     url: "/v1/products/discount",
     query: { limit, offset },
@@ -89,7 +89,7 @@ export const useFeaturedProducts = (limit = 10, offset = 0) => {
 };
 
 // Discounted Products
-export const useDiscountedProducts = (limit = 10, offset = 0) => {
+export const useDiscountedProducts = (limit = 15, offset = 0) => {
   return usePublicQuery<ProductListResponse>({
     url: "/v1/products/discounted-product",
     query: { limit, offset },
@@ -118,7 +118,7 @@ export const useProductReviews = (productSlug: string) => {
 export const useRelatedProducts = (
   productId?: number,
   limit = 10,
-  offset = 0
+  offset = 0,
 ) => {
   return usePublicQuery<Product[]>({
     url: `/v1/products/related-products/${productId}`,

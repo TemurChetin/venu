@@ -53,7 +53,7 @@ function ProductCardSkeleton() {
   );
 }
 
-function Page({}: Props) {
+function Page({ }: Props) {
   const t = useTranslations("home");
 
   // Swiper ref for brands carousel
@@ -65,7 +65,7 @@ function Page({}: Props) {
     0
   );
   const { data: discountData, isLoading: discountLoading } =
-    useDiscountProducts(12, 0);
+    useDiscountProducts(15, 0);
   const { data: seasonalData, isLoading: seasonalLoading } =
     useSeasonalProducts(12, 0);
   const { data: newArrivalData, isLoading: newArrivalLoading } =
