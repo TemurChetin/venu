@@ -168,5 +168,15 @@
     "freeDelivery": "無料配送",
     "freeDeliveryOver": "{amount}以上の注文で無料",
     "freeDeliveryNotAvailable": "利用不可"
+  },
+  "supportChat": {
+    "title": "Venuアシスタント",
+    "subtitle": "商品についてお問い合わせください",
+    "placeholder": "メッセージを入力...",
+    "openChat": "チャットを開く",
+    "closeChat": "チャットを閉じる",
+    "send": "送信",
+    "sendError": "送信できませんでした。後でもう一度お試しください。",
+    "needLogin": "続行するにはログインしてください。"
   }
 }

@@ -232,5 +232,15 @@
     "freeDelivery": "Бесплатная доставка",
     "freeDeliveryOver": "Бесплатно при заказе от {amount}",
     "freeDeliveryNotAvailable": "Недоступна"
+  },
+  "supportChat": {
+    "title": "Помощник Venu",
+    "subtitle": "Задайте вопрос о товарах",
+    "placeholder": "Напишите сообщение...",
+    "openChat": "Открыть чат",
+    "closeChat": "Закрыть чат",
+    "send": "Отправить",
+    "sendError": "Не удалось отправить сообщение. Попробуйте позже.",
+    "needLogin": "Войдите в аккаунт, чтобы продолжить."
   }
 }

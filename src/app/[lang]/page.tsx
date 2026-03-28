@@ -28,7 +28,10 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/autoplay";
 
-type Props = {};
+type Props = {
+  limit: number;
+  offset: number;
+};
 
 // Product Card Skeleton Loader Component
 function ProductCardSkeleton() {
@@ -65,7 +68,7 @@ function Page({ }: Props) {
     0
   );
   const { data: discountData, isLoading: discountLoading } =
-    useDiscountProducts(15, 0);
+    useDiscountProducts(1000, 0);
   const { data: seasonalData, isLoading: seasonalLoading } =
     useSeasonalProducts(12, 0);
   const { data: newArrivalData, isLoading: newArrivalLoading } =

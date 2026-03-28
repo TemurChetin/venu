@@ -168,5 +168,15 @@
     "freeDelivery": "Free Delivery",
     "freeDeliveryOver": "Free for orders over {amount}",
     "freeDeliveryNotAvailable": "Not Available"
+  },
+  "supportChat": {
+    "title": "Venu assistant",
+    "subtitle": "Ask us about products",
+    "placeholder": "Type a message...",
+    "openChat": "Open chat",
+    "closeChat": "Close chat",
+    "send": "Send",
+    "sendError": "Could not send the message. Please try again later.",
+    "needLogin": "Sign in to continue."
   }
 }

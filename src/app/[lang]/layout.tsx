@@ -14,6 +14,8 @@ import {
 } from "@/components/seo/structured-data";
 import "./globals.css";
 import Amplitude from "@/amplitude";
+import { SupportChatWidget } from "@/components/chat";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -84,6 +86,7 @@ export default async function RootLayout({
             <div className="container pb-20 md:pb-0">{children}</div>
             <Toaster position="top-center" reverseOrder={false} />
             <Footer />
+            <SupportChatWidget />
           </main>
         </AppProvider>
       </body>

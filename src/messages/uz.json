@@ -232,5 +232,15 @@
     "freeDelivery": "Bepul yetkazib berish",
     "freeDeliveryOver": "{amount} dan ortiq buyurtmalar uchun bepul",
     "freeDeliveryNotAvailable": "Mavjud emas"
+  },
+  "supportChat": {
+    "title": "Venu yordamchisi",
+    "subtitle": "Mahsulotlar bo'yicha savolingizni yozing",
+    "placeholder": "Xabar yozing...",
+    "openChat": "Chatni ochish",
+    "closeChat": "Chatni yopish",
+    "send": "Yuborish",
+    "sendError": "Xabar yuborishda xatolik. Keyinroq urinib ko'ring.",
+    "needLogin": "Davom etish uchun hisobingizga kiring."
   }
 }
