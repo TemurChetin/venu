@@ -15,6 +15,7 @@ import {
   useRef,
   useState,
 } from "react";
+import ReactMarkdown from "react-markdown";
 
 type ChatMessage = { role: "user" | "assistant"; text: string };
 
@@ -147,13 +148,31 @@ export function SupportChatWidget() {
                 >
                   <div
                     className={cn(
-                      "max-w-[85%] rounded-2xl px-3 py-2 text-sm whitespace-pre-wrap wrap-break-word",
+                      "max-w-[85%] rounded-2xl px-3 py-2 text-sm wrap-break-word",
                       msg.role === "user"
-                        ? "rounded-br-md bg-[#a3eaf7] text-foreground"
-                        : "rounded-bl-md bg-muted text-foreground"
+                        ? "whitespace-pre-wrap rounded-br-md bg-[#a3eaf7] text-foreground"
+                        : "rounded-bl-md bg-muted text-foreground [&_ol]:list-decimal [&_ol]:pl-4 [&_ul]:list-disc [&_ul]:pl-4 [&_li]:mt-0.5 [&_p]:mt-1 [&_p:first-child]:mt-0 [&_a]:text-blue-600 [&_a]:underline [&_strong]:font-semibold"
                     )}
                   >
-                    {msg.text}
+                    {msg.role === "assistant" ? (
+                      <ReactMarkdown
+                        components={{
+                          a: ({ href, children }) => (
+                            <a
+                              href={href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              {children}
+                            </a>
+                          ),
+                        }}
+                      >
+                        {msg.text}
+                      </ReactMarkdown>
+                    ) : (
+                      msg.text
+                    )}
                   </div>
                 </div>
               ))}
