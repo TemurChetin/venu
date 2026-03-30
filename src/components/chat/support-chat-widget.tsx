@@ -111,7 +111,7 @@ export function SupportChatWidget() {
             aria-label={t("title")}
           >
             <div
-              className="flex items-start justify-between gap-3 px-4 py-3 text-white"
+              className="flex items-start justify-between gap-3 px-4 py-3 text-white !bg-primary"
               style={{ backgroundColor: "#35cce6" }}
             >
               <div className="min-w-0">
@@ -216,7 +216,7 @@ export function SupportChatWidget() {
           className={cn(
             "flex size-[60px] cursor-pointer items-center justify-center rounded-full",
             "border-0 shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98]",
-            "focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+            "focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none !bg-primary"
           )}
           style={{
             backgroundColor: "#35cce6",
