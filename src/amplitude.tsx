@@ -2,7 +2,7 @@ import Script from "next/script";
 
 type Props = {};
 
-function Amplitude({}: Props) {
+function Amplitude({ }: Props) {
   return (
     <>
       <Script

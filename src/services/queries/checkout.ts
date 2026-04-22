@@ -145,7 +145,12 @@ export function useCreateOrder() {
       return data;
     },
     onSuccess: (data) => {
-      // Redirect to payment page
+      window.gtag?.("event", "conversion", {
+        send_to: "AW-18083229657/ZJZHCMqv758cENnf4K5D",
+        value: 1.0,
+        currency: "USD",
+        transaction_id: "",
+      });
       if (data.redirect_link) {
         window.location.href = data.redirect_link;
       } else {

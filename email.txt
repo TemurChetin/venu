@@ -1,0 +1,33 @@
+Set up a Google tag on your website
+
+
+You recently viewed instructions on how to set up a Google tag on your website. We haven't found a Google tag on your website, so we're sharing these instructions with you.
+Option 1: Install a tracking ID through your hosting service or commerce platform
+Sign in to your website builder, web hosting service, or commerce platform and paste your tracking ID into the analytics section.
+AW-18083229657
+Option 2: Install a Google tag in your website code
+Paste your Google tag before the closing </head> tag on every page of your website you want to track.
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18083229657"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'AW-18083229657');
+</script>
+Lastly, install an event snippet for each of your goals to measure website conversions
+Copy the snippet below and paste it in between the <head></head> tags of the page(s) you'd like to track, right after the Google tag
+<!-- Event snippet for Purchase conversion page -->
+<script>
+  gtag('event', 'conversion', {
+      'send_to': 'AW-18083229657/ZJZHCMqv758cENnf4K5D',
+      'value': 1.0,
+      'currency': 'USD',
+      'transaction_id': ''
+      // 'new_customer': true /* calculate dynamically, populate with true/false */,
+  });
+</script>
+Thanks,
+
+The Google Ads Team

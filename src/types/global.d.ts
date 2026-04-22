@@ -12,3 +12,8 @@ declare module "*.module.scss" {
 // For side-effect global imports like `import './globals.css'`
 declare module "*.css";
 declare module "*.scss";
+
+interface Window {
+  dataLayer: unknown[];
+  gtag: (...args: unknown[]) => void;
+}

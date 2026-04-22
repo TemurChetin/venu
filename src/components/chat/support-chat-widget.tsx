@@ -98,13 +98,20 @@ export function SupportChatWidget() {
       />
 
       <div
-        className="fixed bottom-5 right-5 z-100 flex flex-col items-end gap-3"
+        className={cn(
+          "fixed z-100 flex flex-col items-end gap-3",
+          open
+            ? "inset-0 sm:inset-auto sm:bottom-[70px] sm:right-[15px]"
+            : "bottom-[70px] right-[15px]"
+        )}
         style={{ fontFamily: "var(--font-geist-sans), system-ui, sans-serif" }}
       >
         {open && (
           <div
             className={cn(
-              "flex w-[min(100vw-2rem,380px)] flex-col overflow-hidden rounded-2xl",
+              "flex flex-col overflow-hidden",
+              "h-full w-full sm:h-auto sm:w-[380px] md:w-[400px] lg:w-[420px]",
+              "sm:rounded-2xl",
               "border border-border bg-background shadow-xl"
             )}
             role="dialog"
@@ -132,7 +139,7 @@ export function SupportChatWidget() {
               </Button>
             </div>
 
-            <div className="max-h-[min(420px,50vh)] space-y-3 overflow-y-auto bg-muted/30 px-3 py-3">
+            <div className="min-h-0 flex-1 space-y-3 overflow-y-auto bg-muted/30 px-3 py-3 sm:flex-none sm:max-h-[min(420px,50vh)] md:max-h-[min(500px,55vh)] lg:max-h-[min(560px,60vh)]">
               {messages.length === 0 && (
                 <p className="px-1 text-center text-sm text-muted-foreground">
                   {t("subtitle")}
@@ -188,7 +195,7 @@ export function SupportChatWidget() {
 
             <form
               onSubmit={onSubmit}
-              className="flex gap-2 border-t border-border bg-background p-3"
+              className="flex gap-2 border-t border-border bg-background p-3 sm:p-3 md:p-4"
             >
               <Input
                 value={input}
@@ -214,9 +221,10 @@ export function SupportChatWidget() {
         <button
           type="button"
           className={cn(
-            "flex size-[60px] cursor-pointer items-center justify-center rounded-full",
+            "flex size-[45px] cursor-pointer items-center justify-center rounded-full sm:size-[50px] lg:size-[52px]",
             "border-0 shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98]",
-            "focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none !bg-primary"
+            "focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none !bg-primary",
+            open && "max-sm:hidden"
           )}
           style={{
             backgroundColor: "#35cce6",

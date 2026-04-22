@@ -14,6 +14,7 @@ import {
 } from "@/components/seo/structured-data";
 import "./globals.css";
 import Amplitude from "@/amplitude";
+import GoogleTag from "@/google-tag";
 import { SupportChatWidget } from "@/components/chat";
 
 
@@ -66,6 +67,7 @@ export default async function RootLayout({
     <html lang={lang} suppressHydrationWarning>
       <head>
         <Amplitude />
+        <GoogleTag />
         {/* Structured Data for SEO */}
         <StructuredData data={generateOrganizationSchema()} />
         <StructuredData data={generateWebsiteSchema()} />
