@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
-import { Navigation, Loader2 } from "lucide-react";
+import { Navigation, Loader2, Search } from "lucide-react";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { YMaps, Map, Placemark } from "@pbe/react-yandex-maps";
-import { geocodeCoordinatesDetailed } from "@/lib/ymaps";
+import { geocodeCoordinatesDetailed, geocodeAddressDetailed } from "@/lib/ymaps";
 import env from "@/lib/env";
 import { TASHKENT_CENTER } from "../types/address-form.types";
 
@@ -37,6 +39,8 @@ export function AddressMapSelector({
 }: AddressMapSelectorProps) {
   const [mapAddress, setMapAddress] = useState<string>("");
   const [isSearching, setIsSearching] = useState(false);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [isTextSearching, setIsTextSearching] = useState(false);
 
   // Yandex Maps uses [lat, lng] format
   const [coords, setCoords] = useState<[number, number]>(() => {
@@ -170,6 +174,33 @@ export function AddressMapSelector({
     }
   }, []);
 
+  const handleAddressSearch = useCallback(async () => {
+    if (!searchQuery.trim() || !apiKey) return;
+
+    setIsTextSearching(true);
+    try {
+      const result = await geocodeAddressDetailed(searchQuery, apiKey);
+      if (result) {
+        const { coordinates, address, regionName, districtName } = result;
+        const [lng, lat] = coordinates;
+        const yandexCoords: [number, number] = [lat, lng];
+
+        setCoords(yandexCoords);
+        setMapAddress(address);
+
+        if (mapRef.current) {
+          mapRef.current.setCenter(yandexCoords);
+          mapRef.current.setZoom(16);
+        }
+
+        onLocationChange(coordinates, address);
+        onAddressChange(address, regionName, districtName);
+      }
+    } finally {
+      setIsTextSearching(false);
+    }
+  }, [searchQuery, apiKey, onLocationChange, onAddressChange]);
+
   if (!apiKey) {
     return (
       <div>
@@ -186,6 +217,30 @@ export function AddressMapSelector({
   return (
     <div>
       <Label className="mb-2 block">Xaritadan manzil tanlash</Label>
+
+      <div className="flex gap-2 mb-2">
+        <Input
+          type="text"
+          placeholder="Manzil nomi bo'yicha qidirish..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleAddressSearch()}
+        />
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          onClick={handleAddressSearch}
+          disabled={isTextSearching || !searchQuery.trim()}
+        >
+          {isTextSearching ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Search className="w-4 h-4" />
+          )}
+        </Button>
+      </div>
+
       <div className="relative h-[300px] w-full rounded-lg border border-border overflow-hidden">
         <YMaps query={{ apikey: apiKey, lang: "en_US" }}>
           <Map

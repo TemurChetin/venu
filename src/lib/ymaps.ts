@@ -359,5 +359,56 @@ export async function geocodeAddress(
   }
 }
 
+/**
+ * Forward geocode: address string → coordinates + region/district components
+ */
+export async function geocodeAddressDetailed(
+  address: string,
+  apiKey: string
+): Promise<{
+  coordinates: [number, number];
+  address: string;
+  regionName: string | null;
+  districtName: string | null;
+} | null> {
+  try {
+    const response = await fetch(
+      `https://geocode-maps.yandex.ru/1.x/?apikey=${apiKey}&geocode=${encodeURIComponent(
+        address
+      )}&format=json&lang=uz_UZ&results=1`
+    );
+    if (!response.ok) return null;
+
+    const data = await response.json();
+    const geoObject =
+      data?.response?.GeoObjectCollection?.featureMember?.[0]?.GeoObject;
+    if (!geoObject) return null;
+
+    const [lng, lat] = geoObject.Point.pos.split(" ").map(Number);
+    const addressText: string =
+      geoObject.metaDataProperty?.GeocoderMetaData?.text || address;
+
+    const components: Array<{ kind: string; name: string }> =
+      geoObject.metaDataProperty?.GeocoderMetaData?.Address?.Components || [];
+
+    const regionName =
+      components.find((c) => c.kind === "province")?.name || null;
+    const districtName =
+      components.find((c) => c.kind === "district")?.name ||
+      components.find((c) => c.kind === "locality")?.name ||
+      null;
+
+    return {
+      coordinates: [lng, lat] as [number, number],
+      address: addressText,
+      regionName,
+      districtName,
+    };
+  } catch (error) {
+    console.error("Forward geocoding error:", error);
+    return null;
+  }
+}
+
 // Export types
 export type { YandexMapsLoader };
