@@ -1,7 +1,6 @@
 "use client";
 
 import { Mail, Phone, MapPin, User } from "lucide-react";
-import { FaTelegram, FaInstagram, FaYoutube } from "react-icons/fa";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
@@ -22,7 +21,13 @@ export function Footer() {
           {/* Logo and App Download Section */}
           <div className="space-y-6">
             <div className="flex items-center gap-3">
-              <Image src={"/logo.png"} alt="Logo" width={200} height={80} />
+              <Image
+                src={"/logo.png"}
+                alt="Logo"
+                width={200}
+                height={59}
+                style={{ height: "auto" }}
+              />
             </div>
 
             {/* App Store Buttons */}
@@ -34,9 +39,10 @@ export function Footer() {
               >
                 <Image
                   width={200}
-                  height={90}
+                  height={67}
                   src={"/playmarket.png"}
                   alt="Play market"
+                  style={{ height: "auto" }}
                 />
               </Link>
 
@@ -49,7 +55,8 @@ export function Footer() {
                   src={"/appstore.png"}
                   alt="App store"
                   width={200}
-                  height={90}
+                  height={67}
+                  style={{ height: "auto" }}
                 />
               </Link>
             </div>

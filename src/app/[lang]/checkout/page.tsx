@@ -32,6 +32,16 @@ import { useCart } from "@/services";
 import { useConfigStore } from "@/stores";
 import Image from "next/image";
 
+function createFallbackTransactionId(guestId: string | number) {
+  if (window.crypto?.randomUUID) {
+    return window.crypto.randomUUID();
+  }
+
+  return `checkout-${guestId}-${Date.now()}-${Math.random()
+    .toString(36)
+    .slice(2)}`;
+}
+
 export default function CheckoutNewPage() {
   const t = useTranslations("checkout");
   const router = useRouter();
@@ -130,6 +140,14 @@ export default function CheckoutNewPage() {
     selectedDeliveryMethod === "free" || isFreeDeliveryEligible
       ? 0
       : deliveryCost || 0;
+
+  const conversionValue = useMemo(() => {
+    const exchangeRate = config?.uzsCurrency?.exchange_rate || 12700;
+    const deliveryValueUsd =
+      finalDeliveryCost > 0 ? finalDeliveryCost / exchangeRate : 0;
+
+    return subtotal + deliveryValueUsd;
+  }, [config?.uzsCurrency?.exchange_rate, finalDeliveryCost, subtotal]);
 
   // Auto-select first address
   useEffect(() => {
@@ -278,7 +296,14 @@ export default function CheckoutNewPage() {
         delivery_method: selectedDeliveryMethod,
       };
 
-      await createOrder.mutateAsync(orderData);
+      await createOrder.mutateAsync({
+        order: orderData,
+        conversion: {
+          value: conversionValue,
+          currency: "USD",
+          transactionId: createFallbackTransactionId(guestId),
+        },
+      });
       // Redirect will happen in the mutation's onSuccess
     } catch (error) {
       // Error is handled by mutations

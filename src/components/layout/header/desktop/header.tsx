@@ -261,7 +261,13 @@ export default function DesktopHeader() {
           {/* Logo */}
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
-              <Image src={"/logo.png"} alt="Logo" width={130} height={80} />
+              <Image
+                src={"/logo.png"}
+                alt="Logo"
+                width={130}
+                height={38}
+                style={{ height: "auto" }}
+              />
             </Link>
           </div>
 

@@ -9,6 +9,22 @@ import ReactDOM from "react-dom";
 
 declare global {
   interface Window {
+    ymaps?: {
+      geocode: (
+        request: string | number[],
+        options?: Record<string, unknown>
+      ) => Promise<{
+        geoObjects?: {
+          get?: (index: number) => {
+            getAddressLine?: () => string;
+            properties?: {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              get?: (key: string) => any;
+            };
+          } | null;
+        };
+      }>;
+    };
     ymaps3: any;
   }
 }
@@ -29,6 +45,68 @@ interface YandexMapsLoader {
 
 let mapsCache: YandexMapsLoader | null = null;
 let loadPromise: Promise<YandexMapsLoader> | null = null;
+
+export interface GeocodedLocation {
+  address: string | null;
+  regionName: string | null;
+  districtName: string | null;
+}
+
+async function reverseGeocodeWithJsApi(
+  coords: [number, number]
+): Promise<string | null> {
+  if (typeof window === "undefined" || !window.ymaps?.geocode) {
+    return null;
+  }
+
+  try {
+    const result = await window.ymaps.geocode([coords[1], coords[0]], {
+      kind: "house",
+      results: 1,
+    });
+    const firstGeoObject = result?.geoObjects?.get?.(0);
+
+    return (
+      firstGeoObject?.getAddressLine?.() ||
+      firstGeoObject?.properties?.get?.("text") ||
+      null
+    );
+  } catch {
+    return null;
+  }
+}
+
+async function reverseGeocodeDetailedWithJsApi(
+  coords: [number, number]
+): Promise<GeocodedLocation | null> {
+  if (typeof window === "undefined" || !window.ymaps?.geocode) return null;
+
+  try {
+    const [lng, lat] = coords;
+    const result = await window.ymaps.geocode([lat, lng], { results: 1 });
+    const firstGeoObject = result?.geoObjects?.get?.(0);
+    if (!firstGeoObject) return null;
+
+    const address =
+      firstGeoObject.getAddressLine?.() ||
+      firstGeoObject.properties?.get?.("text") ||
+      null;
+
+    const meta = firstGeoObject.properties?.get?.("metaDataProperty");
+    const components: Array<{ kind: string; name: string }> =
+      meta?.GeocoderMetaData?.Address?.Components || [];
+
+    const regionName = components.find((c) => c.kind === "province")?.name || null;
+    const districtName =
+      components.find((c) => c.kind === "district")?.name ||
+      components.find((c) => c.kind === "locality")?.name ||
+      null;
+
+    return { address, regionName, districtName };
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Load Yandex Maps v3 API and React components
@@ -162,15 +240,22 @@ export async function geocodeCoordinates(
   coords: [number, number],
   apiKey: string
 ): Promise<string | null> {
+  const jsApiAddress = await reverseGeocodeWithJsApi(coords);
+  if (jsApiAddress) {
+    return jsApiAddress;
+  }
+
   try {
-    // Yandex Geocoding API endpoint
-    // Note: In v3, this might work differently, but HTTP API is always available
     const [lng, lat] = coords;
     const response = await fetch(
       `https://geocode-maps.yandex.ru/1.x/?apikey=${apiKey}&geocode=${lng},${lat}&format=json&lang=uz_UZ`
     );
 
     if (!response.ok) {
+      if (response.status === 403) {
+        return null;
+      }
+
       throw new Error("Geocoding request failed");
     }
 
@@ -186,6 +271,52 @@ export async function geocodeCoordinates(
   } catch (error) {
     console.error("Geocoding error:", error);
     return null;
+  }
+}
+
+/**
+ * Geocode coordinates and extract region/district components.
+ * Tries Yandex JS API first (loaded on page, no CORS/auth issues),
+ * then falls back to HTTP Geocoding API.
+ */
+export async function geocodeCoordinatesDetailed(
+  coords: [number, number],
+  apiKey: string
+): Promise<GeocodedLocation> {
+  const empty: GeocodedLocation = { address: null, regionName: null, districtName: null };
+
+  // JS API is more reliable — no CORS issues, uses the already-loaded Yandex script
+  const jsResult = await reverseGeocodeDetailedWithJsApi(coords);
+  if (jsResult) return jsResult;
+
+  // HTTP API fallback
+  const [lng, lat] = coords;
+  try {
+    const response = await fetch(
+      `https://geocode-maps.yandex.ru/1.x/?apikey=${apiKey}&geocode=${lng},${lat}&format=json&lang=uz_UZ&results=1`
+    );
+    if (!response.ok) return empty;
+
+    const data = await response.json();
+    const geoObject =
+      data?.response?.GeoObjectCollection?.featureMember?.[0]?.GeoObject;
+    if (!geoObject) return empty;
+
+    const address: string | null =
+      geoObject.metaDataProperty?.GeocoderMetaData?.text || null;
+
+    const components: Array<{ kind: string; name: string }> =
+      geoObject.metaDataProperty?.GeocoderMetaData?.Address?.Components || [];
+
+    const regionName = components.find((c) => c.kind === "province")?.name || null;
+    const districtName =
+      components.find((c) => c.kind === "district")?.name ||
+      components.find((c) => c.kind === "locality")?.name ||
+      null;
+
+    return { address, regionName, districtName };
+  } catch {
+    return empty;
   }
 }
 
@@ -230,4 +361,3 @@ export async function geocodeAddress(
 
 // Export types
 export type { YandexMapsLoader };
-

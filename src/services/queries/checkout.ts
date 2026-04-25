@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { instanceAuth, instance } from "../api";
 import { usePublicQuery } from "./use-public-query";
@@ -17,10 +17,70 @@ import {
   CartResponse,
 } from "@/types/api";
 import { toast } from "react-hot-toast";
+import { trackPurchaseConversion } from "@/lib/google-ads-conversion";
 
 interface SuccessResponse {
   message: string;
-  data?: any;
+  data?: unknown;
+}
+
+interface ApiError {
+  response?: {
+    data?: {
+      errors?: Array<{ message?: string }>;
+      message?: string;
+    };
+  };
+}
+
+interface PurchaseConversionData {
+  value: number;
+  currency: string;
+  transactionId: string;
+}
+
+interface CreateOrderMutationVariables {
+  order: CreateOrderRequest;
+  conversion: PurchaseConversionData;
+}
+
+function extractTransactionId(data: CreateOrderResponse) {
+  return (
+    data.order_id ||
+    data.id ||
+    data.order?.id ||
+    data.data?.order_id ||
+    data.data?.id ||
+    data.data?.order?.id
+  );
+}
+
+function extractRedirectLink(data: CreateOrderResponse) {
+  return data.redirect_link || data.data?.redirect_link;
+}
+
+function extractNewCustomer(data: CreateOrderResponse) {
+  const newUser = data.new_user ?? data.data?.new_user;
+
+  if (typeof newUser === "boolean") {
+    return newUser;
+  }
+
+  if (typeof newUser === "number") {
+    return newUser === 1;
+  }
+
+  return undefined;
+}
+
+function getApiErrorMessage(error: unknown, fallback: string) {
+  const apiError = error as ApiError;
+
+  return (
+    apiError.response?.data?.errors?.[0]?.message ||
+    apiError.response?.data?.message ||
+    fallback
+  );
 }
 
 /**
@@ -83,8 +143,6 @@ export function useDeliveryMethods(regionId: number | null) {
  * Hook to choose shipping method for order
  */
 export function useChooseShippingMethod() {
-  const queryClient = useQueryClient();
-
   return useMutation<SuccessResponse, Error, ChooseShippingMethodRequest>({
     mutationFn: async (payload: ChooseShippingMethodRequest) => {
       const { data } = await instanceAuth.post<SuccessResponse>(
@@ -96,12 +154,8 @@ export function useChooseShippingMethod() {
     onSuccess: () => {
       toast.success("Yetkazib berish metodi tanlandi");
     },
-    onError: (error: any) => {
-      const errorMessage =
-        error?.response?.data?.errors?.[0]?.message ||
-        error?.response?.data?.message ||
-        "Xatolik yuz berdi";
-      toast.error(errorMessage);
+    onError: (error: unknown) => {
+      toast.error(getApiErrorMessage(error, "Xatolik yuz berdi"));
     },
   });
 }
@@ -122,12 +176,13 @@ export function useCalculateDelivery() {
       );
       return data;
     },
-    onError: (error: any) => {
-      const errorMessage =
-        error?.response?.data?.errors?.[0]?.message ||
-        error?.response?.data?.message ||
-        "Yetkazib berish narxini hisoblashda xatolik yuz berdi";
-      toast.error(errorMessage);
+    onError: (error: unknown) => {
+      toast.error(
+        getApiErrorMessage(
+          error,
+          "Yetkazib berish narxini hisoblashda xatolik yuz berdi"
+        )
+      );
     },
   });
 }
@@ -136,33 +191,34 @@ export function useCalculateDelivery() {
  * Hook to create order
  */
 export function useCreateOrder() {
-  return useMutation<CreateOrderResponse, Error, CreateOrderRequest>({
-    mutationFn: async (payload: CreateOrderRequest) => {
+  return useMutation<CreateOrderResponse, Error, CreateOrderMutationVariables>({
+    mutationFn: async ({ order }: CreateOrderMutationVariables) => {
       const { data } = await instanceAuth.post<CreateOrderResponse>(
         "/v1/digital-payment",
-        payload
+        order
       );
       return data;
     },
-    onSuccess: (data) => {
-      window.gtag?.("event", "conversion", {
-        send_to: "AW-18083229657/ZJZHCMqv758cENnf4K5D",
-        value: 1.0,
-        currency: "USD",
-        transaction_id: "",
+    onSuccess: (data, variables) => {
+      trackPurchaseConversion({
+        value: variables.conversion.value,
+        currency: variables.conversion.currency,
+        transactionId:
+          extractTransactionId(data) || variables.conversion.transactionId,
+        newCustomer: extractNewCustomer(data),
       });
-      if (data.redirect_link) {
-        window.location.href = data.redirect_link;
+
+      const redirectLink = extractRedirectLink(data);
+      if (redirectLink) {
+        window.location.href = redirectLink;
       } else {
         toast.success("Buyurtma muvaffaqiyatli yaratildi");
       }
     },
-    onError: (error: any) => {
-      const errorMessage =
-        error?.response?.data?.errors?.[0]?.message ||
-        error?.response?.data?.message ||
-        "Buyurtma yaratishda xatolik yuz berdi";
-      toast.error(errorMessage);
+    onError: (error: unknown) => {
+      toast.error(
+        getApiErrorMessage(error, "Buyurtma yaratishda xatolik yuz berdi")
+      );
     },
   });
 }

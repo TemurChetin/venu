@@ -4,14 +4,18 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { Navigation, Loader2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { YMaps, Map, Placemark } from "@pbe/react-yandex-maps";
-import { geocodeCoordinates } from "@/lib/ymaps";
+import { geocodeCoordinatesDetailed } from "@/lib/ymaps";
 import env from "@/lib/env";
 import { TASHKENT_CENTER } from "../types/address-form.types";
 
 interface AddressMapSelectorProps {
   initialCoords?: [number, number];
   onLocationChange: (coords: [number, number], address: string) => void;
-  onAddressChange: (address: string) => void;
+  onAddressChange: (
+    address: string,
+    regionName?: string | null,
+    districtName?: string | null,
+  ) => void;
 }
 
 // Convert [lng, lat] to [lat, lng] for Yandex Maps
@@ -21,7 +25,7 @@ const convertToYandexCoords = (coords: [number, number]): [number, number] => {
 
 // Convert [lat, lng] to [lng, lat] for form
 const convertFromYandexCoords = (
-  coords: [number, number]
+  coords: [number, number],
 ): [number, number] => {
   return [coords[1], coords[0]]; // [lng, lat]
 };
@@ -42,7 +46,9 @@ export function AddressMapSelector({
     return convertToYandexCoords(TASHKENT_CENTER);
   });
 
-  const apiKey = env.NEXT_PUBLIC_YANDEX_MAPS_API_KEY || "";
+  const apiKey =
+    env.NEXT_PUBLIC_YANDEX_MAPS_API_KEY ||
+    "5d059798-6f7f-453b-953a-c05de8365d6a";
   const [isLoaded, setIsLoaded] = useState(false);
   const hasInitialGeocoded = useRef(false);
   const mapRef = useRef<any>(null);
@@ -56,32 +62,35 @@ export function AddressMapSelector({
     async (yandexCoords: [number, number]) => {
       if (!apiKey) return;
 
-      // Convert Yandex coords [lat, lng] to form coords [lng, lat]
       const formCoords = convertFromYandexCoords(yandexCoords);
 
       setIsSearching(true);
       try {
-        const address = await geocodeCoordinates(formCoords, apiKey);
-        if (address) {
-          setMapAddress(address);
-          onAddressChange(address);
+        const result = await geocodeCoordinatesDetailed(formCoords, apiKey);
+        if (result.address) {
+          setMapAddress(result.address);
+          onAddressChange(
+            result.address,
+            result.regionName,
+            result.districtName,
+          );
         } else {
           const [lat, lng] = yandexCoords;
           const addr = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
           setMapAddress(addr);
-          onAddressChange(addr);
+          onAddressChange(addr, null, null);
         }
       } catch (err) {
         console.error("Geocoding error:", err);
         const [lat, lng] = yandexCoords;
         const addr = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
         setMapAddress(addr);
-        onAddressChange(addr);
+        onAddressChange(addr, null, null);
       } finally {
         setIsSearching(false);
       }
     },
-    [apiKey, onAddressChange]
+    [apiKey, onAddressChange],
   );
 
   const handleMapClick = useCallback(
@@ -94,7 +103,7 @@ export function AddressMapSelector({
       onLocationChange(formCoords, mapAddress);
       getAddressFromMap(clickedCoords);
     },
-    [getAddressFromMap, onLocationChange, mapAddress]
+    [getAddressFromMap, onLocationChange, mapAddress],
   );
 
   const handlePlacemarkDragEnd = useCallback(
@@ -108,7 +117,7 @@ export function AddressMapSelector({
       onLocationChange(formCoords, mapAddress);
       getAddressFromMap(newCoords);
     },
-    [getAddressFromMap, onLocationChange, mapAddress]
+    [getAddressFromMap, onLocationChange, mapAddress],
   );
 
   const locateMe = useCallback(() => {
@@ -133,7 +142,7 @@ export function AddressMapSelector({
         },
         () => {
           console.warn("Geolocation not available");
-        }
+        },
       );
     }
   }, [isLoaded, getAddressFromMap, onLocationChange, mapAddress]);

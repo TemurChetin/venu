@@ -45,7 +45,8 @@ const nextConfig: NextConfig = {
           },
           {
             key: "Content-Security-Policy",
-            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.amplitude.com https://www.googletagmanager.com https://googleads.g.doubleclick.net https://www.googleadservices.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https://api.venu.uz https://venu.uz https://cdn.amplitude.com https://www.google-analytics.com https://www.googletagmanager.com https://googleads.g.doubleclick.net https://www.googleadservices.com wss:; frame-src https://td.doubleclick.net; frame-ancestors 'none';",
+            value:
+              "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.amplitude.com https://www.googletagmanager.com https://googleads.g.doubleclick.net https://www.googleadservices.com https://api-maps.yandex.ru https://yastatic.net https://*.maps.yandex.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https://api.venu.uz https://venu.uz https://cdn.amplitude.com https://api2.amplitude.com https://api-sr.amplitude.com https://sr-client-cfg.amplitude.com https://www.google-analytics.com https://www.googletagmanager.com https://googleads.g.doubleclick.net https://www.googleadservices.com https://www.google.com https://api-maps.yandex.ru https://geocode-maps.yandex.ru https://log.api-maps.yandex.ru https://*.maps.yandex.net wss:; frame-src https://td.doubleclick.net; frame-ancestors 'none';",
           },
           {
             key: "Strict-Transport-Security",

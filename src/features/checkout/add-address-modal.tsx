@@ -14,10 +14,8 @@ import { useAddressForm } from "./hooks/use-address-form";
 import {
   AddressTypeSelector,
   ContactPersonFields,
-  RegionDistrictSelectors,
   AddressInputField,
   AddressMapSelector,
-  BillingCheckbox,
 } from "./components";
 import type { InitialAddressData } from "./types/address-form.types";
 
@@ -39,11 +37,6 @@ export function AddAddressModal({
     setValue,
     reset,
     errors,
-    regions,
-    districts,
-    selectedRegionId,
-    isRegionsLoading,
-    regionsError,
     mapAddress,
     markerCoords,
     handleMapLocationChange,
@@ -54,11 +47,8 @@ export function AddAddressModal({
     onSuccess: onClose,
   });
 
-  // Reset form when modal closes
   useEffect(() => {
-    if (!isOpen) {
-      reset();
-    }
+    if (!isOpen) reset();
   }, [isOpen, reset]);
 
   const handleClose = () => {
@@ -66,7 +56,6 @@ export function AddAddressModal({
     onClose();
   };
 
-  // Get initial coordinates for map
   const initialCoords: [number, number] | undefined =
     initialData?.latitude && initialData?.longitude
       ? [initialData.longitude, initialData.latitude]
@@ -94,21 +83,6 @@ export function AddAddressModal({
             errors={errors}
           />
 
-          <RegionDistrictSelectors
-            register={register}
-            errors={errors}
-            regions={regions}
-            districts={districts}
-            selectedRegionId={selectedRegionId}
-            isRegionsLoading={isRegionsLoading}
-            regionsError={regionsError}
-          />
-
-          <BillingCheckbox
-            checked={watch("is_billing")}
-            onCheckedChange={(checked) => setValue("is_billing", checked)}
-          />
-
           <AddressInputField
             register={register}
             errors={errors}
@@ -121,10 +95,12 @@ export function AddAddressModal({
             onAddressChange={handleMapAddressChange}
           />
 
-          {/* Hidden inputs for form submission */}
           <input type="hidden" {...register("city")} />
           <input type="hidden" {...register("country")} />
           <input type="hidden" {...register("zip")} />
+          <input type="hidden" {...register("region_id", { valueAsNumber: true })} />
+          <input type="hidden" {...register("district_id", { valueAsNumber: true })} />
+          <input type="hidden" {...register("is_billing")} />
           <input type="hidden" {...register("latitude")} />
           <input type="hidden" {...register("longitude")} />
 
@@ -137,7 +113,6 @@ export function AddAddressModal({
             </Button>
           </DialogFooter>
 
-          {/* Debug: Show form errors in development */}
           {process.env.NODE_ENV === "development" &&
             Object.keys(errors).length > 0 && (
               <div className="mt-4 rounded-lg bg-red-50 p-4 text-sm text-red-600">

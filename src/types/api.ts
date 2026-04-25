@@ -663,6 +663,16 @@ export interface CreateOrderRequest {
 }
 
 export interface CreateOrderResponse {
-  redirect_link: string;
-  new_user: number;
+  redirect_link?: string;
+  new_user?: number | boolean;
+  id?: number | string;
+  order_id?: number | string;
+  order?: Partial<Order>;
+  data?: {
+    id?: number | string;
+    order_id?: number | string;
+    order?: Partial<Order>;
+    redirect_link?: string;
+    new_user?: number | boolean;
+  };
 }
