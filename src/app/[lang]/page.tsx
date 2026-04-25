@@ -56,7 +56,7 @@ function ProductCardSkeleton() {
   );
 }
 
-function Page({ }: Props) {
+function Page({}: Props) {
   const t = useTranslations("home");
 
   // Swiper ref for brands carousel
@@ -65,7 +65,7 @@ function Page({ }: Props) {
   // Fetch all product lists
   const { data: latestData, isLoading: latestLoading } = useLatestProducts(
     12,
-    0
+    0,
   );
   const { data: discountData, isLoading: discountLoading } =
     useDiscountProducts(1000, 0);
@@ -90,7 +90,7 @@ function Page({ }: Props) {
   const mainSectionBanners =
     bannersData?.filter(
       (banner) =>
-        banner.banner_type === "Main Section Banner" && banner.published === 1
+        banner.banner_type === "Main Section Banner" && banner.published === 1,
     ) || [];
 
   return (
@@ -101,8 +101,8 @@ function Page({ }: Props) {
       {discountLoading ? (
         <div className="">
           <Skeleton className="h-7 w-48 mb-4" />
-          <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {Array.from({ length: 5 }).map((_, i) => (
+          <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+            {Array.from({ length: 6 }).map((_, i) => (
               <ProductCardSkeleton key={`discount-skeleton-${i}`} />
             ))}
           </div>
@@ -112,7 +112,7 @@ function Page({ }: Props) {
         discountData.products.length > 0 && (
           <div className="">
             <h2 className="text-xl font-bold mb-4">{t("discountProducts")}</h2>
-            <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
               {discountData.products.map((product) => (
                 <ProductCard
                   key={`discount-${product.slug}`}
@@ -128,8 +128,8 @@ function Page({ }: Props) {
       {seasonalLoading ? (
         <div className="">
           <Skeleton className="h-7 w-48 mb-4" />
-          <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {Array.from({ length: 5 }).map((_, i) => (
+          <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+            {Array.from({ length: 6 }).map((_, i) => (
               <ProductCardSkeleton key={`seasonal-skeleton-${i}`} />
             ))}
           </div>
@@ -139,7 +139,7 @@ function Page({ }: Props) {
         seasonalData.products.length > 0 && (
           <div className="">
             <h2 className="text-xl font-bold mb-4">{t("seasonalProducts")}</h2>
-            <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
               {seasonalData.products.map((product) => (
                 <ProductCard
                   key={`seasonal-${product.slug}`}
@@ -155,8 +155,8 @@ function Page({ }: Props) {
       {latestLoading ? (
         <div className="">
           <Skeleton className="h-7 w-48 mb-4" />
-          <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {Array.from({ length: 5 }).map((_, i) => (
+          <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+            {Array.from({ length: 6 }).map((_, i) => (
               <ProductCardSkeleton key={`latest-skeleton-${i}`} />
             ))}
           </div>
@@ -166,7 +166,7 @@ function Page({ }: Props) {
         latestData.products.length > 0 && (
           <div className="">
             <h2 className="text-xl font-bold mb-4">{t("latestProducts")}</h2>
-            <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
               {latestData.products.map((product) => (
                 <ProductCard key={`latest-${product.slug}`} product={product} />
               ))}
@@ -222,8 +222,8 @@ function Page({ }: Props) {
       {newArrivalLoading ? (
         <div className="">
           <Skeleton className="h-7 w-48 mb-4" />
-          <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {Array.from({ length: 5 }).map((_, i) => (
+          <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+            {Array.from({ length: 6 }).map((_, i) => (
               <ProductCardSkeleton key={`new-arrival-skeleton-${i}`} />
             ))}
           </div>
@@ -235,7 +235,7 @@ function Page({ }: Props) {
             <h2 className="text-xl font-bold mb-4">
               {t("newArrivalProducts")}
             </h2>
-            <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
               {newArrivalData.products.map((product) => (
                 <ProductCard
                   key={`new-arrival-${product.slug}`}
@@ -251,8 +251,8 @@ function Page({ }: Props) {
       {topRatedLoading ? (
         <div className="">
           <Skeleton className="h-7 w-48 mb-4" />
-          <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {Array.from({ length: 5 }).map((_, i) => (
+          <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+            {Array.from({ length: 6 }).map((_, i) => (
               <ProductCardSkeleton key={`top-rated-skeleton-${i}`} />
             ))}
           </div>
@@ -262,7 +262,7 @@ function Page({ }: Props) {
         topRatedData.products.length > 0 && (
           <div className="">
             <h2 className="text-xl font-bold mb-4">{t("topRatedProducts")}</h2>
-            <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
               {topRatedData.products.map((product) => (
                 <ProductCard
                   key={`top-rated-${product.slug}`}
@@ -321,8 +321,8 @@ function Page({ }: Props) {
       {bestSellingLoading ? (
         <div className="">
           <Skeleton className="h-7 w-48 mb-4" />
-          <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {Array.from({ length: 5 }).map((_, i) => (
+          <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+            {Array.from({ length: 6 }).map((_, i) => (
               <ProductCardSkeleton key={`best-selling-skeleton-${i}`} />
             ))}
           </div>
@@ -334,7 +334,7 @@ function Page({ }: Props) {
             <h2 className="text-xl font-bold mb-4">
               {t("bestSellingProducts")}
             </h2>
-            <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
               {bestSellingData.products.map((product) => (
                 <ProductCard
                   key={`best-selling-${product.slug}`}
@@ -350,8 +350,8 @@ function Page({ }: Props) {
       {featuredLoading ? (
         <div className="">
           <Skeleton className="h-7 w-48 mb-4" />
-          <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {Array.from({ length: 5 }).map((_, i) => (
+          <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+            {Array.from({ length: 6 }).map((_, i) => (
               <ProductCardSkeleton key={`featured-skeleton-${i}`} />
             ))}
           </div>
@@ -361,7 +361,7 @@ function Page({ }: Props) {
         featuredData.products.length > 0 && (
           <div className="">
             <h2 className="text-xl font-bold mb-4">{t("featuredProducts")}</h2>
-            <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            <div className="grid pb-2.5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
               {featuredData.products.map((product) => (
                 <ProductCard
                   key={`featured-${product.slug}`}
@@ -432,7 +432,7 @@ function Page({ }: Props) {
                     <SwiperSlide key={brand.id}>
                       <Link
                         href={`/search?brand=${encodeURIComponent(
-                          JSON.stringify([brand.id])
+                          JSON.stringify([brand.id]),
                         )}`}
                         className="group flex flex-col items-center justify-center p-4 bg-white rounded-xl border border-gray-200 hover:border-primary hover:shadow-md transition-all duration-300 hover:-translate-y-1"
                       >
