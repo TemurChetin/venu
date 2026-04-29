@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
@@ -21,8 +21,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { PhoneAuthModal } from "@/components/auth";
 import {
   useProductSelection,
+  useProductPrice,
   useProductWishlist,
 } from "@/features/detail/hooks";
+import { trackProductPageConversion } from "@/lib/google-ads-conversion";
 import { shareProduct, getProductImages } from "@/features/detail/utils";
 import {
   ProductPriceDisplay,
@@ -222,6 +224,8 @@ export default function DetailPage() {
     setSelectedColor,
     getSelectedColorName,
   } = useProductSelection(product);
+  const priceInfo = useProductPrice(product);
+  const trackedProductPageIdRef = useRef<number | null>(null);
 
   const {
     isWishlisted,
@@ -233,6 +237,18 @@ export default function DetailPage() {
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (!product || trackedProductPageIdRef.current === product.id) {
+      return;
+    }
+
+    trackProductPageConversion({
+      productId: product.id,
+      productName: product.name,
+    });
+    trackedProductPageIdRef.current = product.id;
+  }, [product]);
 
   const reviews = reviewsData?.reviews || [];
   const relatedProducts = relatedProductsData || [];
@@ -252,6 +268,13 @@ export default function DetailPage() {
       quantity: 1,
       variant: selectedSize || undefined,
       color: colorName || undefined,
+      conversion: {
+        value: priceInfo?.discountedPrice ?? product.unit_price,
+        currency: "USD",
+        productId: product.id,
+        productName: product.name,
+        quantity: 1,
+      },
     });
   };
 

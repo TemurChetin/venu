@@ -10,11 +10,24 @@ import {
   SelectCartItemsRequest,
 } from "@/types/api";
 import { toast } from "react-hot-toast";
+import { trackAddToCartConversion } from "@/lib/google-ads-conversion";
 
 interface SuccessResponse {
   message: string;
-  data?: any;
+  data?: unknown;
 }
+
+interface AddToCartConversionData {
+  value: number;
+  currency?: string;
+  productId: string | number;
+  productName?: string;
+  quantity?: number;
+}
+
+type AddToCartMutationVariables = AddToCartRequest & {
+  conversion?: AddToCartConversionData;
+};
 
 /**
  * Hook to get user's cart
@@ -37,17 +50,26 @@ export function useCart(enabled: boolean = true) {
 export function useAddToCart() {
   const queryClient = useQueryClient();
 
-  return useMutation<SuccessResponse, Error, AddToCartRequest>({
-    mutationFn: async (payload: AddToCartRequest) => {
+  return useMutation<SuccessResponse, Error, AddToCartMutationVariables>({
+    mutationFn: async (payload: AddToCartMutationVariables) => {
+      const cartPayload: AddToCartRequest = {
+        id: payload.id,
+        quantity: payload.quantity,
+        variant: payload.variant,
+        color: payload.color,
+      };
       const { data } = await instanceAuth.post<SuccessResponse>(
         "/v1/cart/add",
-        payload
+        cartPayload
       );
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       // Invalidate cart query to refetch
       queryClient.invalidateQueries({ queryKey: ["/v1/cart"] });
+      if (variables.conversion) {
+        trackAddToCartConversion(variables.conversion);
+      }
       toast.success("Mahsulot savatga qo'shildi");
     },
     onError: (error: any) => {

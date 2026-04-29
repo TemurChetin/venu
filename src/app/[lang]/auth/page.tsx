@@ -17,6 +17,7 @@ import {
 import { toast } from "react-hot-toast";
 import { checkPhone, verifyOtp } from "@/services/requests/auth";
 import { useRouter } from "next/navigation";
+import { trackRegistrationConversion } from "@/lib/google-ads-conversion";
 
 export default function AuthPage() {
   const t = useTranslations("auth");
@@ -139,6 +140,7 @@ export default function AuthPage() {
         if (result?.error) {
           toast.error(t("loginError"));
         } else {
+          trackRegistrationConversion();
           toast.success(t("loginSuccess"));
           // Get return URL from query params or default to home
           const params = new URLSearchParams(window.location.search);

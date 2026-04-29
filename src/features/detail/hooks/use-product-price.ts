@@ -15,7 +15,10 @@ export function useProductPrice(product: ProductDetailResponse | undefined): Pri
     let discountedPrice = originalPrice;
 
     if (product.discount > 0) {
-      if (product.discount_type === "percentage") {
+      if (
+        product.discount_type === "percentage" ||
+        product.discount_type === "percent"
+      ) {
         discountedPrice = originalPrice * (1 - product.discount / 100);
       } else {
         discountedPrice = originalPrice - product.discount;
@@ -24,7 +27,8 @@ export function useProductPrice(product: ProductDetailResponse | undefined): Pri
 
     const discountPercent =
       product.discount > 0
-        ? product.discount_type === "percentage"
+        ? product.discount_type === "percentage" ||
+          product.discount_type === "percent"
           ? product.discount
           : Math.round((product.discount / originalPrice) * 100)
         : 0;
@@ -36,5 +40,4 @@ export function useProductPrice(product: ProductDetailResponse | undefined): Pri
     };
   }, [product]);
 }
-
 

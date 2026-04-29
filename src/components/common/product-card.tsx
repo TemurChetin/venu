@@ -119,6 +119,13 @@ export function ProductCard({ product }: ProductCardProps) {
     addToCart.mutate({
       id: product.id,
       quantity: 1,
+      conversion: {
+        value: discountedPrice,
+        currency: "USD",
+        productId: product.id,
+        productName: product.name,
+        quantity: 1,
+      },
     });
   };
 

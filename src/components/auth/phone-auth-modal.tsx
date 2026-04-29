@@ -16,6 +16,7 @@ import { toast } from "react-hot-toast";
 import { checkPhone, verifyOtp } from "@/services/requests/auth";
 import { useTranslations } from "next-intl";
 import amplitude from "@/amplitude";
+import { trackRegistrationConversion } from "@/lib/google-ads-conversion";
 
 interface PhoneAuthModalProps {
   open: boolean;
@@ -192,6 +193,7 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
         if (result?.error) {
           toast.error(t("auth.loginError"));
         } else {
+          trackRegistrationConversion();
           toast.success(t("auth.loginSuccess"));
           onOpenChange(false);
           resetForm();
