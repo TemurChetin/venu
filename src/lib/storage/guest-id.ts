@@ -1,14 +1,7 @@
-/**
- * Guest ID Storage Utilities
- * Handles localStorage operations for guest ID
- */
+
 
 const GUEST_ID_KEY = "venu_guest_id";
 
-/**
- * Retrieves guest ID from localStorage
- * @returns Guest ID or null if not found/invalid
- */
 export function getGuestIdFromStorage(): number | null {
   if (typeof window === "undefined") return null;
 
@@ -29,10 +22,6 @@ export function getGuestIdFromStorage(): number | null {
   return null;
 }
 
-/**
- * Saves guest ID to localStorage
- * @param guestId - The guest ID to save
- */
 export function saveGuestIdToStorage(guestId: number): void {
   if (typeof window === "undefined") return;
 
@@ -45,9 +34,6 @@ export function saveGuestIdToStorage(guestId: number): void {
   }
 }
 
-/**
- * Removes guest ID from localStorage
- */
 export function removeGuestIdFromStorage(): void {
   if (typeof window === "undefined") return;
 

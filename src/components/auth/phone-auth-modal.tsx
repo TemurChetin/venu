@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "react-hot-toast";
 import { checkPhone, verifyOtp } from "@/services/requests/auth";
+import { syncGuestWishlistToBackend } from "@/services/requests/wishlist";
 import { useTranslations } from "next-intl";
 import amplitude from "@/amplitude";
 import { trackRegistrationConversion } from "@/lib/google-ads-conversion";
@@ -199,6 +200,8 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
           toast.error(t("auth.loginError"));
         } else {
           trackRegistrationConversion();
+          // Push the guest wishlist (localStorage) to the user's account
+          await syncGuestWishlistToBackend();
           // Backend merged the guest cart into the user — refetch cart/wishlist
           queryClient.invalidateQueries({ queryKey: ["/v1/cart"] });
           queryClient.invalidateQueries({

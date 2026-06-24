@@ -57,10 +57,8 @@ export default function DesktopHeader() {
 
   const router = useRouter();
 
-  // Wishlist API hooks
-  const { data: wishlistData, isLoading: isWishlistLoading } = useWishlist(
-    !!session
-  );
+  // Wishlist API hooks — works for guests (localStorage) and logged-in users
+  const { data: wishlistData, isLoading: isWishlistLoading } = useWishlist();
   const removeFromWishlist = useRemoveFromWishlist();
 
   // Cart API hooks — works for guests too (cart is keyed by guest_id)

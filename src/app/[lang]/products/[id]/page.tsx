@@ -234,7 +234,7 @@ export default function DetailPage() {
     isWishlisted,
     handleToggle: handleWishlistToggle,
     isPending: isWishlistPending,
-  } = useProductWishlist(product, session, () => setIsAuthModalOpen(true));
+  } = useProductWishlist(product);
 
   // Track mount state to prevent hydration mismatch
   useEffect(() => {

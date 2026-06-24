@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Session } from "next-auth";
 import { ProductDetailResponse } from "@/types/api";
 import {
   useWishlist,
@@ -14,11 +13,9 @@ interface UseProductWishlistReturn {
 }
 
 export function useProductWishlist(
-  product: ProductDetailResponse | undefined,
-  session: Session | null,
-  onAuthRequired: () => void
+  product: ProductDetailResponse | undefined
 ): UseProductWishlistReturn {
-  const { data: wishlistData } = useWishlist(!!session);
+  const { data: wishlistData } = useWishlist();
   const addToWishlist = useAddToWishlist();
   const removeFromWishlist = useRemoveFromWishlist();
   const [isWishlisted, setIsWishlisted] = useState(false);
@@ -34,18 +31,13 @@ export function useProductWishlist(
   }, [wishlistData, product]);
 
   const handleToggle = () => {
-    if (!session) {
-      onAuthRequired();
-      return;
-    }
-
     if (!product) return;
 
     if (isWishlisted) {
       removeFromWishlist.mutate(product.id);
       setIsWishlisted(false);
     } else {
-      addToWishlist.mutate(product.id);
+      addToWishlist.mutate(product);
       setIsWishlisted(true);
     }
   };

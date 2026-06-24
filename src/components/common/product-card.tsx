@@ -7,8 +7,6 @@ import { useFormatCurrency } from "@/lib/format-currency";
 import { TbBasketPlus } from "react-icons/tb";
 import { Button } from "../ui/button";
 import { Link } from "@/i18n/routing";
-import { useSession } from "next-auth/react";
-import { PhoneAuthModal } from "@/components/auth";
 import {
   useAddToWishlist,
   useRemoveFromWishlist,
@@ -24,11 +22,8 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const { data: session } = useSession();
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-
-  // Wishlist hooks - only fetch when user is authenticated
-  const { data: wishlistData } = useWishlist(!!session);
+  // Wishlist hooks — works for guests (localStorage) and logged-in users
+  const { data: wishlistData } = useWishlist();
   const addToWishlist = useAddToWishlist();
   const removeFromWishlist = useRemoveFromWishlist();
 
@@ -89,20 +84,13 @@ export function ProductCard({ product }: ProductCardProps) {
         : `-${formatCurrency(product.discount)}`
       : null;
 
-  // Handle wishlist toggle
+  // Handle wishlist toggle — works for guests too (saved in localStorage)
   const handleWishlistToggle = async () => {
-    // If user is not authenticated, show login modal
-    if (!session) {
-      setIsAuthModalOpen(true);
-      return;
-    }
-
-    // If authenticated, toggle wishlist
     if (isWishlisted) {
       removeFromWishlist.mutate(product.id);
       setIsWishlisted(false);
     } else {
-      addToWishlist.mutate(product.id);
+      addToWishlist.mutate(product);
       setIsWishlisted(true);
     }
   };
@@ -129,14 +117,9 @@ export function ProductCard({ product }: ProductCardProps) {
     addToCart.isPending;
 
   return (
-    <>
-      <PhoneAuthModal
-        open={isAuthModalOpen}
-        onOpenChange={setIsAuthModalOpen}
-      />
-      <div className="w-full max-w-[320px]">
-        {/* Header with badge and wishlist */}
-        <div className="relative">
+    <div className="w-full max-w-[320px]">
+      {/* Header with badge and wishlist */}
+      <div className="relative">
           {/* Discount Badge */}
           {discountDisplayText && (
             <div className="absolute left-1 top-1 z-10 flex items-center justify-center rounded-md bg-red-500 px-2.5 py-1 text-xs font-bold text-white shadow-md">
@@ -217,6 +200,5 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
         </div>
       </div>
-    </>
   );
 }
