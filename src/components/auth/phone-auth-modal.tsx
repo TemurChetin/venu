@@ -17,6 +17,8 @@ import { checkPhone, verifyOtp } from "@/services/requests/auth";
 import { useTranslations } from "next-intl";
 import amplitude from "@/amplitude";
 import { trackRegistrationConversion } from "@/lib/google-ads-conversion";
+import { useGuestId } from "@/services/guest-id";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface PhoneAuthModalProps {
   open: boolean;
@@ -25,6 +27,8 @@ interface PhoneAuthModalProps {
 
 export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
   const t = useTranslations();
+  const { guestId } = useGuestId();
+  const queryClient = useQueryClient();
   const [phone, setPhone] = useState("+998");
   const [otpCode, setOtpCode] = useState("");
   const [loading, setLoading] = useState(false);
@@ -180,6 +184,7 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
       const response = await verifyOtp({
         phone: phone,
         token: otpCode,
+        guest_id: guestId, // backend merges the guest cart into this user
       });
 
       if (response.token && response.status) {
@@ -194,6 +199,11 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
           toast.error(t("auth.loginError"));
         } else {
           trackRegistrationConversion();
+          // Backend merged the guest cart into the user — refetch cart/wishlist
+          queryClient.invalidateQueries({ queryKey: ["/v1/cart"] });
+          queryClient.invalidateQueries({
+            queryKey: ["/v1/customer/wish-list"],
+          });
           toast.success(t("auth.loginSuccess"));
           onOpenChange(false);
           resetForm();

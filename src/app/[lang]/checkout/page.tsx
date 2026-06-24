@@ -75,7 +75,7 @@ export default function CheckoutNewPage() {
   const { config } = useConfigStore();
 
   // Queries
-  const { data: cartData, isLoading: isCartLoading } = useCart(true);
+  const { data: cartData, isLoading: isCartLoading } = useCart();
   const { data: addresses, isLoading: isAddressesLoading } = useAddresses();
   const selectedAddress = addresses?.find((a) => a.id === selectedAddressId);
   const { data: deliveryMethods } = useDeliveryMethods(

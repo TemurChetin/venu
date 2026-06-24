@@ -2,6 +2,8 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { instanceAuth } from "../api";
+import { useGuestId } from "../guest-id";
+import { queryGenerator } from "@/lib/query-generator";
 import {
   CartResponse,
   AddToCartRequest,
@@ -30,16 +32,30 @@ type AddToCartMutationVariables = AddToCartRequest & {
 };
 
 /**
- * Hook to get user's cart
+ * Appends guest_id query param to a path when a guest id is available.
+ * The cart works the same way for guests and logged-in users: it is always
+ * keyed by guest_id. On login the backend merges the guest_id cart into the
+ * user account, and instanceAuth additionally sends the auth token when present.
  */
-export function useCart(enabled: boolean = true) {
+function withGuestId(path: string, guestId: number | null): string {
+  return guestId ? `${path}${queryGenerator({ guest_id: guestId })}` : path;
+}
+
+/**
+ * Hook to get the cart (works for both guests and authenticated users)
+ */
+export function useCart() {
+  const { guestId, isLoading: isLoadingGuestId } = useGuestId();
+
   return useQuery<CartResponse>({
-    queryKey: ["/v1/cart"],
+    queryKey: ["/v1/cart", guestId],
     queryFn: async () => {
-      const { data } = await instanceAuth.get<CartResponse>("/v1/cart");
+      const { data } = await instanceAuth.get<CartResponse>(
+        withGuestId("/v1/cart", guestId)
+      );
       return data;
     },
-    enabled, // Only fetch when enabled (user is authenticated)
+    enabled: !!guestId && !isLoadingGuestId,
     retry: false,
   });
 }
@@ -49,6 +65,7 @@ export function useCart(enabled: boolean = true) {
  */
 export function useAddToCart() {
   const queryClient = useQueryClient();
+  const { guestId } = useGuestId();
 
   return useMutation<SuccessResponse, Error, AddToCartMutationVariables>({
     mutationFn: async (payload: AddToCartMutationVariables) => {
@@ -59,7 +76,7 @@ export function useAddToCart() {
         color: payload.color,
       };
       const { data } = await instanceAuth.post<SuccessResponse>(
-        "/v1/cart/add",
+        withGuestId("/v1/cart/add", guestId),
         cartPayload
       );
       return data;
@@ -85,11 +102,12 @@ export function useAddToCart() {
  */
 export function useRemoveFromCart() {
   const queryClient = useQueryClient();
+  const { guestId } = useGuestId();
 
   return useMutation<SuccessResponse, Error, RemoveFromCartRequest>({
     mutationFn: async (payload: RemoveFromCartRequest) => {
       const { data } = await instanceAuth.delete<SuccessResponse>(
-        "/v1/cart/remove",
+        withGuestId("/v1/cart/remove", guestId),
         { data: payload }
       );
       return data;
@@ -112,11 +130,12 @@ export function useRemoveFromCart() {
  */
 export function useUpdateCart() {
   const queryClient = useQueryClient();
+  const { guestId } = useGuestId();
 
   return useMutation<SuccessResponse, Error, UpdateCartRequest>({
     mutationFn: async (payload: UpdateCartRequest) => {
       const { data } = await instanceAuth.put<SuccessResponse>(
-        "/v1/cart/update",
+        withGuestId("/v1/cart/update", guestId),
         payload
       );
       return data;
@@ -139,11 +158,12 @@ export function useUpdateCart() {
  */
 export function useSelectCartItems() {
   const queryClient = useQueryClient();
+  const { guestId } = useGuestId();
 
   return useMutation<SuccessResponse, Error, SelectCartItemsRequest>({
     mutationFn: async (payload: SelectCartItemsRequest) => {
       const { data } = await instanceAuth.post<SuccessResponse>(
-        "/v1/cart/select-cart-items",
+        withGuestId("/v1/cart/select-cart-items", guestId),
         payload
       );
       return data;

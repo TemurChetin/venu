@@ -107,14 +107,8 @@ export function ProductCard({ product }: ProductCardProps) {
     }
   };
 
-  // Handle add to cart
+  // Handle add to cart — works for guests too (cart is keyed by guest_id)
   const handleAddToCart = async () => {
-    // If user is not authenticated, show login modal
-    if (!session) {
-      setIsAuthModalOpen(true);
-      return;
-    }
-
     // Add to cart with default quantity 1
     addToCart.mutate({
       id: product.id,

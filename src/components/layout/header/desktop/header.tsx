@@ -63,8 +63,8 @@ export default function DesktopHeader() {
   );
   const removeFromWishlist = useRemoveFromWishlist();
 
-  // Cart API hooks - only fetch when user is authenticated
-  const { data: cartData, isLoading: isCartLoading } = useCart(!!session);
+  // Cart API hooks — works for guests too (cart is keyed by guest_id)
+  const { data: cartData, isLoading: isCartLoading } = useCart();
   const updateCart = useUpdateCart();
   const removeFromCart = useRemoveFromCart();
   const addToCart = useAddToCart();
@@ -74,12 +74,8 @@ export default function DesktopHeader() {
     removeFromWishlist.mutate(productId);
   };
 
-  // Handle add to cart from wishlist
+  // Handle add to cart from wishlist — works for guests too
   const handleAddToCart = (productId: number) => {
-    if (!session) {
-      setIsAuthModalOpen(true);
-      return;
-    }
     setAddingProductId(productId);
     addToCart.mutate(
       {
@@ -99,19 +95,11 @@ export default function DesktopHeader() {
 
   // Handle update cart quantity
   const handleUpdateCartQuantity = (key: number, quantity: number) => {
-    if (!session) {
-      setIsAuthModalOpen(true);
-      return;
-    }
     updateCart.mutate({ key, quantity });
   };
 
   // Handle remove from cart
   const handleRemoveFromCart = (key: number) => {
-    if (!session) {
-      setIsAuthModalOpen(true);
-      return;
-    }
     removeFromCart.mutate({ key });
   };
 

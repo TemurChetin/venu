@@ -17,6 +17,8 @@ import {
 } from "@/services/queries/products";
 import { useAddToCart, useCart, useSelectCartItems } from "@/services/queries";
 import { instanceAuth } from "@/services/api";
+import { useGuestId } from "@/services/guest-id";
+import { queryGenerator } from "@/lib/query-generator";
 import { useQueryClient } from "@tanstack/react-query";
 import { PhoneAuthModal } from "@/components/auth";
 import {
@@ -214,7 +216,8 @@ export default function DetailPage() {
   const queryClient = useQueryClient();
 
   const addToCart = useAddToCart();
-  const { data: cartData } = useCart(!!session);
+  const { data: cartData } = useCart();
+  const { guestId } = useGuestId();
   const selectCartItems = useSelectCartItems();
   const [isOneClickBuyPending, setIsOneClickBuyPending] = useState(false);
   const {
@@ -254,11 +257,7 @@ export default function DetailPage() {
   const relatedProducts = relatedProductsData || [];
 
   const handleAddToCart = () => {
-    if (!session) {
-      setIsAuthModalOpen(true);
-      return;
-    }
-
+    // Works for guests too — cart is keyed by guest_id
     if (!product) return;
 
     const colorName = getSelectedColorName();
@@ -293,11 +292,8 @@ export default function DetailPage() {
   };
 
   const handleOneClickBuy = async () => {
-    if (!session) {
-      setIsAuthModalOpen(true);
-      return;
-    }
-
+    // Works for guests — items go into the guest_id cart; the checkout page
+    // requires login, where the guest cart is merged into the user.
     if (!product) return;
 
     setIsOneClickBuyPending(true);
@@ -331,9 +327,12 @@ export default function DetailPage() {
       // Use fetchQuery to get the updated cart data
       const cartItems =
         (await queryClient.fetchQuery({
-          queryKey: ["/v1/cart"],
+          queryKey: ["/v1/cart", guestId],
           queryFn: async () => {
-            const { data } = await instanceAuth.get<any[]>("/v1/cart");
+            const url = guestId
+              ? `/v1/cart${queryGenerator({ guest_id: guestId })}`
+              : "/v1/cart";
+            const { data } = await instanceAuth.get<any[]>(url);
             return data;
           },
         })) || [];

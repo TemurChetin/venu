@@ -37,7 +37,6 @@ function BottomNavigation({ cartItemsCount: propCartItemsCount }: Props) {
       id: "cart",
       showBadge: true,
       isDrawer: true, // Cart opens drawer, doesn't navigate
-      auth_required: true,
     },
     {
       name: t("navigation.orders"),
@@ -59,26 +58,18 @@ function BottomNavigation({ cartItemsCount: propCartItemsCount }: Props) {
   const { data: session } = useSession();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
-  // Cart API hooks - only fetch when user is authenticated
-  const { data: cartData, isLoading: isCartLoading } = useCart(!!session);
+  // Cart API hooks — works for guests too (cart is keyed by guest_id)
+  const { data: cartData, isLoading: isCartLoading } = useCart();
   const updateCart = useUpdateCart();
   const removeFromCart = useRemoveFromCart();
 
   // Handle update cart quantity
   const handleUpdateCartQuantity = (key: number, quantity: number) => {
-    if (!session) {
-      setIsAuthModalOpen(true);
-      return;
-    }
     updateCart.mutate({ key, quantity });
   };
 
   // Handle remove from cart
   const handleRemoveFromCart = (key: number) => {
-    if (!session) {
-      setIsAuthModalOpen(true);
-      return;
-    }
     removeFromCart.mutate({ key });
   };
 
@@ -116,15 +107,6 @@ function BottomNavigation({ cartItemsCount: propCartItemsCount }: Props) {
 
             // Special handling for cart with drawer
             if (item.isDrawer && item.id === "cart") {
-              const handleCartClick = (e: React.MouseEvent) => {
-                if (item.auth_required && !session) {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setIsAuthModalOpen(true);
-                  return false;
-                }
-              };
-
               return (
                 <CartDrawer
                   key={item.id}
@@ -134,7 +116,6 @@ function BottomNavigation({ cartItemsCount: propCartItemsCount }: Props) {
                   isLoading={isCartLoading}
                 >
                   <button
-                    onClick={handleCartClick}
                     className={cn(
                       "relative flex flex-col items-center justify-center",
                       "min-w-0 flex-1 gap-1 p-2",

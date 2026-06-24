@@ -16,6 +16,7 @@ export interface CheckPhoneResponse {
 export interface VerifyOtpRequest {
   phone: string;
   token: string; // OTP code
+  guest_id?: number | null; // guest cart owner — backend merges this cart into the user on login
 }
 
 export interface VerifyOtpResponse {
@@ -50,6 +51,8 @@ export async function verifyOtp(
     {
       phone: data.phone,
       token: data.token, // OTP code (6 digits)
+      // Pass guest_id so the backend can merge the guest cart into the user
+      ...(data.guest_id ? { guest_id: data.guest_id } : {}),
     }
   );
   return response.data;
