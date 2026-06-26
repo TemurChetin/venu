@@ -1,12 +1,12 @@
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/routing";
-import { ProductDetailResponse } from "@/types/api";
 
 interface ProductBreadcrumbProps {
-  product: ProductDetailResponse;
+  id: number;
+  name: string;
 }
 
-export function ProductBreadcrumb({ product }: ProductBreadcrumbProps) {
+export function ProductBreadcrumb({ name, id }: ProductBreadcrumbProps) {
   const t = useTranslations("product");
   const lang = useLocale();
 
@@ -19,20 +19,20 @@ export function ProductBreadcrumb({ product }: ProductBreadcrumbProps) {
           </Link>
         </li>
         <li>/</li>
-        {product.category && (
+        {name && (
           <>
             <li>
               <Link
-                href={`/${lang}/search?category=${product.category.id}`}
+                href={`/${lang}/search?category=${id}`}
                 className="hover:text-foreground transition-colors"
               >
-                {product.category.name}
+                {name}
               </Link>
             </li>
             <li>/</li>
           </>
         )}
-        <li className="text-foreground">{product.name}</li>
+        <li className="text-foreground">{name}</li>
       </ol>
     </nav>
   );

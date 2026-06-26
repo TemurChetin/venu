@@ -22,18 +22,14 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  // Wishlist hooks — works for guests (localStorage) and logged-in users
   const { data: wishlistData } = useWishlist();
   const addToWishlist = useAddToWishlist();
   const removeFromWishlist = useRemoveFromWishlist();
 
-  // Cart hooks
   const addToCart = useAddToCart();
 
-  // Currency formatting hook
   const formatCurrency = useFormatCurrency();
 
-  // Check if product is in wishlist
   const [isWishlisted, setIsWishlisted] = useState(false);
 
   // Update wishlist status when wishlistData or product changes
@@ -45,13 +41,11 @@ export function ProductCard({ product }: ProductCardProps) {
     );
   }, [wishlistData, product.id]);
 
-  // Calculate average rating
   const averageRating =
     product.rating && Array.isArray(product.rating) && product.rating.length > 0
       ? product.rating.reduce((sum, r) => sum + r, 0) / product.rating.length
       : 0;
 
-  // Calculate prices
   const originalPrice = product.unit_price;
   const discountAmount =
     product.discount_type === "percentage" ||
