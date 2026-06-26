@@ -51,7 +51,7 @@ export default function CheckoutNewPage() {
   const formatCurrency = useFormatCurrency();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
-  // Redirect to auth page if not authenticated
+  // Redirect to auth page if not authenticated something
   // useEffect(() => {
   //   if (status === "unauthenticated") {
   //     const currentPath = window.location.pathname;
