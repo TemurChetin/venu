@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -24,9 +24,14 @@ import { useQueryClient } from "@tanstack/react-query";
 interface PhoneAuthModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
 }
 
-export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
+export function PhoneAuthModal({
+  open,
+  onOpenChange,
+  onSuccess,
+}: PhoneAuthModalProps) {
   const t = useTranslations();
   const { guestId } = useGuestId();
   const queryClient = useQueryClient();
@@ -38,6 +43,7 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
   const [canResend, setCanResend] = useState(true);
   const [countdown, setCountdown] = useState(0);
   const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const { update } = useSession();
 
   // Countdown effect to handle resend timeout
   useEffect(() => {
@@ -85,10 +91,10 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
   const formatPhoneDisplay = (value: string): string => {
     // Remove all non-digit characters except +
     const cleaned = value.replace(/[^\d+]/g, "");
-    
+
     // If empty, return empty
     if (!cleaned) return "";
-    
+
     // Ensure it starts with +998
     let phone = cleaned;
     if (phone.startsWith("998")) {
@@ -98,15 +104,17 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
     } else if (!phone.startsWith("+")) {
       phone = `+998${phone}`;
     }
-    
+
     // Extract digits after +998
     const digits = phone.replace(/^\+998/, "");
-    
+
     // Format: +998 XX XXX-XX-XX
     if (digits.length === 0) return "+998";
     if (digits.length <= 2) return `+998 ${digits}`;
-    if (digits.length <= 5) return `+998 ${digits.slice(0, 2)} ${digits.slice(2)}`;
-    if (digits.length <= 7) return `+998 ${digits.slice(0, 2)} ${digits.slice(2, 5)}-${digits.slice(5)}`;
+    if (digits.length <= 5)
+      return `+998 ${digits.slice(0, 2)} ${digits.slice(2)}`;
+    if (digits.length <= 7)
+      return `+998 ${digits.slice(0, 2)} ${digits.slice(2, 5)}-${digits.slice(5)}`;
     return `+998 ${digits.slice(0, 2)} ${digits.slice(2, 5)}-${digits.slice(5, 7)}-${digits.slice(7, 9)}`;
   };
 
@@ -164,7 +172,7 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
     } catch (error: any) {
       console.error("Send code error:", error);
       toast.error(
-        error?.response?.data?.errors?.[0]?.message || t("auth.sendCodeError")
+        error?.response?.data?.errors?.[0]?.message || t("auth.sendCodeError"),
       );
     } finally {
       setSendingCode(false);
@@ -208,6 +216,8 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
             queryKey: ["/v1/customer/wish-list"],
           });
           toast.success(t("auth.loginSuccess"));
+          await update();
+          onSuccess && onSuccess();
           onOpenChange(false);
           resetForm();
         }
@@ -217,7 +227,7 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
     } catch (error: any) {
       console.error("Verify OTP error:", error);
       toast.error(
-        error?.response?.data?.errors?.[0]?.message || t("auth.verifyError")
+        error?.response?.data?.errors?.[0]?.message || t("auth.verifyError"),
       );
     } finally {
       setLoading(false);
@@ -275,7 +285,9 @@ export function PhoneAuthModal({ open, onOpenChange }: PhoneAuthModalProps) {
             <Button
               type="button"
               onClick={handleSendCode}
-              disabled={sendingCode || phone === "+998" || !validatePhone(phone)}
+              disabled={
+                sendingCode || phone === "+998" || !validatePhone(phone)
+              }
               className="w-full"
             >
               {sendingCode ? t("auth.waiting") : t("auth.sendCode")}

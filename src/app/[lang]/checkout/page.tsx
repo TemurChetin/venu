@@ -31,6 +31,7 @@ import { toast } from "react-hot-toast";
 import { useCart } from "@/services";
 import { useConfigStore } from "@/stores";
 import Image from "next/image";
+import { PhoneAuthModal } from "@/components/auth";
 
 function createFallbackTransactionId(guestId: string | number) {
   if (window.crypto?.randomUUID) {
@@ -48,18 +49,19 @@ export default function CheckoutNewPage() {
   const { data: session, status } = useSession();
   const { guestId } = useGuestId();
   const formatCurrency = useFormatCurrency();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   // Redirect to auth page if not authenticated
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      const currentPath = window.location.pathname;
-      router.push(`/auth?returnUrl=${encodeURIComponent(currentPath)}`);
-    }
-  }, [status, router]);
+  // useEffect(() => {
+  //   if (status === "unauthenticated") {
+  //     const currentPath = window.location.pathname;
+  //     router.push(`/auth?returnUrl=${encodeURIComponent(currentPath)}`);
+  //   }
+  // }, [status, router]);
 
   // State
   const [selectedAddressId, setSelectedAddressId] = useState<number | null>(
-    null
+    null,
   );
   const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState<
     "yandex" | "bts" | "free" | null
@@ -79,7 +81,7 @@ export default function CheckoutNewPage() {
   const { data: addresses, isLoading: isAddressesLoading } = useAddresses();
   const selectedAddress = addresses?.find((a) => a.id === selectedAddressId);
   const { data: deliveryMethods } = useDeliveryMethods(
-    selectedAddress?.region_id || null
+    selectedAddress?.region_id || null,
   );
 
   // Mutations
@@ -162,13 +164,13 @@ export default function CheckoutNewPage() {
       // Prefer the address's delivery method, or use the first available
       const preferredMethod = selectedAddress.delivery_method;
       const methodExists = deliveryMethods.some(
-        (m) => m.code === preferredMethod
+        (m) => m.code === preferredMethod,
       );
       if (methodExists) {
         setSelectedDeliveryMethod(preferredMethod as "yandex" | "bts" | "free");
       } else {
         setSelectedDeliveryMethod(
-          deliveryMethods[0].code as "yandex" | "bts" | "free"
+          deliveryMethods[0].code as "yandex" | "bts" | "free",
         );
       }
     }
@@ -230,7 +232,7 @@ export default function CheckoutNewPage() {
             onError: () => {
               setDeliveryCost(null);
             },
-          }
+          },
         );
       }
     } else if (deliveryMethod === "free" || isFreeEligible) {
@@ -257,6 +259,11 @@ export default function CheckoutNewPage() {
 
   // Handle order submission
   const handleSubmit = async () => {
+    if (!session) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+
     if (!selectedAddressId || !selectedDeliveryMethod || !guestId) {
       toast.error(t("fillAllFields"));
       return;
@@ -312,9 +319,9 @@ export default function CheckoutNewPage() {
   };
 
   // Don't render if not authenticated (will redirect)
-  if (status === "unauthenticated") {
-    return null;
-  }
+  // if (status === "unauthenticated") {
+  //   return null;
+  // }
 
   // Show loading skeletons while checking authentication or loading data
   const isLoading = status === "loading" || isCartLoading || isAddressesLoading;
@@ -537,9 +544,9 @@ export default function CheckoutNewPage() {
                       isFree || isFreeDeliveryEligible
                         ? 0
                         : method.code === selectedDeliveryMethod &&
-                          deliveryCost !== null
-                        ? deliveryCost
-                        : null;
+                            deliveryCost !== null
+                          ? deliveryCost
+                          : null;
 
                     return (
                       <div
@@ -593,9 +600,12 @@ export default function CheckoutNewPage() {
 
               <RadioGroup
                 value={selectedPaymentMethod}
-                onValueChange={(value) =>
-                  setSelectedPaymentMethod(value as "click" | "payme")
-                }
+                onValueChange={(value) => {
+                  setSelectedPaymentMethod(value as "click" | "payme");
+                  if (!session) {
+                    setIsAuthModalOpen(true);
+                  }
+                }}
                 className="grid grid-cols-2 gap-4"
               >
                 <Label
@@ -819,6 +829,12 @@ export default function CheckoutNewPage() {
       <AddAddressModal
         isOpen={isAddAddressModalOpen}
         onClose={() => setIsAddAddressModalOpen(false)}
+      />
+
+      <PhoneAuthModal
+        open={isAuthModalOpen}
+        onOpenChange={setIsAuthModalOpen}
+        onSuccess={() => handleSubmit()}
       />
     </div>
   );
