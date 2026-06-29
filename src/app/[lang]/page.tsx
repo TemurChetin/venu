@@ -27,7 +27,7 @@ function Page({}: Props) {
       <Carousel />
 
       {/* Discount Products */}
-        <DiscountProducts />
+      <DiscountProducts />
 
       {/* Seasonal Products */}
       <LazySection skeleton={<HomeSkleton />}>

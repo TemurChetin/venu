@@ -4,7 +4,6 @@ import { useQuery, UseQueryOptions } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { instance } from "../api";
 import { queryGenerator } from "@/lib/query-generator";
-import { useDebounces } from "@/hooks/use-debounces";
 import { useGuestId } from "../guest-id";
 
 interface UsePublicQueryOptions<T> {
@@ -36,7 +35,7 @@ export function usePublicQuery<T>({
   method = "GET",
 }: UsePublicQueryOptions<T>) {
   const params = useParams();
-  const { guestId, isLoading: isLoadingGuestId } = useGuestId();
+  const { guestID, isLoading: isLoadingGuestId } = useGuestId();
 
   // Replace URL parameters from Next.js route params
   let finalUrl = url;
@@ -51,8 +50,8 @@ export function usePublicQuery<T>({
 
   // Add guest ID to query if required
   const finalQuery = { ...query };
-  if (requiresGuestId && guestId) {
-    finalQuery.guest_id = guestId;
+  if (requiresGuestId && guestID) {
+    finalQuery.guest_id = guestID;
   }
 
   // Build query string
@@ -60,22 +59,16 @@ export function usePublicQuery<T>({
     finalUrl += queryGenerator(finalQuery);
   }
 
-  // Apply debouncing if specified
-  const debouncedUrl = debounceTime
-    ? useDebounces(finalUrl, debounceTime)
-    : finalUrl;
-
   // Include data in query key for POST requests to ensure refetch when data changes
-  const queryKey =
-    method === "POST" && data ? [debouncedUrl, data] : [debouncedUrl];
+  const queryKey = method === "POST" && data ? [finalUrl, data] : [finalUrl];
 
   return useQuery<T>({
     queryKey,
     queryFn: async () => {
       try {
-        const apiUrl = debouncedUrl.startsWith("/api")
-          ? debouncedUrl
-          : `/api${debouncedUrl}`;
+        const apiUrl = finalUrl.startsWith("/api")
+          ? finalUrl
+          : `/api${finalUrl}`;
 
         const { data: responseData } = await instance.request<T>({
           method,
@@ -87,17 +80,14 @@ export function usePublicQuery<T>({
       } catch (error) {
         if (process.env.NODE_ENV === "development") {
           console.error("React Query Error:", {
-            url: debouncedUrl,
+            url: finalUrl,
             error,
           });
         }
         throw error;
       }
     },
-    enabled:
-      enabled &&
-      (!debounceTime || debouncedUrl === finalUrl) &&
-      (!requiresGuestId || !isLoadingGuestId),
+    enabled: enabled && (!requiresGuestId || !isLoadingGuestId),
     retry: (failureCount, error) => {
       // Don't retry on client errors
       if (error && typeof error === "object" && "status" in error) {

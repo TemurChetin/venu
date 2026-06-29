@@ -1,46 +1,73 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getGuestIdFromStorage } from "@/lib/storage/guest-id";
-import { fetchGuestId } from "./guest-id-manager";
 
 /**
- * Hook to manage guest ID state
- * - Checks localStorage first for immediate availability
- * - Fetches from API if not available
- * - Prevents multiple simultaneous fetches
+ * Guest ID hook
+ * - Avval cookie'dan o'qiydi (proxy SSR'da o'rnatadi) — sinxron, kutishsiz.
+ * - Cookie yo'q bo'lsa (proxy fetch'i yiqilgan bo'lsa) — client fallback:
+ *   backend'dan olib, COOKIE'ga yozadi (localStorage emas), shunda keyingi
+ *   tashrif/navigatsiyada SSR prefetch ishlaydi.
  */
-export function useGuestId() {
-  const [guestId, setGuestId] = useState<number | null>(() => {
-    if (typeof window !== "undefined") {
-      return getGuestIdFromStorage();
-    }
-    return null;
-  });
 
-  const [isLoading, setIsLoading] = useState(() => {
-    if (typeof window !== "undefined") {
-      return !getGuestIdFromStorage();
-    }
-    return true;
-  });
+const GUEST_ID_COOKIE = "venu_guest_id";
+
+function readCookie(name: string): number | null {
+  if (typeof document === "undefined") return null;
+  const m = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
+  return m ? Number(m[2]) : null;
+}
+
+function writeCookie(name: string, value: number) {
+  if (typeof document === "undefined") return;
+  document.cookie = `${name}=${value}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
+}
+
+function getLang(): string {
+  if (typeof window === "undefined") return "uz";
+  return window.location.pathname.startsWith("/ru") ? "ru" : "uz";
+}
+
+// Bir nechta hook bir vaqtda fetch qilmasligi uchun singleton promise
+let guestIdPromise: Promise<number | null> | null = null;
+
+function fetchGuestId(): Promise<number | null> {
+  if (guestIdPromise) return guestIdPromise;
+
+  guestIdPromise = fetch(`${process.env.NEXT_PUBLIC_API}/api/v1/get-guest-id`, {
+    headers: { lang: getLang() },
+  })
+    .then((r) => r.json())
+    .then((d) => (d?.guest_id ? Number(d.guest_id) : null))
+    .catch(() => null)
+    .finally(() => {
+      guestIdPromise = null;
+    });
+
+  return guestIdPromise;
+}
+
+export function useGuestId() {
+  const [guestID, setGuestID] = useState<number | null>(() =>
+    readCookie(GUEST_ID_COOKIE),
+  );
 
   useEffect(() => {
-    // If guest ID is already available, no need to fetch
-    if (guestId || typeof window === "undefined") {
-      return;
-    }
+    if (guestID) return;
 
-    // Fetch guest ID
-    fetchGuestId()
-      .then((newGuestId) => {
-        setGuestId(newGuestId);
-        setIsLoading(false);
-      })
-      .catch(() => {
-        setIsLoading(false);
-      });
-  }, [guestId]);
+    // Cookie yo'q — proxy fetch'i yiqilgan bo'lishi mumkin. Client fallback.
+    let active = true;
+    fetchGuestId().then((id) => {
+      if (active && id) {
+        writeCookie(GUEST_ID_COOKIE, id);
+        setGuestID(id);
+      }
+    });
 
-  return { guestId, isLoading };
+    return () => {
+      active = false;
+    };
+  }, [guestID]);
+
+  return { guestID, isLoading: false };
 }

@@ -87,16 +87,16 @@ function getApiErrorMessage(error: unknown, fallback: string) {
  * Hook to get cart with guest_id support (for checkout)
  */
 export function useCartForCheckout() {
-  const { guestId, isLoading: isLoadingGuestId } = useGuestId();
+  const { guestID, isLoading: isLoadingGuestId } = useGuestId();
 
   return useQuery<CartResponse>({
-    queryKey: ["/api/v1/cart", guestId],
+    queryKey: ["/api/v1/cart", guestID],
     queryFn: async () => {
-      const url = `/api/v1/cart${queryGenerator({ guest_id: guestId! })}`;
+      const url = `/api/v1/cart${queryGenerator({ guest_id: guestID! })}`;
       const { data } = await instance.get<CartResponse>(url);
       return data;
     },
-    enabled: !!guestId && !isLoadingGuestId,
+    enabled: !!guestID && !isLoadingGuestId,
     retry: false,
   });
 }
@@ -107,22 +107,22 @@ export function useCartForCheckout() {
  */
 export function useAddresses() {
   const { data: session } = useSession();
-  const { guestId, isLoading: isLoadingGuestId } = useGuestId();
+  const { guestID, isLoading: isLoadingGuestId } = useGuestId();
 
   return useQuery<AddressesResponse>({
-    queryKey: ["/v1/customer/address/list", guestId, session?.user?.id],
+    queryKey: ["/v1/customer/address/list", guestID, session?.user?.id],
     queryFn: async () => {
       // Build URL with guest_id query parameter
       let url = "/v1/customer/address/list";
-      if (guestId) {
-        url += queryGenerator({ guest_id: guestId });
+      if (guestID) {
+        url += queryGenerator({ guest_id: guestID });
       }
 
       // instanceAuth automatically adds Authorization header from session
       const { data } = await instanceAuth.get<AddressesResponse>(url);
       return data;
     },
-    enabled: (!isLoadingGuestId && !!guestId) || !!session, // Enable if guest_id is loaded or user is authenticated
+    enabled: (!isLoadingGuestId && !!guestID) || !!session, // Enable if guest_id is loaded or user is authenticated
     retry: false,
   });
 }

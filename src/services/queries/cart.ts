@@ -45,17 +45,17 @@ function withGuestId(path: string, guestId: number | null): string {
  * Hook to get the cart (works for both guests and authenticated users)
  */
 export function useCart() {
-  const { guestId, isLoading: isLoadingGuestId } = useGuestId();
+  const { guestID, isLoading: isLoadingGuestId } = useGuestId();
 
   return useQuery<CartResponse>({
-    queryKey: ["/v1/cart", guestId],
+    queryKey: ["/v1/cart", guestID],
     queryFn: async () => {
       const { data } = await instanceAuth.get<CartResponse>(
-        withGuestId("/v1/cart", guestId)
+        withGuestId("/v1/cart", guestID)
       );
       return data;
     },
-    enabled: !!guestId && !isLoadingGuestId,
+    enabled: !!guestID && !isLoadingGuestId,
     retry: false,
   });
 }
@@ -65,7 +65,7 @@ export function useCart() {
  */
 export function useAddToCart() {
   const queryClient = useQueryClient();
-  const { guestId } = useGuestId();
+  const { guestID } = useGuestId();
 
   return useMutation<SuccessResponse, Error, AddToCartMutationVariables>({
     mutationFn: async (payload: AddToCartMutationVariables) => {
@@ -76,7 +76,7 @@ export function useAddToCart() {
         color: payload.color,
       };
       const { data } = await instanceAuth.post<SuccessResponse>(
-        withGuestId("/v1/cart/add", guestId),
+        withGuestId("/v1/cart/add", guestID),
         cartPayload
       );
       return data;
@@ -102,12 +102,12 @@ export function useAddToCart() {
  */
 export function useRemoveFromCart() {
   const queryClient = useQueryClient();
-  const { guestId } = useGuestId();
+  const { guestID } = useGuestId();
 
   return useMutation<SuccessResponse, Error, RemoveFromCartRequest>({
     mutationFn: async (payload: RemoveFromCartRequest) => {
       const { data } = await instanceAuth.delete<SuccessResponse>(
-        withGuestId("/v1/cart/remove", guestId),
+        withGuestId("/v1/cart/remove", guestID),
         { data: payload }
       );
       return data;
@@ -130,12 +130,12 @@ export function useRemoveFromCart() {
  */
 export function useUpdateCart() {
   const queryClient = useQueryClient();
-  const { guestId } = useGuestId();
+  const { guestID } = useGuestId();
 
   return useMutation<SuccessResponse, Error, UpdateCartRequest>({
     mutationFn: async (payload: UpdateCartRequest) => {
       const { data } = await instanceAuth.put<SuccessResponse>(
-        withGuestId("/v1/cart/update", guestId),
+        withGuestId("/v1/cart/update", guestID),
         payload
       );
       return data;
@@ -158,12 +158,12 @@ export function useUpdateCart() {
  */
 export function useSelectCartItems() {
   const queryClient = useQueryClient();
-  const { guestId } = useGuestId();
+  const { guestID } = useGuestId();
 
   return useMutation<SuccessResponse, Error, SelectCartItemsRequest>({
     mutationFn: async (payload: SelectCartItemsRequest) => {
       const { data } = await instanceAuth.post<SuccessResponse>(
-        withGuestId("/v1/cart/select-cart-items", guestId),
+        withGuestId("/v1/cart/select-cart-items", guestID),
         payload
       );
       return data;

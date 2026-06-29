@@ -33,7 +33,7 @@ export function PhoneAuthModal({
   onSuccess,
 }: PhoneAuthModalProps) {
   const t = useTranslations();
-  const { guestId } = useGuestId();
+  const { guestID } = useGuestId();
   const queryClient = useQueryClient();
   const [phone, setPhone] = useState("+998");
   const [otpCode, setOtpCode] = useState("");
@@ -193,7 +193,7 @@ export function PhoneAuthModal({
       const response = await verifyOtp({
         phone: phone,
         token: otpCode,
-        guest_id: guestId, // backend merges the guest cart into this user
+        guest_id: guestID, // backend merges the guest cart into this user
       });
 
       if (response.token && response.status) {

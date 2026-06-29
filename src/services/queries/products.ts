@@ -194,22 +194,8 @@ export interface ProductFilterParams {
 
 export const useProductFilter = (params: ProductFilterParams) => {
   const { isLoading: isLoadingGuestId } = useGuestId();
+  const isCategory = !!(params.category && params.category > 0);
 
-  // Stop here
-
-  // If category is selected, use category-specific endpoint
-  if (params.category && params.category > 0) {
-    return usePublicQuery<ProductListResponse>({
-      url: `/v1/categories/products/${params.category}`,
-      query: {
-        limit: params.limit || "20",
-        offset: params.offset || 0,
-      },
-      enabled: !isLoadingGuestId,
-    });
-  }
-
-  // Build filter payload according to ProductFilterParams interface
   const filterPayload: ProductFilterParams = {
     search: params.search || "",
     category: params.category || ("[]" as any),
@@ -224,12 +210,20 @@ export const useProductFilter = (params: ProductFilterParams) => {
     product_type: params.product_type || "all",
   };
 
-  return usePublicQuery<ProductListResponse>({
-    url: "/v1/products/filter",
-    enabled: !isLoadingGuestId,
-    method: "POST",
-    data: filterPayload,
-  });
+  return usePublicQuery<ProductListResponse>(
+    isCategory
+      ? {
+          url: `/v1/categories/products/${params.category}`,
+          query: { limit: params.limit || "20", offset: params.offset || 0 },
+          enabled: !isLoadingGuestId,
+        }
+      : {
+          url: "/v1/products/filter",
+          method: "POST",
+          data: filterPayload,
+          enabled: !isLoadingGuestId,
+        },
+  );
 };
 
 // Product Suggestion (for search autocomplete)
