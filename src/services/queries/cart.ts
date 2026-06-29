@@ -19,6 +19,26 @@ interface SuccessResponse {
   data?: unknown;
 }
 
+/**
+ * `/v1/cart/add` javobi — qo'shilgan item id'sini va is_checked holatini qaytaradi,
+ * shuning uchun savatni qayta tortib item qidirish shart emas.
+ */
+interface AddToCartResponse {
+  status?: number;
+  message: string;
+  in_cart_key?: number;
+  product_variant_type?: string;
+  cart?: {
+    id: number;
+    is_checked: number;
+    product_id: number;
+    variant: string;
+    color: string | null;
+    quantity: number;
+    [key: string]: unknown;
+  };
+}
+
 interface AddToCartConversionData {
   value: number;
   currency?: string;
@@ -51,7 +71,7 @@ export function useCart() {
     queryKey: ["/v1/cart", guestID],
     queryFn: async () => {
       const { data } = await instanceAuth.get<CartResponse>(
-        withGuestId("/v1/cart", guestID)
+        withGuestId("/v1/cart", guestID),
       );
       return data;
     },
@@ -67,7 +87,7 @@ export function useAddToCart() {
   const queryClient = useQueryClient();
   const { guestID } = useGuestId();
 
-  return useMutation<SuccessResponse, Error, AddToCartMutationVariables>({
+  return useMutation<AddToCartResponse, Error, AddToCartMutationVariables>({
     mutationFn: async (payload: AddToCartMutationVariables) => {
       const cartPayload: AddToCartRequest = {
         id: payload.id,
@@ -75,9 +95,9 @@ export function useAddToCart() {
         variant: payload.variant,
         color: payload.color,
       };
-      const { data } = await instanceAuth.post<SuccessResponse>(
+      const { data } = await instanceAuth.post<AddToCartResponse>(
         withGuestId("/v1/cart/add", guestID),
-        cartPayload
+        cartPayload,
       );
       return data;
     },
@@ -108,7 +128,7 @@ export function useRemoveFromCart() {
     mutationFn: async (payload: RemoveFromCartRequest) => {
       const { data } = await instanceAuth.delete<SuccessResponse>(
         withGuestId("/v1/cart/remove", guestID),
-        { data: payload }
+        { data: payload },
       );
       return data;
     },
@@ -136,7 +156,7 @@ export function useUpdateCart() {
     mutationFn: async (payload: UpdateCartRequest) => {
       const { data } = await instanceAuth.put<SuccessResponse>(
         withGuestId("/v1/cart/update", guestID),
-        payload
+        payload,
       );
       return data;
     },
@@ -164,7 +184,7 @@ export function useSelectCartItems() {
     mutationFn: async (payload: SelectCartItemsRequest) => {
       const { data } = await instanceAuth.post<SuccessResponse>(
         withGuestId("/v1/cart/select-cart-items", guestID),
-        payload
+        payload,
       );
       return data;
     },

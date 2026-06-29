@@ -1,25 +1,17 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import dynamic from "next/dynamic";
+import { useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useSession } from "next-auth/react";
-import { useRouter } from "@/i18n/routing";
 import { Card, CardContent } from "@/components/ui/card";
 import ProductGallery from "@/features/detail/product-galler";
-import { SellerInfo } from "@/features/detail/seller-info";
-import { ProductReviews } from "@/features/detail/product-reviews";
-import { RelatedProducts } from "@/features/detail/related-products";
 import {
   useProductDetail,
   useProductReviews,
   useRelatedProducts,
 } from "@/services/queries/products";
-import { useAddToCart, useCart, useSelectCartItems } from "@/services/queries";
-import { instanceAuth } from "@/services/api";
-import { useGuestId } from "@/services/guest-id";
-import { queryGenerator } from "@/lib/query-generator";
-import { useQueryClient } from "@tanstack/react-query";
+import { useAddToCart } from "@/services/queries";
 import {
   useProductSelection,
   useProductPrice,
@@ -35,35 +27,41 @@ import {
   ProductStats,
   ProductActionButtons,
   ProductBreadcrumb,
-  ProductDescription,
   ProductDeliveryBanner,
-  ProductStructuredData,
   ProductGuarantees,
 } from "@/features/detail/components";
 import { Share2 } from "lucide-react";
 import { MountLoadSkleton } from "@/features/detail/skletonProduct";
 import { LazySection } from "@/components/common/lazy";
 import { HomeSkleton } from "@/components/common/homeSkleton";
+import { useOneClickBuy } from "./hooks/use-one-click-buy";
+
+// Below-the-fold qismlar — alohida chunk'ga bo'linadi (boshlang'ich JS kichrayadi)
+const ProductDescription = dynamic(() =>
+  import("@/features/detail/components/product-description").then(
+    (m) => m.ProductDescription,
+  ),
+);
+const ProductReviews = dynamic(() =>
+  import("@/features/detail/product-reviews").then((m) => m.ProductReviews),
+);
+const SellerInfo = dynamic(() =>
+  import("@/features/detail/seller-info").then((m) => m.SellerInfo),
+);
+const RelatedProducts = dynamic(() =>
+  import("@/features/detail/related-products").then((m) => m.RelatedProducts),
+);
 
 export default function DetailClient({ slug }: { slug: string }) {
   const t = useTranslations("product");
   const params = useParams();
   const lang = (params?.lang as string) || "uz";
 
-  const { data: product, isLoading: isLoadingProduct } =
-    useProductDetail(slug);
+  const { data: product, isLoading: isLoadingProduct } = useProductDetail(slug);
   const { data: reviewsData } = useProductReviews(slug);
   const { data: relatedProductsData } = useRelatedProducts(product?.id, 4);
 
-  const { data: session } = useSession();
-  const router = useRouter();
-  const queryClient = useQueryClient();
-
   const addToCart = useAddToCart();
-  const { data: cartData } = useCart();
-  const { guestID } = useGuestId();
-  const selectCartItems = useSelectCartItems();
-  const [isOneClickBuyPending, setIsOneClickBuyPending] = useState(false);
   const {
     selectedSize,
     selectedColor,
@@ -130,81 +128,8 @@ export default function DetailClient({ slug }: { slug: string }) {
     });
   };
 
-  const handleOneClickBuy = async () => {
-    // Works for guests — items go into the guest_id cart; the checkout page
-    // requires login, where the guest cart is merged into the user.
-    if (!product) return;
-
-    setIsOneClickBuyPending(true);
-
-    try {
-      // Step 1: Uncheck all cart items
-      if (cartData && cartData.length > 0) {
-        const allCheckedItemIds = cartData
-          .filter((item) => item.is_checked === 1)
-          .map((item) => item.id);
-
-        if (allCheckedItemIds.length > 0) {
-          await selectCartItems.mutateAsync({
-            ids: allCheckedItemIds,
-            action: "unchecked",
-          });
-        }
-      }
-
-      // Step 2: Add product to cart
-      const colorName = getSelectedColorName();
-      await addToCart.mutateAsync({
-        id: product.id,
-        quantity: 1,
-        variant: selectedSize || undefined,
-        color: colorName || undefined,
-      });
-
-      // Step 3: Wait for cart to refresh and find the newly added item
-      // The addToCart mutation already invalidates queries, so we fetch fresh data
-      // Use fetchQuery to get the updated cart data
-      const cartItems =
-        (await queryClient.fetchQuery({
-          queryKey: ["/v1/cart", guestID],
-          queryFn: async () => {
-            const url = guestID
-              ? `/v1/cart${queryGenerator({ guest_id: guestID })}`
-              : "/v1/cart";
-            const { data } = await instanceAuth.get<any[]>(url);
-            return data;
-          },
-        })) || [];
-
-      // Step 4: Find the newly added item that matches this product
-      const newCartItem = cartItems.find((item) => {
-        const matchesProduct = item.product_id === product.id;
-        const matchesVariant = !selectedSize || item.variant === selectedSize;
-        const matchesColor = !colorName || item.color === colorName;
-        return matchesProduct && matchesVariant && matchesColor;
-      });
-
-      // Step 5: Check the newly added item
-      if (newCartItem) {
-        await selectCartItems.mutateAsync({
-          ids: [newCartItem.id],
-          action: "checked",
-        });
-
-        // Step 6: Redirect to checkout page
-        router.push("/checkout");
-      } else {
-        // If item not found, still try to redirect (it might have been added)
-        // The checkout page will handle checking if there are any checked items
-        router.push("/checkout");
-      }
-    } catch (error) {
-      console.error("One-click buy error:", error);
-      // Error is already handled by the mutations' onError handlers
-    } finally {
-      setIsOneClickBuyPending(false);
-    }
-  };
+  const { buy: handleOneClickBuy, isPending: isOneClickBuyPending } =
+    useOneClickBuy(product, selectedSize, getSelectedColorName);
 
   // Show loading state only after mount to prevent hydration mismatch
   if (isLoadingProduct) {

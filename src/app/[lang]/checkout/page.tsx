@@ -50,14 +50,6 @@ export default function CheckoutNewPage() {
   const formatCurrency = useFormatCurrency();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
-  // Redirect to auth page if not authenticated something
-  // useEffect(() => {
-  //   if (status === "unauthenticated") {
-  //     const currentPath = window.location.pathname;
-  //     router.push(`/auth?returnUrl=${encodeURIComponent(currentPath)}`);
-  //   }
-  // }, [status, router]);
-
   // State
   const [selectedAddressId, setSelectedAddressId] = useState<number | null>(
     null,
@@ -76,7 +68,18 @@ export default function CheckoutNewPage() {
   const { config } = useConfigStore();
 
   // Queries
-  const { data: cartData, isLoading: isCartLoading } = useCart();
+  const {
+    data: cartData,
+    isLoading: isCartLoading,
+    isFetching: isCartFetching,
+    refetch: refetchCart,
+  } = useCart();
+
+  // Checkout'ga kirganda cart'ni majburan yangilaymiz (staleTime'ni chetlab).
+  // One-click'dan keyin cache eski bo'lishi mumkin — yangi holatni olamiz.
+  useEffect(() => {
+    refetchCart();
+  }, [refetchCart]);
   const { data: addresses, isLoading: isAddressesLoading } = useAddresses();
   const selectedAddress = addresses?.find((a) => a.id === selectedAddressId);
   const { data: deliveryMethods } = useDeliveryMethods(
@@ -93,13 +96,25 @@ export default function CheckoutNewPage() {
     return (cartData || []).filter((item) => item.is_checked === 1);
   }, [cartData]);
 
-  // Redirect if no checked items
+  // Redirect if no checked items — faqat mount'dan keyin cart kamida bir marta
+  // yangilanib bo'lgach. Bu effect-ordering race'ni (eski cache'da erta redirect)
+  // oldini oladi: avval fetch boshlanishini kutamiz, keyin natijaga qaraymiz.
+  const cartRefetchedRef = useRef(false);
   useEffect(() => {
-    if (!isCartLoading && cartData && cartItems.length === 0) {
+    if (isCartFetching) {
+      cartRefetchedRef.current = true;
+      return;
+    }
+    if (
+      cartRefetchedRef.current &&
+      !isCartLoading &&
+      cartData &&
+      cartItems.length === 0
+    ) {
       toast.error(t("selectItemsToCheckout"));
       router.push("/");
     }
-  }, [cartItems.length, isCartLoading, cartData, router, t]);
+  }, [cartItems.length, isCartLoading, isCartFetching, cartData, router, t]);
 
   const subtotal = useMemo(() => {
     return cartItems.reduce((sum, item) => {
@@ -316,11 +331,6 @@ export default function CheckoutNewPage() {
       console.error("Order creation error:", error);
     }
   };
-
-  // Don't render if not authenticated (will redirect)
-  // if (status === "unauthenticated") {
-  //   return null;
-  // }
 
   // Show loading skeletons while checking authentication or loading data
   const isLoading = status === "loading" || isCartLoading || isAddressesLoading;
