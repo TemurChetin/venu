@@ -72,14 +72,12 @@ export default function CheckoutNewPage() {
     data: cartData,
     isLoading: isCartLoading,
     isFetching: isCartFetching,
-    refetch: refetchCart,
   } = useCart();
 
-  // Checkout'ga kirganda cart'ni majburan yangilaymiz (staleTime'ni chetlab).
-  // One-click'dan keyin cache eski bo'lishi mumkin — yangi holatni olamiz.
-  useEffect(() => {
-    refetchCart();
-  }, [refetchCart]);
+  // Cart freshness invalidatsiya orqali ta'minlanadi: useAddToCart va
+  // useSelectCartItems mutatsiyalari ["/v1/cart"] ni invalidatsiya qiladi,
+  // shuning uchun one-click'dan keyin checkout mount'da React Query o'zi
+  // bir marta qayta tortadi. Qo'lbola refetch (dublikat so'rov) kerak emas.
   const { data: addresses, isLoading: isAddressesLoading } = useAddresses();
   const selectedAddress = addresses?.find((a) => a.id === selectedAddressId);
   const { data: deliveryMethods } = useDeliveryMethods(
@@ -96,21 +94,11 @@ export default function CheckoutNewPage() {
     return (cartData || []).filter((item) => item.is_checked === 1);
   }, [cartData]);
 
-  // Redirect if no checked items — faqat mount'dan keyin cart kamida bir marta
-  // yangilanib bo'lgach. Bu effect-ordering race'ni (eski cache'da erta redirect)
-  // oldini oladi: avval fetch boshlanishini kutamiz, keyin natijaga qaraymiz.
-  const cartRefetchedRef = useRef(false);
+  // Redirect if no checked items. Ma'lumot hali yetib kelmaganda (stale bo'lsa
+  // refetch in-flight) kutamiz — shunda eski cache'da erta redirect bo'lmaydi.
   useEffect(() => {
-    if (isCartFetching) {
-      cartRefetchedRef.current = true;
-      return;
-    }
-    if (
-      cartRefetchedRef.current &&
-      !isCartLoading &&
-      cartData &&
-      cartItems.length === 0
-    ) {
+    if (isCartLoading || isCartFetching) return;
+    if (cartData && cartItems.length === 0) {
       toast.error(t("selectItemsToCheckout"));
       router.push("/");
     }

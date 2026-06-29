@@ -4,6 +4,7 @@ import { ReactQueryProvider } from "./react-query-provider";
 import { NextIntlClientProvider } from "next-intl";
 import { SessionProvider } from "next-auth/react";
 import { ConfigLoader } from "@/components/config/config-loader";
+import { TokenSync } from "./token-sync";
 
 interface AppProviderProps {
   children: React.ReactNode;
@@ -21,6 +22,7 @@ interface AppProviderProps {
 export function AppProvider({ children, locale, messages }: AppProviderProps) {
   return (
     <SessionProvider>
+      <TokenSync />
       <ReactQueryProvider>
         <NextIntlClientProvider
           timeZone="Asia/Tashkent"
@@ -28,6 +30,7 @@ export function AppProvider({ children, locale, messages }: AppProviderProps) {
           messages={messages}
         >
           <ConfigLoader />
+          
           {children}
         </NextIntlClientProvider>
       </ReactQueryProvider>

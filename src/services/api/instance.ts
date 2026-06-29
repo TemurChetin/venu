@@ -60,7 +60,7 @@ instance.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 /**
@@ -75,26 +75,32 @@ export const instanceAuth: AxiosInstance = axios.create({
  * Request Interceptor for Authenticated Instance
  * Automatically adds Authorization header with access token and lang header
  */
+import {
+  getCachedToken,
+  isSessionResolved,
+  setAccessToken,
+} from "./token-store";
+
 instanceAuth.interceptors.request.use(
   async (config) => {
-    const session = await getSession();
+    let token = getCachedToken();
 
-    // Extract access token from session
-    const accessToken = (session as any)?.accessToken;
-
-    if (accessToken) {
-      config.headers["Authorization"] = `Bearer ${accessToken}`;
+    // Cold-start fallback: TokenSync hali ulgurmagan bo'lsa, BIR marta
+    // getSession qilamiz va keshlaymiz. Keyingi barcha so'rovlar sinxron o'qiydi.
+    if (!token && !isSessionResolved()) {
+      const session = await getSession();
+      token = (session as any)?.accessToken ?? null;
+      setAccessToken(token);
     }
 
-    // Add lang header
-    const locale = getCurrentLocale();
-    config.headers["lang"] = locale;
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
+    }
 
+    config.headers["lang"] = getCurrentLocale();
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error),
 );
 
 /**
@@ -127,5 +133,5 @@ instanceAuth.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
