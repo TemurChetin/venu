@@ -1,329 +1,112 @@
 "use client";
-import { useState, useEffect, useMemo, useRef } from "react";
+
+import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
-import { useRouter } from "@/i18n/routing";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-  User,
-  Truck,
-  CreditCard,
-  Check,
-  Loader2,
-  Plus,
-  ShoppingCart,
-} from "lucide-react";
-import { AddAddressModal } from "@/features/checkout/add-address-modal";
-import { useFormatCurrency, formatUZS } from "@/lib/format-currency";
-import {
-  useAddresses,
-  useDeliveryMethods,
-  useChooseShippingMethod,
-  useCalculateDelivery,
-  useCreateOrder,
-} from "@/services/queries/checkout";
 import { useGuestId } from "@/services/guest-id";
-import { toast } from "react-hot-toast";
-import { useCart } from "@/services";
+import { useAddresses, useDeliveryMethods } from "@/services/queries/checkout";
 import { useConfigStore } from "@/stores";
-import Image from "next/image";
+import { AddAddressModal } from "@/features/checkout/add-address-modal";
 import { PhoneAuthModal } from "@/components/auth";
 import { EmptyCheckout, LoadCheckout } from "@/features/checkout/load-empty";
-
-function createFallbackTransactionId(guestId: string | number) {
-  if (window.crypto?.randomUUID) {
-    return window.crypto.randomUUID();
-  }
-
-  return `checkout-${guestId}-${Date.now()}-${Math.random()
-    .toString(36)
-    .slice(2)}`;
-}
+import {
+  AddressSelection,
+  DeliveryMethodSelection,
+  PaymentMethodSelection,
+  OrderSummary,
+} from "@/features/checkout/components";
+import {
+  useCheckoutCart,
+  useCheckoutAddress,
+  useCheckoutPricing,
+  useCheckoutDelivery,
+  useCheckoutSelectionRestore,
+  useCheckoutSubmit,
+} from "@/features/checkout/hooks";
+import type { PaymentMethod } from "@/features/checkout/types/checkout.types";
 
 export default function CheckoutNewPage() {
   const t = useTranslations("checkout");
-  const router = useRouter();
   const { data: session, status } = useSession();
   const { guestID } = useGuestId();
-  const formatCurrency = useFormatCurrency();
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-
-  // State
-  const [selectedAddressId, setSelectedAddressId] = useState<number | null>(
-    null,
-  );
-  const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState<
-    "yandex" | "bts" | "free" | null
-  >(null);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
-    "click" | "payme"
-  >("click");
-  const [couponCode, setCouponCode] = useState("");
-  const [orderNote, setOrderNote] = useState("");
-  const [isAddAddressModalOpen, setIsAddAddressModalOpen] = useState(false);
-  const [deliveryCost, setDeliveryCost] = useState<number | null>(null);
-
   const { config } = useConfigStore();
 
-  // Queries
-  const {
-    data: cartData,
-    isLoading: isCartLoading,
-    isFetching: isCartFetching,
-  } = useCart();
+  // Page-level UI state
+  const [selectedPaymentMethod, setSelectedPaymentMethod] =
+    useState<PaymentMethod>("click");
+  const [couponCode] = useState("");
+  const [orderNote] = useState("");
+  const [isAddAddressModalOpen, setIsAddAddressModalOpen] = useState(false);
 
-  // Cart freshness invalidatsiya orqali ta'minlanadi: useAddToCart va
-  // useSelectCartItems mutatsiyalari ["/v1/cart"] ni invalidatsiya qiladi,
-  // shuning uchun one-click'dan keyin checkout mount'da React Query o'zi
-  // bir marta qayta tortadi. Qo'lbola refetch (dublikat so'rov) kerak emas.
+  // Data + domen hook'lari
+  const { cartData, cartItems, isCartLoading, isCartFetching, cartDataUpdatedAt } =
+    useCheckoutCart();
+
   const { data: addresses, isLoading: isAddressesLoading } = useAddresses();
-  const selectedAddress = addresses?.find((a) => a.id === selectedAddressId);
+  const { selectedAddressId, setSelectedAddressId, selectedAddress } =
+    useCheckoutAddress(addresses);
+
   const { data: deliveryMethods } = useDeliveryMethods(
     selectedAddress?.region_id || null,
   );
 
-  // Mutations
-  const chooseShippingMethod = useChooseShippingMethod();
-  const calculateDelivery = useCalculateDelivery();
-  const createOrder = useCreateOrder();
+  const { subtotal, totalDiscount, isFreeDeliveryEligible, howMuchToAdd } =
+    useCheckoutPricing(cartItems, config);
 
-  // Filter only checked items for checkout
-  const cartItems = useMemo(() => {
-    return (cartData || []).filter((item) => item.is_checked === 1);
-  }, [cartData]);
-
-  // Redirect if no checked items. Ma'lumot hali yetib kelmaganda (stale bo'lsa
-  // refetch in-flight) kutamiz — shunda eski cache'da erta redirect bo'lmaydi.
-  useEffect(() => {
-    if (isCartLoading || isCartFetching) return;
-    if (cartData && cartItems.length === 0) {
-      toast.error(t("selectItemsToCheckout"));
-      router.push("/");
-    }
-  }, [cartItems.length, isCartLoading, isCartFetching, cartData, router, t]);
-
-  const subtotal = useMemo(() => {
-    return cartItems.reduce((sum, item) => {
-      const price = item.price || 0;
-      const quantity = item.quantity || 0;
-      return sum + price * quantity;
-    }, 0);
-  }, [cartItems]);
-
-  // Calculate total discount
-  const totalDiscount = useMemo(() => {
-    return cartItems.reduce((sum, item) => {
-      const product = item.product_full_info || item.product;
-      if (!product) return sum;
-
-      const originalPrice = product.unit_price || item.price || 0;
-      const discount = product.discount || 0;
-      const discountType = product.discount_type || "";
-
-      // Calculate discount amount for this item
-      const discountAmount =
-        discount > 0
-          ? discountType === "percentage" || discountType === "percent"
-            ? (originalPrice * discount) / 100
-            : discount
-          : 0;
-
-      const quantity = item.quantity || 0;
-      return sum + discountAmount * quantity;
-    }, 0);
-  }, [cartItems]);
-
-  const isFreeDeliveryEligible =
-    subtotal * (config?.uzsCurrency?.exchange_rate || 0) >= 1000000;
-  const howMuchToAdd =
-    1000000 - subtotal * (config?.uzsCurrency?.exchange_rate || 0);
-
-  const finalDeliveryCost =
-    selectedDeliveryMethod === "free" || isFreeDeliveryEligible
-      ? 0
-      : deliveryCost || 0;
-
-  const conversionValue = useMemo(() => {
-    const exchangeRate = config?.uzsCurrency?.exchange_rate || 12700;
-    const deliveryValueUsd =
-      finalDeliveryCost > 0 ? finalDeliveryCost / exchangeRate : 0;
-
-    return subtotal + deliveryValueUsd;
-  }, [config?.uzsCurrency?.exchange_rate, finalDeliveryCost, subtotal]);
-
-  // Auto-select first address
-  useEffect(() => {
-    if (addresses && addresses.length > 0 && !selectedAddressId) {
-      setSelectedAddressId(addresses[0].id);
-    }
-  }, [addresses, selectedAddressId]);
-
-  // Auto-select delivery method when address changes
-  useEffect(() => {
-    if (selectedAddress && deliveryMethods && deliveryMethods.length > 0) {
-      // Prefer the address's delivery method, or use the first available
-      const preferredMethod = selectedAddress.delivery_method;
-      const methodExists = deliveryMethods.some(
-        (m) => m.code === preferredMethod,
-      );
-      if (methodExists) {
-        setSelectedDeliveryMethod(preferredMethod as "yandex" | "bts" | "free");
-      } else {
-        setSelectedDeliveryMethod(
-          deliveryMethods[0].code as "yandex" | "bts" | "free",
-        );
-      }
-    }
-  }, [selectedAddress, deliveryMethods]);
-
-  // Track previous values to prevent unnecessary recalculations
-  const prevCalcParamsRef = useRef<{
-    addressId?: number;
-    deliveryMethod?: string | null;
-    isFreeEligible?: boolean;
-  }>({});
-
-  // Calculate delivery cost when address and delivery method are selected
-  useEffect(() => {
-    const addressId = selectedAddress?.id;
-    const deliveryMethod = selectedDeliveryMethod;
-    const isFreeEligible = isFreeDeliveryEligible;
-
-    // Skip if values haven't changed
-    const prev = prevCalcParamsRef.current;
-    if (
-      prev.addressId === addressId &&
-      prev.deliveryMethod === deliveryMethod &&
-      prev.isFreeEligible === isFreeEligible
-    ) {
-      return;
-    }
-
-    // Update ref
-    prevCalcParamsRef.current = {
-      addressId,
-      deliveryMethod,
-      isFreeEligible,
-    };
-
-    if (
-      selectedAddress &&
-      deliveryMethod &&
-      deliveryMethod !== "free" &&
-      !isFreeEligible
-    ) {
-      const customerId = session?.user?.id
-        ? parseInt(session.user.id, 10)
-        : null;
-
-      if (customerId) {
-        calculateDelivery.mutate(
-          {
-            delivery_method: deliveryMethod,
-            customer_id: customerId,
-            long: parseFloat(selectedAddress.longitude),
-            lat: parseFloat(selectedAddress.latitude),
-            district: selectedAddress.district_id.toString(),
-          },
-          {
-            onSuccess: (data) => {
-              setDeliveryCost(data.price);
-            },
-            onError: () => {
-              setDeliveryCost(null);
-            },
-          },
-        );
-      }
-    } else if (deliveryMethod === "free" || isFreeEligible) {
-      setDeliveryCost(0);
-    }
-  }, [
-    selectedAddress?.id,
-    selectedAddress?.longitude,
-    selectedAddress?.latitude,
-    selectedAddress?.district_id,
+  const {
     selectedDeliveryMethod,
+    deliveryCost,
+    handleDeliveryMethodChange,
+  } = useCheckoutDelivery({
+    selectedAddress,
+    deliveryMethods,
     isFreeDeliveryEligible,
-    session?.user?.id,
-  ]);
+    sessionUserId: session?.user?.id,
+  });
 
-  // Handle shipping method selection
-  const handleDeliveryMethodChange = (value: string) => {
-    setSelectedDeliveryMethod(value as "yandex" | "bts" | "free");
-    if (value !== "free" && !isFreeDeliveryEligible) {
-      // Reset delivery cost to recalculate
-      setDeliveryCost(null);
-    }
-  };
+  const { isAuthModalOpen, setIsAuthModalOpen, openAuthModal } =
+    useCheckoutSelectionRestore({
+      status,
+      cartData,
+      cartItems,
+      cartDataUpdatedAt,
+      isCartLoading,
+      isCartFetching,
+    });
 
-  // Handle order submission
-  const handleSubmit = async () => {
+  const { handleSubmit, isSubmitting } = useCheckoutSubmit({
+    guestID,
+    selectedAddressId,
+    selectedDeliveryMethod,
+    selectedPaymentMethod,
+    orderNote,
+    couponCode,
+    subtotal,
+    deliveryCost,
+    isFreeDeliveryEligible,
+    exchangeRate: config?.uzsCurrency?.exchange_rate,
+    openAuthModal,
+  });
+
+  const handlePaymentChange = (value: PaymentMethod) => {
+    setSelectedPaymentMethod(value);
     if (!session) {
-      setIsAuthModalOpen(true);
-      return;
-    }
-
-    if (!selectedAddressId || !selectedDeliveryMethod || !guestID) {
-      toast.error(t("fillAllFields"));
-      return;
-    }
-
-    const customerId = session?.user?.id || null;
-    const isGuest = !customerId;
-
-    try {
-      // Note: Shipping method choose step might be optional or needs proper ID
-      // Skipping for now as the ID mapping is unclear from the API docs
-      // If needed, we can add it later with proper shipping method ID mapping
-
-      // Choose shipping method before creating order
-      await chooseShippingMethod.mutateAsync({
-        id: 2, // Shipping method ID (from API documentation)
-        guest_id: guestID.toString(),
-        cart_group_id: "all_cart_group",
-      });
-
-      // Create order
-      const orderData = {
-        order_note: orderNote || "",
-        customer_id: customerId?.toString() || "",
-        address_id: selectedAddressId.toString(),
-        billing_address_id: selectedAddressId.toString(),
-        coupon_code: couponCode || "",
-        coupon_discount: "0",
-        payment_platform: "app",
-        payment_method: selectedPaymentMethod,
-        callback: null,
-        payment_request_from: "app",
-        guest_id: guestID.toString(),
-        is_guest: isGuest,
-        is_check_create_account: "0",
-        password: "",
-        delivery_method: selectedDeliveryMethod,
-      };
-
-      await createOrder.mutateAsync({
-        order: orderData,
-        conversion: {
-          value: conversionValue,
-          currency: "USD",
-          transactionId: createFallbackTransactionId(guestID),
-        },
-      });
-      // Redirect will happen in the mutation's onSuccess
-    } catch (error) {
-      // Error is handled by mutations
-      console.error("Order creation error:", error);
+      openAuthModal();
     }
   };
+
+  const submitDisabled =
+    !selectedAddressId ||
+    !selectedDeliveryMethod ||
+    isSubmitting ||
+    (deliveryCost === null &&
+      selectedDeliveryMethod !== "free" &&
+      !isFreeDeliveryEligible);
 
   // Show loading skeletons while checking authentication or loading data
-  const isLoading = status === "loading" || isCartLoading || isAddressesLoading;
+  const isLoading =
+    status === "loading" || isCartLoading || isAddressesLoading;
 
-  // Loading skeleton component
   if (isLoading) {
     return <LoadCheckout />;
   }
@@ -340,374 +123,48 @@ export default function CheckoutNewPage() {
         {/* Left Side - Form */}
         <div className="col-span-12 lg:col-span-8">
           <div className="space-y-6">
-            {/* Address Selection */}
-            <div className="rounded-2xl bg-white p-6 shadow-sm">
-              <div className="mb-6 flex items-center justify-between">
-                <h2 className="flex items-center gap-2 text-xl font-semibold">
-                  <User className="h-5 w-5 text-primary" />
-                  {t("deliveryAddress")}
-                </h2>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsAddAddressModalOpen(true)}
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  {t("addNewAddress")}
-                </Button>
-              </div>
+            <AddressSelection
+              addresses={addresses}
+              selectedAddressId={selectedAddressId}
+              onSelect={setSelectedAddressId}
+              onAddNew={() => setIsAddAddressModalOpen(true)}
+            />
 
-              {addresses && addresses.length > 0 ? (
-                <RadioGroup
-                  value={selectedAddressId?.toString() || ""}
-                  onValueChange={(value) =>
-                    setSelectedAddressId(parseInt(value, 10))
-                  }
-                  className="space-y-3"
-                >
-                  {addresses.map((address) => (
-                    <div
-                      key={address.id}
-                      className="flex items-center justify-between rounded-lg border border-border p-4 transition-all hover:border-primary has-[:checked]:border-primary has-[:checked]:bg-primary/5"
-                    >
-                      <div className="flex items-center space-x-3 flex-1">
-                        <RadioGroupItem
-                          value={address.id.toString()}
-                          id={`address-${address.id}`}
-                        />
-                        <Label
-                          htmlFor={`address-${address.id}`}
-                          className="flex flex-col items-start cursor-pointer font-normal flex-1"
-                        >
-                          <div className="font-semibold">
-                            {address.contact_person_name}
-                          </div>
-                          <div className="text-sm text-muted-foreground">
-                            {address.address}
-                          </div>
-                          <div className="text-xs text-muted-foreground mt-1">
-                            {address.phone} • {address.address_type}
-                          </div>
-                        </Label>
-                      </div>
-                    </div>
-                  ))}
-                </RadioGroup>
-              ) : (
-                <div className="rounded-lg border border-dashed border-border p-8 text-center">
-                  <p className="text-muted-foreground mb-4">
-                    {t("noAddresses")}
-                  </p>
-                  <Button onClick={() => setIsAddAddressModalOpen(true)}>
-                    {t("addAddress")}
-                  </Button>
-                </div>
-              )}
-            </div>
-
-            {/* Delivery Method */}
             {selectedAddress && deliveryMethods && (
-              <div className="rounded-2xl bg-white p-6 shadow-sm">
-                <h2 className="mb-6 flex items-center gap-2 text-xl font-semibold">
-                  <Truck className="h-5 w-5 text-primary" />
-                  {t("deliveryMethod")}
-                </h2>
-
-                <RadioGroup
-                  value={selectedDeliveryMethod || ""}
-                  onValueChange={handleDeliveryMethodChange}
-                  className="space-y-3"
-                >
-                  {deliveryMethods.map((method) => {
-                    const isFree = method.code === "free";
-                    const isDisabled = isFree && !isFreeDeliveryEligible;
-                    const cost =
-                      isFree || isFreeDeliveryEligible
-                        ? 0
-                        : method.code === selectedDeliveryMethod &&
-                            deliveryCost !== null
-                          ? deliveryCost
-                          : null;
-
-                    return (
-                      <div
-                        key={method.code}
-                        className={`flex items-center justify-between rounded-lg border border-border p-4 transition-all hover:border-primary has-[:checked]:border-primary has-[:checked]:bg-primary/5 ${
-                          isDisabled ? "opacity-50" : ""
-                        }`}
-                      >
-                        <div className="flex items-center space-x-3 flex-1">
-                          <RadioGroupItem
-                            value={method.code}
-                            id={method.code}
-                            disabled={isDisabled}
-                          />
-                          <Label
-                            htmlFor={method.code}
-                            className={`cursor-pointer font-normal flex-1 ${
-                              isDisabled ? "cursor-not-allowed" : ""
-                            }`}
-                          >
-                            <div className="font-semibold">{method.title}</div>
-                            {isFree && (
-                              <div className="text-sm text-muted-foreground">
-                                {isFreeDeliveryEligible
-                                  ? t("freeDeliveryEligible")
-                                  : t("freeDeliveryOnly")}
-                              </div>
-                            )}
-                          </Label>
-                        </div>
-                        <span className="font-semibold">
-                          {cost === null ? null : cost === 0 ? (
-                            <span className="text-green-600">{t("free")}</span>
-                          ) : (
-                            formatUZS(cost)
-                          )}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </RadioGroup>
-              </div>
+              <DeliveryMethodSelection
+                deliveryMethods={deliveryMethods}
+                selectedDeliveryMethod={selectedDeliveryMethod}
+                deliveryCost={deliveryCost}
+                isFreeDeliveryEligible={isFreeDeliveryEligible}
+                onChange={handleDeliveryMethodChange}
+              />
             )}
 
-            {/* Payment Method */}
-            <div className="rounded-2xl bg-white p-6 shadow-sm">
-              <h2 className="mb-6 flex items-center gap-2 text-xl font-semibold">
-                <CreditCard className="h-5 w-5 text-primary" />
-                {t("paymentMethod")}
-              </h2>
-
-              <RadioGroup
-                value={selectedPaymentMethod}
-                onValueChange={(value) => {
-                  setSelectedPaymentMethod(value as "click" | "payme");
-                  if (!session) {
-                    setIsAuthModalOpen(true);
-                  }
-                }}
-                className="grid grid-cols-2 gap-4"
-              >
-                <Label
-                  htmlFor="payme"
-                  className="relative flex bg-[#10ACAF] items-center justify-center rounded-lg border border-border p-4 transition-all cursor-pointer"
-                >
-                  {selectedPaymentMethod === "payme" && (
-                    <div className="flex items-center justify-center absolute top-2 right-2 h-5 w-5 rounded-full bg-white">
-                      <Check className="h-3 w-3 text-[#10ACAF]" />
-                    </div>
-                  )}
-                  <RadioGroupItem
-                    value="payme"
-                    id="payme"
-                    className="sr-only"
-                  />
-                  <Image
-                    width={400}
-                    height={90}
-                    src="/payme.png"
-                    alt="Payme"
-                    className="h-8 object-contain"
-                  />
-                </Label>
-
-                <Label
-                  htmlFor="click"
-                  className="relative flex bg-blue-500 items-center justify-center rounded-lg border border-border p-4 transition-all cursor-pointer"
-                >
-                  {selectedPaymentMethod === "click" && (
-                    <div className="flex items-center justify-center absolute top-2 right-2 h-5 w-5 rounded-full bg-white">
-                      <Check className="h-3 w-3 text-blue-500" />
-                    </div>
-                  )}
-                  <RadioGroupItem
-                    value="click"
-                    id="click"
-                    className="sr-only"
-                  />
-                  <Image
-                    width={400}
-                    height={90}
-                    src="/click.png"
-                    alt="Click"
-                    className="h-8 object-contain"
-                  />
-                </Label>
-              </RadioGroup>
-            </div>
+            <PaymentMethodSelection
+              selectedPaymentMethod={selectedPaymentMethod}
+              onChange={handlePaymentChange}
+            />
           </div>
         </div>
 
         {/* Right Side - Order Summary */}
         <div className="col-span-12 lg:col-span-4">
-          <div className="sticky top-4 space-y-4">
-            <div className="rounded-2xl bg-white p-6 shadow-sm">
-              <h2 className="mb-4 text-xl font-semibold">
-                {t("orderSummary")}
-              </h2>
-
-              <div className="space-y-4 max-h-[400px] overflow-y-auto">
-                {cartItems.map((item) => {
-                  const itemName =
-                    item.name ||
-                    item.product?.name ||
-                    item.product_full_info?.name ||
-                    "Product";
-
-                  // Get thumbnail image
-                  const thumbnailUrl =
-                    item.product?.thumbnail_full_url?.path ||
-                    "/placeholder.svg";
-
-                  // Get product info for discount calculation
-                  const product = item.product_full_info || item.product;
-                  const originalPrice = product?.unit_price || item.price;
-                  const discount = product?.discount || 0;
-                  const discountType = product?.discount_type || "";
-
-                  // Calculate discount amount
-                  const discountAmount =
-                    discount > 0
-                      ? discountType === "percentage" ||
-                        discountType === "percent"
-                        ? (originalPrice * discount) / 100
-                        : discount
-                      : 0;
-
-                  const hasDiscount = discount > 0 && discountAmount > 0;
-                  const discountedPrice = hasDiscount
-                    ? originalPrice - discountAmount
-                    : item.price;
-
-                  // Discount display text
-                  const discountText = hasDiscount
-                    ? discountType === "percentage" ||
-                      discountType === "percent"
-                      ? `-${discount}%`
-                      : `-${formatCurrency(discount)}`
-                    : null;
-
-                  return (
-                    <div key={item.id} className="flex gap-3 relative">
-                      {/* Discount Badge */}
-                      {discountText && (
-                        <div className="absolute left-0 top-0 z-10 flex items-center justify-center rounded-md bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white shadow-sm">
-                          {discountText}
-                        </div>
-                      )}
-                      <Image
-                        width={700}
-                        height={700}
-                        src={thumbnailUrl}
-                        alt={itemName}
-                        className="h-20 w-20 rounded-lg object-cover"
-                      />
-                      <div className="flex-1">
-                        <h3 className="line-clamp-2 text-sm font-medium">
-                          {itemName}
-                        </h3>
-                        <div className="mt-1 space-y-0.5">
-                          {hasDiscount && (
-                            <p className="text-xs text-muted-foreground line-through">
-                              {formatCurrency(originalPrice)} x {item.quantity}
-                            </p>
-                          )}
-                          <p className="text-sm font-semibold">
-                            {formatCurrency(discountedPrice)} x {item.quantity}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className="mt-6 space-y-3 border-t pt-4 text-sm">
-                <div className="flex justify-between">
-                  <span className="flex items-center gap-1 text-muted-foreground">
-                    <ShoppingCart className="h-4 w-4" />
-                    {t("products")} ({cartItems.length})
-                  </span>
-                  <span className="font-medium">
-                    {formatCurrency(subtotal)}
-                  </span>
-                </div>
-
-                <div className="flex justify-between">
-                  <span className="flex items-center gap-1 text-muted-foreground">
-                    <Truck className="h-4 w-4" />
-                    {t("delivery")}
-                  </span>
-                  <span className="font-medium">
-                    {finalDeliveryCost === 0 ? (
-                      <span className="text-green-600">{t("free")}</span>
-                    ) : deliveryCost === null ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      formatUZS(finalDeliveryCost)
-                    )}
-                  </span>
-                </div>
-
-                {totalDiscount > 0 && (
-                  <div className="flex justify-between">
-                    <span className="flex items-center gap-1 text-muted-foreground">
-                      {t("discount")}
-                    </span>
-                    <span className="font-medium text-green-600">
-                      -{formatCurrency(totalDiscount)}
-                    </span>
-                  </div>
-                )}
-
-                {!isFreeDeliveryEligible &&
-                  config?.uzsCurrency?.exchange_rate && (
-                    <p className="rounded-lg bg-primary/10 p-3 text-xs text-primary">
-                      {t("addMoreForFreeDelivery", {
-                        amount: formatUZS(howMuchToAdd),
-                      })}
-                    </p>
-                  )}
-              </div>
-
-              <Button
-                onClick={handleSubmit}
-                disabled={
-                  !selectedAddressId ||
-                  !selectedDeliveryMethod ||
-                  createOrder.isPending ||
-                  chooseShippingMethod.isPending ||
-                  (deliveryCost === null &&
-                    selectedDeliveryMethod !== "free" &&
-                    !isFreeDeliveryEligible)
-                }
-                className="mt-6 w-full bg-primary py-6 text-base font-semibold hover:bg-primary/90"
-              >
-                {createOrder.isPending || chooseShippingMethod.isPending ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {t("creatingOrder")}
-                  </>
-                ) : (
-                  t("confirmOrder")
-                )}
-              </Button>
-
-              <p className="mt-4 text-center text-xs text-muted-foreground">
-                {t("termsAgreement")}{" "}
-                <a href="#" className="text-primary hover:underline">
-                  {t("termsLink")}
-                </a>{" "}
-                {t("termsAgreementEnd")}
-              </p>
-            </div>
-          </div>
+          <OrderSummary
+            cartItems={cartItems}
+            subtotal={subtotal}
+            totalDiscount={totalDiscount}
+            isFreeDeliveryEligible={isFreeDeliveryEligible}
+            howMuchToAdd={howMuchToAdd}
+            deliveryCost={deliveryCost}
+            selectedDeliveryMethod={selectedDeliveryMethod}
+            config={config}
+            onSubmit={handleSubmit}
+            isSubmitting={isSubmitting}
+            submitDisabled={submitDisabled}
+          />
         </div>
       </div>
 
-      {/* Add Address Modal */}
       <AddAddressModal
         isOpen={isAddAddressModalOpen}
         onClose={() => setIsAddAddressModalOpen(false)}
